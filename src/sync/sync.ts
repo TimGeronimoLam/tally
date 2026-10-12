@@ -5,6 +5,7 @@ import { recordError } from '../lib/diagnostics.ts'
 import { onLocalChange } from '../lib/localChanges.ts'
 import { uuid } from '../lib/uuid.ts'
 import { supabase } from '../lib/supabase.ts'
+import { planExerciseMerges } from './dedupe.ts'
 import {
   entryToRow,
   exerciseToRow,
@@ -78,6 +79,7 @@ async function run(userId: string): Promise<SyncResult> {
     await ensureSyncOwner(userId)
     await pullExercises()
     await pullEntries()
+    await mergeDuplicateExercises()
     await pushExercises()
     await pushEntries()
     setSyncStatus({ state: 'idle', lastSyncAt: Date.now(), error: null })
@@ -200,7 +202,6 @@ async function pullExercises(): Promise<void> {
     page++
   }
   if (newest !== since) await setMeta(META_KEYS.lastPullExercises, newest)
-  await dropDuplicateSeeds()
 }
 
 async function pullEntries(): Promise<void> {
@@ -225,25 +226,55 @@ async function pullEntries(): Promise<void> {
 }
 
 /**
- * A fresh install seeds default exercises. When an existing account is then
- * pulled in, those untouched seeds would duplicate the account's own
- * exercises. Drop a never-pushed, never-used local exercise whose name
- * matches a synced one.
+ * One live exercise per name (see dedupe.ts). After a pull the account's
+ * copy of "Pushups" may sit next to this device's own: the seed of a fresh
+ * install, the seed "Delete all data" made, or the copy re-keyed for
+ * another account. Each twin is folded into the one to keep: its entries
+ * move over, it is archived (or dropped if the server never saw it), and
+ * any challenge membership that counted it is pointed at the survivor so
+ * the leaderboard keeps counting. The server is updated first; if that
+ * fails nothing changes locally and the next sync tries again.
  */
-async function dropDuplicateSeeds(): Promise<void> {
-  await db.transaction('rw', db.exercises, db.entries, async () => {
-    const all = await db.exercises.toArray()
-    const synced = new Map(
-      all
-        .filter((e) => e.syncedAt != null && e.deletedAt == null)
-        .map((e) => [e.name.trim().toLowerCase(), e]),
-    )
-    for (const e of all) {
-      if (e.syncedAt != null) continue
-      const twin = synced.get(e.name.trim().toLowerCase())
-      if (!twin || twin.id === e.id) continue
-      const used = await db.entries.where('exerciseId').equals(e.id).count()
-      if (used === 0) await db.exercises.delete(e.id)
+async function mergeDuplicateExercises(): Promise<void> {
+  const merges = planExerciseMerges(await db.exercises.toArray())
+  if (merges.length === 0) return
+  for (const { survivor, losers } of merges) {
+    const { error } = await supabase!
+      .from('challenge_members')
+      .update({ exercise_id: survivor.id })
+      .in(
+        'exercise_id',
+        losers.map((e) => e.id),
+      )
+    if (error) throw new Error(`merge exercises: ${error.message}`)
+  }
+  const now = Date.now()
+  await db.transaction('rw', db.exercises, db.entries, db.meta, async () => {
+    const last = await getMeta<string>(META_KEYS.lastExerciseId)
+    for (const { survivor, losers } of merges) {
+      for (const loser of losers) {
+        // Re-read: the plan was made outside this transaction.
+        const current = await db.exercises.get(loser.id)
+        if (!current || current.deletedAt != null) continue
+        await db.entries
+          .where('exerciseId')
+          .equals(loser.id)
+          .modify((e) => {
+            e.exerciseId = survivor.id
+            delete e.syncedAt
+          })
+        if (current.syncedAt == null) {
+          await db.exercises.delete(loser.id)
+        } else {
+          await db.exercises.update(loser.id, {
+            deletedAt: now,
+            syncedAt: undefined,
+          })
+        }
+        if (last === loser.id) {
+          await setMeta(META_KEYS.lastExerciseId, survivor.id)
+        }
+      }
     }
   })
 }

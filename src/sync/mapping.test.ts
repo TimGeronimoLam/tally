@@ -90,6 +90,20 @@ describe('mergeEntry', () => {
     const merged = mergeEntry(local, { ...remote, deletedAt: T0 + 2 })
     expect(merged.deletedAt).toBe(T0 + 2)
   })
+
+  it('keeps an unpushed move to another exercise', () => {
+    const local = { ...entry, exerciseId: 'x2' }
+    const merged = mergeEntry(local, remote)
+    expect(merged.exerciseId).toBe('x2')
+    expect(merged.syncedAt).toBeUndefined()
+  })
+
+  it('follows a move made on another device when local is clean', () => {
+    const local = { ...entry, syncedAt: 100 }
+    const merged = mergeEntry(local, { ...remote, exerciseId: 'x2' })
+    expect(merged.exerciseId).toBe('x2')
+    expect(merged.syncedAt).toBe(500)
+  })
 })
 
 describe('mergeExercise', () => {

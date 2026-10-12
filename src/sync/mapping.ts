@@ -82,15 +82,27 @@ function latestDeletedAt(a?: number, b?: number): number | undefined {
 }
 
 /**
- * Entries are immutable except `deletedAt`, so the merge is just
- * "latest deletedAt wins". If the result differs from what the server has,
- * the row is left dirty (no `syncedAt`) so the next push sends it.
+ * Entries are immutable except `deletedAt` and, when sync folds two
+ * exercises into one, `exerciseId`. "Latest deletedAt wins"; an unpushed
+ * local move to another exercise is kept. If the result differs from what
+ * the server has, the row is left dirty (no `syncedAt`) so the next push
+ * sends it.
  */
 export function mergeEntry(local: Entry | undefined, remote: Entry): Entry {
   if (!local) return remote
   const deletedAt = latestDeletedAt(local.deletedAt, remote.deletedAt)
-  const dirty = local.syncedAt == null || deletedAt !== remote.deletedAt
-  return { ...remote, deletedAt, syncedAt: dirty ? undefined : remote.syncedAt }
+  const localDirty = local.syncedAt == null
+  const exerciseId = localDirty ? local.exerciseId : remote.exerciseId
+  const dirty =
+    localDirty ||
+    deletedAt !== remote.deletedAt ||
+    exerciseId !== remote.exerciseId
+  return {
+    ...remote,
+    exerciseId,
+    deletedAt,
+    syncedAt: dirty ? undefined : remote.syncedAt,
+  }
 }
 
 /**
