@@ -7,6 +7,7 @@ export type ButtonVariant =
   | 'outline'
   | 'ghost'
   | 'danger' // text only, red
+  | 'destructive' // red fill
 export type ButtonSize = 'sm' | 'md' | 'lg'
 
 export interface ButtonStyleProps {
@@ -27,6 +28,7 @@ const variants: Record<ButtonVariant, string> = {
     'border-[1.5px] border-border bg-bg text-fg font-medium disabled:opacity-40',
   ghost: 'bg-transparent text-muted font-medium disabled:opacity-40',
   danger: 'bg-transparent text-danger font-medium disabled:opacity-40',
+  destructive: 'bg-danger text-white disabled:opacity-40',
 }
 
 const sizes: Record<ButtonSize, string> = {

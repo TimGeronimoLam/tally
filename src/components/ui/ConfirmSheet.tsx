@@ -28,11 +28,10 @@ export function ConfirmSheet({
       <p className="text-[15px] leading-relaxed text-muted">{message}</p>
       <div className="flex flex-col gap-2">
         <Button
-          variant={destructive ? 'inverse' : 'primary'}
+          variant={destructive ? 'destructive' : 'primary'}
           size="lg"
           fullWidth
           onClick={onConfirm}
-          className={destructive ? 'bg-danger text-white' : undefined}
         >
           {confirmLabel}
         </Button>
