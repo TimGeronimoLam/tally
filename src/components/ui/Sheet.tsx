@@ -50,7 +50,7 @@ export function Sheet({
         aria-label={title ? undefined : rest['aria-label']}
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          'flex w-full flex-col gap-4 rounded-t-sheet bg-bg px-5 pt-3 pb-[calc(28px_+_env(safe-area-inset-bottom))] shadow-sheet',
+          'mx-auto flex w-full max-w-app flex-col gap-4 rounded-t-sheet bg-bg px-5 pt-3 pb-[calc(28px_+_env(safe-area-inset-bottom))] shadow-sheet',
           className,
         )}
       >

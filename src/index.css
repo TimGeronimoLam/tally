@@ -116,6 +116,9 @@
   --shadow-toast: var(--shadow-toast);
   --shadow-sheet: var(--shadow-sheet);
 
+  /* Phone-width column the whole app lives in; centered on wider screens. */
+  --container-app: 430px;
+
   --radius-control: 12px;
   --radius-card: 14px;
   --radius-sheet: 24px;

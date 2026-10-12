@@ -26,6 +26,9 @@ Screens follow the Tally design canvas: https://claude.ai/artifact/6T6fTGkoBAK7K
 Tokens (colors, radii, shadows) are CSS variables in `src/index.css`, exposed to
 Tailwind via `@theme inline` so utilities like `bg-surface` / `text-muted` follow
 the active theme. Light and dark are switched by `data-theme` on `<html>`.
+The whole app sits in a centered column capped by `--container-app` (430px), so
+desktop windows show a phone-shaped layout with side borders instead of a
+stretched UI. Fixed overlays (toast, sheet) share the same cap.
 
 ## Project structure
 

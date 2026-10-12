@@ -32,7 +32,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         <div
           role="status"
           aria-live="polite"
-          className="pointer-events-none fixed inset-x-5 bottom-[calc(76px_+_env(safe-area-inset-bottom))] z-30"
+          className="pointer-events-none fixed inset-x-0 bottom-[calc(76px_+_env(safe-area-inset-bottom))] z-30 mx-auto w-full max-w-app px-5"
         >
           <div className="pointer-events-auto flex h-[52px] items-center justify-between rounded-control bg-inverse pr-2 pl-4 text-[15px] text-inverse-fg shadow-toast">
             <span className="truncate">{toast.message}</span>
