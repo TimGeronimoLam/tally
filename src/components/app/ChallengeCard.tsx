@@ -28,7 +28,9 @@ export function ChallengeCard({ challenge: c, meId }: ChallengeCardProps) {
       {c.goalType === 'first_to' ? (
         <div className="flex flex-col gap-1.5">
           <div className="flex justify-between text-[13px]">
-            <span className="font-semibold">You</span>
+            <span className="font-semibold">
+              {c.top.find((r) => r.userId === meId)?.displayName ?? 'You'}
+            </span>
             <span>
               {formatNumber(c.myTotal)} / {formatNumber(c.goalValue ?? 0)}
             </span>

@@ -35,7 +35,8 @@ export function LeaderboardList({
             <span className="w-5 text-right text-sm text-faint">{r.rank}</span>
             <Avatar initial={r.displayName} highlight={me} />
             <span className="min-w-0 flex-1 truncate text-[15px]">
-              {me ? 'You' : r.displayName}
+              {r.displayName}
+              {me && <span className="font-normal text-muted"> (you)</span>}
             </span>
             <span className="text-xs font-normal text-faint">
               +{formatNumber(r.today)} today
