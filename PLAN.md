@@ -53,17 +53,17 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
 
 ## Phase 2 – Stats (2 days)
 
-- [ ] Pure function `computeStats(entries, exerciseId | 'all', today)` returning:
+- [x] Pure function `computeStats(entries, exerciseId | 'all', today)` returning:
   - today, this week, all-time total, best day
   - current streak, longest streak
   - Use the device-local date string (`YYYY-MM-DD`) as the day key everywhere
   - Unit-test streak logic across midnight and timezones
-- [ ] Heatmap component
+- [x] Heatmap component (26 weeks per the design; tap shows a day card rather than a sheet)
   - 53 columns × 7 rows of small squares in a horizontally scrollable container, scrolled to the right by default
   - Intensity by quantile of daily totals (one huge day shouldn't flatten the rest)
   - Tap a day → bottom sheet listing that day's entries
-- [ ] Exercise toggle (All / single exercise) above the heatmap
-- [ ] 7 / 30-day bar chart (plain divs with heights; no chart library)
+- [x] Exercise toggle (All / single exercise) above the heatmap
+- [x] 7 / 30-day bar chart (plain divs with heights; no chart library)
 
 ---
 

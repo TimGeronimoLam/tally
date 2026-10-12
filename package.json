@@ -11,7 +11,9 @@
     "typecheck": "tsc -b",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "icons": "node scripts/gen-icons.mjs"
+    "icons": "node scripts/gen-icons.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",
@@ -32,6 +34,7 @@
     "prettier": "^3.9.10",
     "typescript": "~6.0.2",
     "vite": "^8.3.0",
-    "vite-plugin-pwa": "^2.0.0"
+    "vite-plugin-pwa": "^2.0.0",
+    "vitest": "^5.0.4"
   }
 }

@@ -45,6 +45,14 @@ export function useTodayEntries(exerciseId: string | undefined): Entry[] {
   return entries ?? []
 }
 
+/** Every live entry. Stats derive from this in memory. */
+export function useAllEntries(): Entry[] | undefined {
+  return useLiveQuery(
+    () => db.entries.filter((e) => e.deletedAt == null).toArray(),
+    [],
+  )
+}
+
 export function useEntryCount(): number {
   return (
     useLiveQuery(
