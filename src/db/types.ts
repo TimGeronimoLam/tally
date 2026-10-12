@@ -40,6 +40,10 @@ export interface MetaRow {
 export const META_KEYS = {
   deviceId: 'deviceId',
   seededAt: 'seededAt',
-  lastSyncAt: 'lastSyncAt',
   lastExerciseId: 'lastExerciseId',
+  /** Supabase user id the sync markers belong to. */
+  syncUserId: 'syncUserId',
+  /** Newest `updated_at` pulled per table (ISO string). */
+  lastPullExercises: 'lastPull.exercises',
+  lastPullEntries: 'lastPull.entries',
 } as const

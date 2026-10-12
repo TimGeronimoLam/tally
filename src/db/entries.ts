@@ -1,5 +1,6 @@
 import { endOfDay, startOfDay } from '../lib/date.ts'
 import { uuid } from '../lib/uuid.ts'
+import { notifyLocalChange } from '../lib/localChanges.ts'
 import { db } from './db.ts'
 import type { Entry } from './types.ts'
 
@@ -19,16 +20,19 @@ export async function logEntry(
     createdAt: Date.now(),
   }
   await db.entries.add(entry)
+  notifyLocalChange()
   return entry
 }
 
 /** Soft delete; used by Undo. */
 export async function deleteEntry(id: string): Promise<void> {
   await db.entries.update(id, { deletedAt: Date.now(), syncedAt: undefined })
+  notifyLocalChange()
 }
 
 export async function restoreEntry(id: string): Promise<void> {
   await db.entries.update(id, { deletedAt: undefined, syncedAt: undefined })
+  notifyLocalChange()
 }
 
 /** Live entries (not soft-deleted) for one exercise on the local day containing `at`. */

@@ -1,8 +1,6 @@
 import { useRef, useState, type ChangeEvent } from 'react'
-import { ExerciseSheet } from '../components/app/index.ts'
+import { ExerciseSheet, SyncCard } from '../components/app/index.ts'
 import {
-  Button,
-  Card,
   ConfirmSheet,
   Gutter,
   ListGroup,
@@ -84,26 +82,7 @@ export function AccountPage() {
       <ScreenHeader title="Account" />
 
       <Gutter className="pt-4">
-        <Card>
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-col gap-0.5">
-              <span className="text-[15px] font-semibold">Local only</span>
-              <span className="text-[13px] leading-relaxed text-muted">
-                Your data lives on this device. Sign in to back it up and sync
-                across phones.
-              </span>
-            </div>
-            <Button
-              variant="inverse"
-              fullWidth
-              onClick={() =>
-                toast({ message: 'Sync is coming in a later version' })
-              }
-            >
-              Sign in to sync
-            </Button>
-          </div>
-        </Card>
+        <SyncCard />
       </Gutter>
 
       <Gutter>

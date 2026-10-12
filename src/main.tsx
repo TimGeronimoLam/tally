@@ -7,9 +7,12 @@ import App from './App.tsx'
 import { ToastProvider } from './components/ui/index.ts'
 import { seedIfNeeded } from './db/index.ts'
 import { initTheme } from './lib/theme.ts'
+import { initAuth, startSyncTriggers } from './sync/index.ts'
 
 registerSW({ immediate: true })
 initTheme()
+initAuth()
+startSyncTriggers()
 
 const root = createRoot(document.getElementById('root')!)
 

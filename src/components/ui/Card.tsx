@@ -8,7 +8,7 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   variant?: CardVariant
   /** Render as a router link to this path. */
   to?: string
-  children: ReactNode
+  children?: ReactNode
 }
 
 const variants: Record<CardVariant, string> = {

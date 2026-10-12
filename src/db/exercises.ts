@@ -1,4 +1,5 @@
 import { uuid } from '../lib/uuid.ts'
+import { notifyLocalChange } from '../lib/localChanges.ts'
 import { db } from './db.ts'
 import type { Exercise } from './types.ts'
 
@@ -13,6 +14,7 @@ export async function addExercise(
     createdAt: Date.now(),
   }
   await db.exercises.add(exercise)
+  notifyLocalChange()
   return exercise
 }
 
@@ -25,13 +27,16 @@ export async function updateExercise(
     unit: patch.unit.trim() || 'reps',
     syncedAt: undefined,
   })
+  notifyLocalChange()
 }
 
 /** Soft delete. Entries are kept so stats and sync stay intact. */
 export async function archiveExercise(id: string): Promise<void> {
   await db.exercises.update(id, { deletedAt: Date.now(), syncedAt: undefined })
+  notifyLocalChange()
 }
 
 export async function unarchiveExercise(id: string): Promise<void> {
   await db.exercises.update(id, { deletedAt: undefined, syncedAt: undefined })
+  notifyLocalChange()
 }

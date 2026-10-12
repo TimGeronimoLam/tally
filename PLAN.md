@@ -88,24 +88,24 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
 ### Setup
 
 - [ ] Create Supabase project
-- [ ] Tables mirroring Dexie (`exercises`, `entries`) plus `user_id` and `updated_at`
-- [ ] Row Level Security on all tables: `user_id = auth.uid()` for select / insert / update / delete
+- [x] Tables mirroring Dexie (`exercises`, `entries`) plus `user_id` and `updated_at` (`supabase/migrations/20261012000000_init.sql`)
+- [x] Row Level Security on all tables: `user_id = auth.uid()` for select / insert / update / delete
 - [ ] Enable anonymous sign-ins
 - [ ] Enable Turnstile captcha for anonymous sign-ins (free, prevents junk users)
 
 ### Sync module
 
-- [ ] `push()`: upsert all local rows with `syncedAt == null`, then mark them
-- [ ] `pull()`: fetch rows with `updated_at > lastSyncAt`, upsert into Dexie by ID
-- [ ] Triggers: session start, after each log (debounced), `visibilitychange`
-- [ ] Conflict resolution: rows are immutable except `deletedAt`, so "latest `deletedAt` wins"
-- [ ] Once any session exists (anonymous or linked), sync **all** entries, not just challenge-related ones
+- [x] `push()`: upsert all local rows with `syncedAt == null`, then mark them
+- [x] `pull()`: fetch rows with `updated_at > lastSyncAt`, upsert into Dexie by ID
+- [x] Triggers: session start, after each log (debounced), `visibilitychange`, plus `online`
+- [x] Conflict resolution: rows are immutable except `deletedAt`, so "latest `deletedAt` wins"
+- [x] Once any session exists (anonymous or linked), sync **all** entries, not just challenge-related ones
 
 ### Settings screen
 
-- [ ] "Link an email / Google" using `supabase.auth.updateUser({ email })` or `linkIdentity({ provider: 'google' })` on the **existing** session
+- [x] "Link an email / Google" using `supabase.auth.updateUser({ email })` or `linkIdentity({ provider: 'google' })` on the **existing** session
   - Never call a fresh `signInWithOAuth` here; that creates a second user and orphans the anonymous one
-- [ ] Sign out keeps local data
+- [x] Sign out keeps local data (different user signing in later resets sync markers)
 
 ### Notes
 

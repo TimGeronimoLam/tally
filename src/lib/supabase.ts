@@ -1,7 +1,17 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
-const url = import.meta.env.VITE_SUPABASE_URL
+// Accept a pasted REST/Auth endpoint too: only the origin matters.
+const url = toOrigin(import.meta.env.VITE_SUPABASE_URL)
 const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+function toOrigin(value: string | undefined): string | undefined {
+  if (!value) return undefined
+  try {
+    return new URL(value).origin
+  } catch {
+    return undefined
+  }
+}
 
 /**
  * Supabase client, or null when the env vars are missing. The app is

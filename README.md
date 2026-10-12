@@ -55,6 +55,18 @@ Optional. Without it the app is fully local.
 4. Copy `.env.example` to `.env.local` and paste the Project URL and anon key
    from Project Settings → API. Restart `npm run dev`.
 
+5. Authentication → URL Configuration: set **Site URL** to where the app is
+   served and add it to **Redirect URLs** (plus `http://localhost:5173` for
+   dev), so confirmation and magic-link emails land back in the app.
+
+How sync works (`src/sync/`): on sign-in, on each local change (debounced),
+on tab focus and on reconnect, the app pulls rows with `updated_at` newer than
+the last pull, merges them (latest `deleted_at` wins; unsynced local edits to
+an exercise's name/unit win), then pushes rows without `syncedAt`. Signing in
+starts as an anonymous user; adding an email upgrades that same user in place,
+so nothing is orphaned. Sign out keeps local data; signing in as a different
+user resets the sync markers so everything is pushed to the new account.
+
 Free-tier projects pause after a week of inactivity; the Restore button is on
 the project's dashboard home.
 
