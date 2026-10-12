@@ -1,5 +1,7 @@
+import { startOfDay } from '../lib/date.ts'
 import { supabase } from '../lib/supabase.ts'
 import { signInAnonymously } from '../sync/auth.ts'
+import { syncNow } from '../sync/sync.ts'
 import { generateInviteCode } from './codes.ts'
 import type {
   Challenge,
@@ -26,6 +28,9 @@ export async function ensureSession(): Promise<string> {
   await signInAnonymously()
   const fresh = (await c.auth.getSession()).data.session
   if (!fresh) throw new Error('Could not sign in')
+  // Let the first sync settle (it may re-key local rows) before any RPC
+  // references a local exercise id.
+  await syncNow()
   return fresh.user.id
 }
 
@@ -111,7 +116,8 @@ export async function createChallenge(
       p_unit: input.unit,
       p_goal_type: input.goalType,
       p_goal_value: input.goalValue,
-      p_starts_at: new Date().toISOString(),
+      // From the start of today, so reps logged earlier today already count.
+      p_starts_at: new Date(startOfDay()).toISOString(),
       p_ends_at: input.endsAt.toISOString(),
       p_invite_code: generateInviteCode(),
       p_display_name: input.displayName,

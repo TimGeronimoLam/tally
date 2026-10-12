@@ -2,6 +2,7 @@ import { db } from '../db/db.ts'
 import { getMeta, setMeta } from '../db/meta.ts'
 import { META_KEYS, type Entry, type Exercise } from '../db/types.ts'
 import { onLocalChange } from '../lib/localChanges.ts'
+import { uuid } from '../lib/uuid.ts'
 import { supabase } from '../lib/supabase.ts'
 import {
   entryToRow,
@@ -89,20 +90,57 @@ async function run(userId: string): Promise<SyncResult> {
 
 /**
  * Sync markers belong to one account. If a different user signs in on this
- * device, forget them so every local row is pushed to the new account.
+ * device, every local row must be pushed to the new account. Rows that were
+ * already pushed under the previous owner keep their ids on the server, so
+ * they are re-keyed first: the new account gets its own copies.
  */
 async function ensureSyncOwner(userId: string): Promise<void> {
   const owner = await getMeta<string>(META_KEYS.syncUserId)
   if (owner === userId) return
   await db.transaction('rw', db.exercises, db.entries, db.meta, async () => {
-    await db.exercises.toCollection().modify({ syncedAt: undefined })
-    await db.entries.toCollection().modify({ syncedAt: undefined })
+    if (owner === undefined) {
+      // Never synced: nothing lives on the server yet, ids are free to use.
+      await db.exercises.toCollection().modify({ syncedAt: undefined })
+      await db.entries.toCollection().modify({ syncedAt: undefined })
+    } else {
+      await rekeyLocalData()
+    }
     await db.meta.bulkDelete([
       META_KEYS.lastPullExercises,
       META_KEYS.lastPullEntries,
     ])
     await setMeta(META_KEYS.syncUserId, userId)
   })
+}
+
+/** Give every exercise and entry a fresh id, keeping their relations. Runs inside a transaction. */
+async function rekeyLocalData(): Promise<void> {
+  const [exercises, entries] = await Promise.all([
+    db.exercises.toArray(),
+    db.entries.toArray(),
+  ])
+  const exerciseIds = new Map(exercises.map((e) => [e.id, uuid()]))
+  await db.exercises.clear()
+  await db.entries.clear()
+  await db.exercises.bulkAdd(
+    exercises.map((e) => ({
+      ...e,
+      id: exerciseIds.get(e.id)!,
+      syncedAt: undefined,
+    })),
+  )
+  await db.entries.bulkAdd(
+    entries.map((e) => ({
+      ...e,
+      id: uuid(),
+      exerciseId: exerciseIds.get(e.exerciseId) ?? e.exerciseId,
+      syncedAt: undefined,
+    })),
+  )
+  const last = await getMeta<string>(META_KEYS.lastExerciseId)
+  if (last && exerciseIds.has(last)) {
+    await setMeta(META_KEYS.lastExerciseId, exerciseIds.get(last)!)
+  }
 }
 
 /* ---------- pull ---------- */
