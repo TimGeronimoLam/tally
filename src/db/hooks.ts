@@ -2,7 +2,12 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from './db.ts'
 import { entriesForDay } from './entries.ts'
 import { getMeta } from './meta.ts'
-import { META_KEYS, type Entry, type Exercise } from './types.ts'
+import {
+  META_KEYS,
+  type Entry,
+  type Exercise,
+  type UnlockedAchievement,
+} from './types.ts'
 
 /** Live (non-archived) exercises in creation order. `undefined` while loading. */
 export function useExercises(): Exercise[] | undefined {
@@ -51,6 +56,10 @@ export function useAllEntries(): Entry[] | undefined {
     () => db.entries.filter((e) => e.deletedAt == null).toArray(),
     [],
   )
+}
+
+export function useUnlockedAchievements(): UnlockedAchievement[] | undefined {
+  return useLiveQuery(() => db.achievements.toArray(), [])
 }
 
 export function useEntryCount(): number {

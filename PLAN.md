@@ -69,11 +69,11 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
 
 ## Phase 3 – Achievements (1 day)
 
-- [ ] Define achievements as data: `{ id, title, description, check: (stats, entries) => boolean }`
-- [ ] Evaluate after every log; store unlocked IDs with timestamp in Dexie
-- [ ] Badge grid, locked badges greyed out
-- [ ] Small celebration toast on unlock
-- [ ] Initial set (~12):
+- [x] Define achievements as data: `{ id, title, description, check: (stats, entries) => boolean }` (`src/achievements/definitions.ts`, plus optional `progress` caption)
+- [x] Evaluate after every log; store unlocked IDs with timestamp in Dexie (also on Achievements screen mount, for imports)
+- [x] Badge grid, locked badges greyed out
+- [x] Small celebration toast on unlock (queued behind the Undo toast)
+- [x] Initial set (12): milestones 100/1k/10k · streaks 7/30/100 · Full month, Early bird, Variety · First challenge, Won, Host (social locked until Phase 5)
   - Milestones: 100 / 1,000 / 10,000 reps
   - Streaks: 7 / 30 / 100 days
   - Consistency: logged 7 days in a row, 5 exercises tracked

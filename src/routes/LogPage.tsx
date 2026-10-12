@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { evaluateAchievements } from '../achievements/index.ts'
 import { ExerciseChips, ExerciseSheet } from '../components/app/index.ts'
 import {
   BigNumber,
@@ -55,6 +56,9 @@ export function LogPage() {
       message: `${formatNumber(n)} ${unitLabel(selected)} logged`,
       action: { label: 'Undo', onClick: () => void deleteEntry(entry.id) },
     })
+    for (const a of await evaluateAchievements()) {
+      toast({ message: `Achievement unlocked: ${a.title}`, queue: true })
+    }
   }
   useEffect(() => {
     submitRef.current = log

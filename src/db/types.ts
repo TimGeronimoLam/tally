@@ -24,6 +24,14 @@ export interface Entry {
   syncedAt?: number
 }
 
+/** One row per unlocked achievement. Unlocks are permanent. */
+export interface UnlockedAchievement {
+  /** Achievement id from src/achievements/definitions.ts */
+  id: string
+  unlockedAt: number
+  syncedAt?: number
+}
+
 export interface MetaRow {
   key: string
   value: unknown

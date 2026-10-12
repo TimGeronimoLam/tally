@@ -1,51 +1,56 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { ToastContext, type ToastOptions } from '../../lib/toast.ts'
 
 interface ToastState extends ToastOptions {
   id: number
 }
 
+let nextId = 1
+
 /**
- * Single-slot toast above the tab bar. Show one with `useToast()` from
- * src/lib/toast.ts. A new toast replaces the current one.
+ * Toast slot above the tab bar. Show one with `useToast()` from
+ * src/lib/toast.ts. By default a new toast replaces the one on screen;
+ * `queue: true` lines it up behind instead (used for achievement unlocks
+ * so they never hide the Undo of the log that earned them).
  */
 export function ToastProvider({ children }: { children: ReactNode }) {
-  const [toast, setToast] = useState<ToastState | null>(null)
-  const timer = useRef<number | undefined>(undefined)
+  const [queue, setQueue] = useState<ToastState[]>([])
+  const current = queue[0]
 
   const show = useCallback((opts: ToastOptions) => {
-    window.clearTimeout(timer.current)
-    const id = Date.now()
-    setToast({ ...opts, id })
-    timer.current = window.setTimeout(
-      () => setToast((t) => (t?.id === id ? null : t)),
-      opts.duration ?? 4000,
-    )
+    const toast = { ...opts, id: nextId++ }
+    setQueue((q) => (opts.queue ? [...q, toast] : [toast, ...q.slice(1)]))
   }, [])
 
-  useEffect(() => () => window.clearTimeout(timer.current), [])
+  const dismiss = useCallback(() => setQueue((q) => q.slice(1)), [])
+
+  useEffect(() => {
+    if (!current) return
+    const t = window.setTimeout(dismiss, current.duration ?? 4000)
+    return () => window.clearTimeout(t)
+  }, [current, dismiss])
 
   return (
     <ToastContext.Provider value={show}>
       {children}
-      {toast && (
+      {current && (
         <div
           role="status"
           aria-live="polite"
           className="pointer-events-none fixed inset-x-0 bottom-[calc(76px_+_env(safe-area-inset-bottom))] z-30 mx-auto w-full max-w-app px-5"
         >
           <div className="pointer-events-auto flex h-[52px] items-center justify-between rounded-control bg-inverse pr-2 pl-4 text-[15px] text-inverse-fg shadow-toast">
-            <span className="truncate">{toast.message}</span>
-            {toast.action && (
+            <span className="truncate">{current.message}</span>
+            {current.action && (
               <button
                 type="button"
                 className="h-9 shrink-0 rounded-lg px-3 font-semibold text-accent-on-inverse"
                 onClick={() => {
-                  toast.action?.onClick()
-                  setToast(null)
+                  current.action?.onClick()
+                  dismiss()
                 }}
               >
-                {toast.action.label}
+                {current.action.label}
               </button>
             )}
           </div>

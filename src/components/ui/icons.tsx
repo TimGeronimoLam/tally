@@ -131,6 +131,15 @@ export const TrashIcon = createIcon(
 
 export const CheckIcon = createIcon(<path d="M5 12l5 5 9-10" />, 2)
 
+export const LayersIcon = createIcon(
+  <>
+    <path d="M12 3l9 5-9 5-9-5 9-5z" />
+    <path d="M3 12l9 5 9-5" />
+    <path d="M3 16l9 5 9-5" />
+  </>,
+  2,
+)
+
 /* Tab bar */
 export const LogIcon = createIcon(
   <>

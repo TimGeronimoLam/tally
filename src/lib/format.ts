@@ -31,6 +31,14 @@ export function formatShortDate(d: Date | number): string {
   })
 }
 
+/** "Mar 2026" */
+export function formatMonthYear(d: Date | number): string {
+  return new Date(d).toLocaleDateString(undefined, {
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
 /** "17:10" / "5:10 PM" depending on locale */
 export function formatTime(d: Date | number): string {
   return new Date(d).toLocaleTimeString([], {

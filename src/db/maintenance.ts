@@ -1,6 +1,6 @@
 import { db } from './db.ts'
 import { seedIfNeeded } from './seed.ts'
-import type { Entry, Exercise } from './types.ts'
+import type { Entry, Exercise, UnlockedAchievement } from './types.ts'
 
 export interface Snapshot {
   app: 'tally'
@@ -8,12 +8,15 @@ export interface Snapshot {
   exportedAt: string
   exercises: Exercise[]
   entries: Entry[]
+  /** Added later; absent in early exports. */
+  achievements?: UnlockedAchievement[]
 }
 
 export async function exportSnapshot(): Promise<Snapshot> {
-  const [exercises, entries] = await Promise.all([
+  const [exercises, entries, achievements] = await Promise.all([
     db.exercises.toArray(),
     db.entries.toArray(),
+    db.achievements.toArray(),
   ])
   return {
     app: 'tally',
@@ -21,6 +24,7 @@ export async function exportSnapshot(): Promise<Snapshot> {
     exportedAt: new Date().toISOString(),
     exercises,
     entries,
+    achievements,
   }
 }
 
@@ -60,21 +64,37 @@ export async function importSnapshot(
   if (!isSnapshot(parsed)) {
     throw new Error('Not a Tally export file')
   }
-  await db.transaction('rw', db.exercises, db.entries, async () => {
-    await db.exercises.bulkPut(parsed.exercises)
-    await db.entries.bulkPut(parsed.entries)
-  })
+  await db.transaction(
+    'rw',
+    db.exercises,
+    db.entries,
+    db.achievements,
+    async () => {
+      await db.exercises.bulkPut(parsed.exercises)
+      await db.entries.bulkPut(parsed.entries)
+      if (parsed.achievements)
+        await db.achievements.bulkPut(parsed.achievements)
+    },
+  )
   return { exercises: parsed.exercises.length, entries: parsed.entries.length }
 }
 
 /** Wipe everything and re-seed defaults. Irreversible. */
 export async function resetAllData(): Promise<void> {
-  await db.transaction('rw', db.exercises, db.entries, db.meta, async () => {
-    await Promise.all([
-      db.exercises.clear(),
-      db.entries.clear(),
-      db.meta.clear(),
-    ])
-  })
+  await db.transaction(
+    'rw',
+    db.exercises,
+    db.entries,
+    db.meta,
+    db.achievements,
+    async () => {
+      await Promise.all([
+        db.exercises.clear(),
+        db.entries.clear(),
+        db.meta.clear(),
+        db.achievements.clear(),
+      ])
+    },
+  )
   await seedIfNeeded()
 }
