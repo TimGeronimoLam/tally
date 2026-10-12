@@ -16,6 +16,7 @@ function App() {
         <Route index element={<LogPage />} />
         <Route path="stats" element={<StatsPage />} />
         <Route path="challenges" element={<ChallengesPage />} />
+        <Route path="challenges/:id" element={<ChallengeDetailPage />} />
         <Route path="achievements" element={<AchievementsPage />} />
         <Route path="account" element={<AccountPage />} />
         <Route path="settings" element={<Navigate to="/account" replace />} />
@@ -23,7 +24,6 @@ function App() {
       {/* Full-screen flows without the tab bar. */}
       <Route element={<AppShell tabs={false} />}>
         <Route path="challenges/new" element={<NewChallengePage />} />
-        <Route path="challenges/:id" element={<ChallengeDetailPage />} />
         <Route path="join/:code" element={<JoinPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -147,7 +147,7 @@ export function ChallengeDetailPage() {
       <div className="flex-1" />
 
       {status !== 'ended' && (
-        <Gutter className="pt-6 pb-[calc(20px_+_env(safe-area-inset-bottom))]">
+        <Gutter className="pt-6 pb-5">
           <Button size="lg" fullWidth onClick={logThis}>
             Log {c.exerciseName.toLowerCase()}
           </Button>

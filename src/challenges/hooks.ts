@@ -13,6 +13,7 @@ export function useMyChallenges(): Polled<ChallengeSummary[]> & {
   const userId = session?.user.id ?? null
   const polled = usePolling(fetchMyChallenges, [userId, lastSyncAt], {
     enabled: ready && userId !== null,
+    cacheKey: userId ? `cache.challenges.${userId}` : undefined,
   })
   // Signed out: nothing to load, report an empty list rather than "loading".
   const data = useMemo(
@@ -35,6 +36,9 @@ export function useLeaderboard(
   return usePolling(
     () => (challengeId ? fetchLeaderboard(challengeId) : Promise.resolve([])),
     [challengeId, lastSyncAt],
-    { enabled: challengeId !== undefined },
+    {
+      enabled: challengeId !== undefined,
+      cacheKey: challengeId ? `cache.leaderboard.${challengeId}` : undefined,
+    },
   )
 }

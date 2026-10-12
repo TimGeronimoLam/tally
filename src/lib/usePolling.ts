@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { getMeta, setMeta } from '../db/meta.ts'
 
 export interface Polled<T> {
   data: T | undefined
@@ -11,7 +12,16 @@ export interface PollingOptions {
   intervalMs?: number
   /** When false, nothing is fetched and `data` stays undefined. */
   enabled?: boolean
+  /**
+   * Persist the last result under this key so the next mount (or reload)
+   * shows it immediately instead of a loading state. Include anything the
+   * result depends on (user id, challenge id) in the key.
+   */
+  cacheKey?: string
 }
+
+/** Last successful result per cache key, for synchronous hydration. */
+const memory = new Map<string, unknown>()
 
 /**
  * Fetch on mount, every `intervalMs`, when the tab becomes visible, and
@@ -21,25 +31,52 @@ export interface PollingOptions {
 export function usePolling<T>(
   fetcher: () => Promise<T>,
   deps: unknown[],
-  { intervalMs = 30_000, enabled = true }: PollingOptions = {},
+  { intervalMs = 30_000, enabled = true, cacheKey }: PollingOptions = {},
 ): Polled<T> {
-  const [data, setData] = useState<T | undefined>(undefined)
+  const [data, setData] = useState<T | undefined>(() =>
+    cacheKey ? (memory.get(cacheKey) as T | undefined) : undefined,
+  )
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(enabled)
   const latest = useRef(fetcher)
   latest.current = fetcher
+  const key = useRef(cacheKey)
+  key.current = cacheKey
 
   const refresh = useCallback(async () => {
     if (!enabled) return
     try {
-      setData(await latest.current())
+      const result = await latest.current()
+      setData(result)
       setError(null)
+      if (key.current) {
+        memory.set(key.current, result)
+        void setMeta(key.current, result)
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
     } finally {
       setLoading(false)
     }
   }, [enabled])
+
+  // Hydrate from cache when the key changes: memory first, then IndexedDB.
+  useEffect(() => {
+    if (!cacheKey) return
+    const cached = memory.get(cacheKey) as T | undefined
+    setData(cached)
+    if (cached !== undefined) return
+    let cancelled = false
+    void getMeta<T>(cacheKey).then((stored) => {
+      if (cancelled || stored === undefined) return
+      if (!memory.has(cacheKey)) memory.set(cacheKey, stored)
+      // A fetch may have landed first; never overwrite fresh data with stale.
+      setData((prev) => prev ?? stored)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [cacheKey])
 
   useEffect(() => {
     if (!enabled) {
