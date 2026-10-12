@@ -35,15 +35,15 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
 
 ### Tasks
 
-- [ ] Seed default exercises on first launch (Pushups, Squats, Pull-ups, Plank)
-- [ ] Log screen
+- [x] Seed default exercises on first launch (Pushups, Squats, Pull-ups, Plank)
+- [x] Log screen
   - Exercise chips (horizontal row, "+" chip at the end)
   - Number input with `inputMode="numeric"` and autofocus
   - Log button; field clears after logging
   - Today's total for the selected exercise
   - Toast "25 pushups logged" with Undo (soft-deletes the entry)
-- [ ] Add / edit / archive exercise via the "+" chip
-- [ ] Use `useLiveQuery` from `dexie-react-hooks` so all screens update reactively
+- [x] Add / edit / archive exercise via the "+" chip (edit: tap the active chip)
+- [x] Use `useLiveQuery` from `dexie-react-hooks` so all screens update reactively
 
 **Milestone:** log workouts on your phone, fully offline.
 

@@ -5,6 +5,10 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    // Honour PORT so the Claude preview can pick a free port.
+    port: Number(process.env.PORT) || 5173,
+  },
   plugins: [
     react(),
     tailwindcss(),

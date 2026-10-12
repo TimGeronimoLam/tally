@@ -4,13 +4,23 @@ import { BrowserRouter } from 'react-router'
 import { registerSW } from 'virtual:pwa-register'
 import './index.css'
 import App from './App.tsx'
+import { ToastProvider } from './components/Toast.tsx'
+import { seedIfNeeded } from './db/index.ts'
 
 registerSW({ immediate: true })
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </StrictMode>,
-)
+const root = createRoot(document.getElementById('root')!)
+
+seedIfNeeded()
+  .catch((err) => console.error('seed failed', err))
+  .finally(() => {
+    root.render(
+      <StrictMode>
+        <BrowserRouter>
+          <ToastProvider>
+            <App />
+          </ToastProvider>
+        </BrowserRouter>
+      </StrictMode>,
+    )
+  })
