@@ -24,6 +24,7 @@ import {
   useExercises,
   type Exercise,
 } from '../db/index.ts'
+import { clearLastError, readLastError } from '../lib/diagnostics.ts'
 import { formatNumber } from '../lib/format.ts'
 import { THEME_OPTIONS, useThemePreference } from '../lib/theme.ts'
 import { useToast } from '../lib/toast.ts'
@@ -41,6 +42,7 @@ export function AccountPage() {
   const entryCount = useEntryCount()
   const [theme, setTheme] = useThemePreference()
   const [sheet, setSheet] = useState<SheetState>({ mode: 'closed' })
+  const [lastError, setLastError] = useState(readLastError)
   const fileInput = useRef<HTMLInputElement>(null)
 
   const closeSheet = () => setSheet({ mode: 'closed' })
@@ -156,7 +158,23 @@ export function AccountPage() {
       </Gutter>
 
       <Gutter className="pt-5 pb-6 text-xs leading-relaxed text-faint">
-        Tally {__APP_VERSION__}
+        <div>Tally {__APP_VERSION__}</div>
+        {lastError && (
+          <div className="mt-2 break-words">
+            Last error ({new Date(lastError.at).toLocaleString()},{' '}
+            {lastError.where}): {lastError.message}{' '}
+            <button
+              type="button"
+              className="underline"
+              onClick={() => {
+                clearLastError()
+                setLastError(null)
+              }}
+            >
+              Clear
+            </button>
+          </div>
+        )}
       </Gutter>
 
       <ExerciseSheet

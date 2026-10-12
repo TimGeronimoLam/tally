@@ -5,7 +5,6 @@ import {
   joinChallenge,
   normalizeInviteCode,
   previewChallenge,
-  resolveLocalExercise,
   type ChallengePreview,
 } from '../challenges/index.ts'
 import {
@@ -18,7 +17,7 @@ import {
 } from '../components/ui/index.ts'
 import { useDisplayName } from '../db/index.ts'
 import { useToast } from '../lib/toast.ts'
-import { setDisplayName, syncNow, useSession } from '../sync/index.ts'
+import { setDisplayName, useSession } from '../sync/index.ts'
 
 type Preview =
   | { state: 'loading' }
@@ -71,13 +70,12 @@ export function JoinPage() {
     setBusy(true)
     try {
       if (yourName.trim() !== savedName) await setDisplayName(yourName)
-      const exerciseId = await resolveLocalExercise(
+      const id = await joinChallenge(
+        code,
+        yourName.trim(),
         challenge.exerciseName,
         challenge.unit,
       )
-      const id = await joinChallenge(code, yourName.trim(), exerciseId)
-      // Entries logged earlier today should count right away.
-      await syncNow()
       toast({ message: `You're in: ${challenge.name}` })
       if (!session?.user.email) {
         toast({

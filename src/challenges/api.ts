@@ -1,8 +1,9 @@
 import { calibrate } from '../lib/clock.ts'
 import { supabase } from '../lib/supabase.ts'
 import { signInAnonymously } from '../sync/auth.ts'
-import { syncNow } from '../sync/sync.ts'
+import { ensureSyncOwner, syncNow } from '../sync/sync.ts'
 import { generateInviteCode } from './codes.ts'
+import { resolveLocalExercise } from './localExercise.ts'
 import type {
   Challenge,
   ChallengePreview,
@@ -23,15 +24,29 @@ function client() {
  */
 export async function ensureSession(): Promise<string> {
   const c = client()
-  const existing = (await c.auth.getSession()).data.session
-  if (existing) return existing.user.id
-  await signInAnonymously()
-  const fresh = (await c.auth.getSession()).data.session
-  if (!fresh) throw new Error('Could not sign in')
-  // Let the first sync settle (it may re-key local rows) before any RPC
-  // references a local exercise id.
-  await syncNow()
-  return fresh.user.id
+  let session = (await c.auth.getSession()).data.session
+  if (!session) {
+    await signInAnonymously()
+    session = (await c.auth.getSession()).data.session
+    if (!session) throw new Error('Could not sign in')
+  }
+  // Local rows may be re-keyed when the account changes, so the local
+  // exercise id a challenge points at is only resolved after this. A full
+  // sync (pull + push) is not needed here and would hold the UI hostage on
+  // a slow connection; it is kicked off after the RPC instead.
+  await withTimeout(
+    ensureSyncOwner(session.user.id),
+    15_000,
+    'Local data did not get ready in time. Please try again.',
+  )
+  return session.user.id
+}
+
+function withTimeout<T>(p: Promise<T>, ms: number, message: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = window.setTimeout(() => reject(new Error(message)), ms)
+    p.then(resolve, reject).finally(() => window.clearTimeout(timer))
+  })
 }
 
 export async function currentUserId(): Promise<string | null> {
@@ -108,6 +123,8 @@ export async function createChallenge(
   input: NewChallengeInput,
 ): Promise<Challenge> {
   await ensureSession()
+  // Resolved after ensureSession: the id must survive any re-key above.
+  const exerciseId = await resolveLocalExercise(input.exerciseName, input.unit)
   // Retry on the (very unlikely) invite-code collision.
   for (let attempt = 0; attempt < 5; attempt++) {
     const { data, error } = await client().rpc('create_challenge', {
@@ -120,10 +137,13 @@ export async function createChallenge(
       p_ends_at: input.endsAt.toISOString(),
       p_invite_code: generateInviteCode(),
       p_display_name: input.displayName,
-      p_exercise_id: input.exerciseId,
+      p_exercise_id: exerciseId,
     })
-    if (!error)
+    if (!error) {
+      // Entries logged earlier today should count right away.
+      void syncNow()
       return toChallenge((Array.isArray(data) ? data[0] : data) as Raw)
+    }
     if (error.code !== '23505') fail('Could not create challenge', error)
   }
   throw new Error('Could not create challenge: code collision')
@@ -140,19 +160,26 @@ export async function previewChallenge(
   return rows.length ? toPreview(rows[0]) : null
 }
 
-/** Returns the challenge id. */
+/**
+ * Join by invite code. The member's local exercise that counts is found or
+ * created by the challenge's exercise name. Returns the challenge id.
+ */
 export async function joinChallenge(
   code: string,
   displayName: string,
-  exerciseId: string,
+  exerciseName: string,
+  unit: string,
 ): Promise<string> {
   await ensureSession()
+  const exerciseId = await resolveLocalExercise(exerciseName, unit)
   const { data, error } = await client().rpc('join_challenge', {
     p_code: code,
     p_display_name: displayName,
     p_exercise_id: exerciseId,
   })
   if (error) fail('Could not join', error)
+  // Entries logged earlier today should count right away.
+  void syncNow()
   return str(data)
 }
 

@@ -75,7 +75,6 @@ export function NewChallengePage() {
         goalValue: goalType === 'first_to' ? goal : null,
         startsAt: timeWindow.startsAt,
         endsAt: timeWindow.endsAt,
-        exerciseId: exercise.id,
         displayName: yourName.trim(),
       })
       toast({ message: 'Challenge created. Share the code!' })

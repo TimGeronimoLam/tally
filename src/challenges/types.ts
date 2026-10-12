@@ -60,7 +60,5 @@ export interface NewChallengeInput {
   goalValue: number | null
   startsAt: Date
   endsAt: Date
-  /** The creator's local exercise that counts toward it. */
-  exerciseId: string
   displayName: string
 }

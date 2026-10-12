@@ -1,6 +1,7 @@
 import { db } from '../db/db.ts'
 import { getMeta, setMeta } from '../db/meta.ts'
 import { META_KEYS, type Entry, type Exercise } from '../db/types.ts'
+import { recordError } from '../lib/diagnostics.ts'
 import { onLocalChange } from '../lib/localChanges.ts'
 import { uuid } from '../lib/uuid.ts'
 import { supabase } from '../lib/supabase.ts'
@@ -83,42 +84,60 @@ async function run(userId: string): Promise<SyncResult> {
     return { ok: true }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
+    recordError('sync', err)
     setSyncStatus({ state: 'error', error: message })
     return { ok: false, reason: 'failed', error: message }
   }
 }
+
+let ownerInflight: Promise<void> | null = null
 
 /**
  * Sync markers belong to one account. If a different user signs in on this
  * device, every local row must be pushed to the new account. Rows that were
  * already pushed under the previous owner keep their ids on the server, so
  * they are re-keyed first: the new account gets its own copies.
+ *
+ * Concurrent callers (a sign-in triggers one sync, the challenge flow asks
+ * for ownership too) share one run, and the owner is checked again inside
+ * the transaction so the data is never re-keyed twice.
  */
-async function ensureSyncOwner(userId: string): Promise<void> {
-  const owner = await getMeta<string>(META_KEYS.syncUserId)
-  if (owner === userId) return
-  await db.transaction('rw', db.exercises, db.entries, db.meta, async () => {
-    if (owner === undefined) {
-      // Never synced: nothing lives on the server yet, ids are free to use.
-      await db.exercises.toCollection().modify({ syncedAt: undefined })
-      await db.entries.toCollection().modify({ syncedAt: undefined })
-    } else {
-      await rekeyLocalData()
-    }
-    await db.meta.bulkDelete([
-      META_KEYS.lastPullExercises,
-      META_KEYS.lastPullEntries,
-    ])
-    await setMeta(META_KEYS.syncUserId, userId)
-  })
+export async function ensureSyncOwner(userId: string): Promise<void> {
+  if ((await getMeta<string>(META_KEYS.syncUserId)) === userId) return
+  if (ownerInflight) return ownerInflight
+  ownerInflight = db
+    .transaction('rw', db.exercises, db.entries, db.meta, async () => {
+      const owner = await getMeta<string>(META_KEYS.syncUserId)
+      if (owner === userId) return
+      if (owner === undefined) {
+        // Never synced: nothing lives on the server yet, ids are free to use.
+        await db.exercises.toCollection().modify(clearSyncedAt)
+        await db.entries.toCollection().modify(clearSyncedAt)
+      } else {
+        await rekeyLocalData()
+      }
+      await db.meta.bulkDelete([
+        META_KEYS.lastPullExercises,
+        META_KEYS.lastPullEntries,
+      ])
+      await setMeta(META_KEYS.syncUserId, userId)
+    })
+    .finally(() => {
+      ownerInflight = null
+    })
+  return ownerInflight
+}
+
+function clearSyncedAt(row: { syncedAt?: number }): boolean {
+  if (row.syncedAt == null) return false
+  delete row.syncedAt
+  return true
 }
 
 /** Give every exercise and entry a fresh id, keeping their relations. Runs inside a transaction. */
 async function rekeyLocalData(): Promise<void> {
-  const [exercises, entries] = await Promise.all([
-    db.exercises.toArray(),
-    db.entries.toArray(),
-  ])
+  const exercises = await db.exercises.toArray()
+  const entries = await db.entries.toArray()
   const exerciseIds = new Map(exercises.map((e) => [e.id, uuid()]))
   await db.exercises.clear()
   await db.entries.clear()
