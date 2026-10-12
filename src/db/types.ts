@@ -41,6 +41,8 @@ export const META_KEYS = {
   deviceId: 'deviceId',
   seededAt: 'seededAt',
   lastExerciseId: 'lastExerciseId',
+  /** Name shown on leaderboards. Mirrored to Supabase user metadata. */
+  displayName: 'displayName',
   /** Supabase user id the sync markers belong to. */
   syncUserId: 'syncUserId',
   /** Newest `updated_at` pulled per table (ISO string). */

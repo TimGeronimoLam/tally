@@ -58,6 +58,14 @@ export function useAllEntries(): Entry[] | undefined {
   )
 }
 
+/** The user's display name, or '' when unset. `undefined` while loading. */
+export function useDisplayName(): string | undefined {
+  return useLiveQuery(
+    async () => (await getMeta<string>(META_KEYS.displayName)) ?? '',
+    [],
+  )
+}
+
 export function useUnlockedAchievements(): UnlockedAchievement[] | undefined {
   return useLiveQuery(() => db.achievements.toArray(), [])
 }

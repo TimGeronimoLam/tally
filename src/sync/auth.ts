@@ -1,6 +1,7 @@
 import type { Session } from '@supabase/supabase-js'
 import { useSyncExternalStore } from 'react'
 import { supabase } from '../lib/supabase.ts'
+import { reconcileDisplayName } from './profile.ts'
 import { syncNow } from './sync.ts'
 
 export interface AuthState {
@@ -33,7 +34,10 @@ export function initAuth(): void {
     set({ session, ready: true })
     // Supabase warns against awaiting its own calls inside this callback.
     if (session && event !== 'TOKEN_REFRESHED') {
-      window.setTimeout(() => void syncNow(), 0)
+      window.setTimeout(() => {
+        void reconcileDisplayName(session)
+        void syncNow()
+      }, 0)
     }
   })
 }
