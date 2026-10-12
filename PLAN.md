@@ -131,7 +131,7 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
 
 1. Ensure a session: `signInAnonymously()` if none exists
 2. Ask for a display name
-3. Pick or create the local exercise to map onto the challenge
+3. The local exercise with the challenge's name is found (or created) automatically; only the creator picks the exercise
 4. Insert `challenge_members` and `challenge_exercise_map` rows
 5. Trigger a sync so entries already logged today count
 6. Show a one-line hint: "Add an email in settings to keep your challenges if you switch phones"

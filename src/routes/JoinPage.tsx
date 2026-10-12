@@ -5,9 +5,9 @@ import {
   joinChallenge,
   normalizeInviteCode,
   previewChallenge,
+  resolveLocalExercise,
   type ChallengePreview,
 } from '../challenges/index.ts'
-import { ExercisePicker } from '../components/app/index.ts'
 import {
   Button,
   ButtonLink,
@@ -16,7 +16,7 @@ import {
   Screen,
   TextField,
 } from '../components/ui/index.ts'
-import { addExercise, useDisplayName, useExercises } from '../db/index.ts'
+import { useDisplayName } from '../db/index.ts'
 import { useToast } from '../lib/toast.ts'
 import { setDisplayName, syncNow, useSession } from '../sync/index.ts'
 
@@ -26,18 +26,20 @@ type Preview =
   | { state: 'error'; message: string }
   | { state: 'ready'; challenge: ChallengePreview }
 
-/** `/join/:code`: what a shared link opens. */
+/**
+ * `/join/:code`: what a shared link opens. The exercise that counts is
+ * fixed by the challenge; the member's matching local exercise is found or
+ * created on join.
+ */
 export function JoinPage() {
   const code = normalizeInviteCode(useParams().code ?? '')
   const navigate = useNavigate()
   const toast = useToast()
-  const exercises = useExercises()
   const savedName = useDisplayName()
   const { session } = useSession()
 
   const [preview, setPreview] = useState<Preview>({ state: 'loading' })
   const [nameInput, setNameInput] = useState<string | null>(null)
-  const [exerciseId, setExerciseId] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
@@ -60,35 +62,23 @@ export function JoinPage() {
   }, [code])
 
   const challenge = preview.state === 'ready' ? preview.challenge : null
-
-  // Default to the local exercise whose name matches the challenge's.
-  const matched =
-    challenge && exercises
-      ? exercises.find(
-          (e) =>
-            e.name.trim().toLowerCase() ===
-            challenge.exerciseName.trim().toLowerCase(),
-        )
-      : undefined
-  const selectedId = exerciseId ?? matched?.id ?? null
   const yourName = nameInput ?? savedName ?? ''
-  const valid = !!challenge && !!selectedId && yourName.trim().length > 0
-
-  async function createMatching(name: string) {
-    const ex = await addExercise(name, challenge?.unit ?? 'reps')
-    setExerciseId(ex.id)
-  }
+  const valid = !!challenge && yourName.trim().length > 0
 
   async function join(e: FormEvent) {
     e.preventDefault()
-    if (!valid || !selectedId || busy) return
+    if (!valid || !challenge || busy) return
     setBusy(true)
     try {
       if (yourName.trim() !== savedName) await setDisplayName(yourName)
-      const id = await joinChallenge(code, yourName.trim(), selectedId)
+      const exerciseId = await resolveLocalExercise(
+        challenge.exerciseName,
+        challenge.unit,
+      )
+      const id = await joinChallenge(code, yourName.trim(), exerciseId)
       // Entries logged earlier today should count right away.
       await syncNow()
-      toast({ message: `You're in: ${challenge!.name}` })
+      toast({ message: `You're in: ${challenge.name}` })
       if (!session?.user.email) {
         toast({
           message:
@@ -128,7 +118,7 @@ export function JoinPage() {
           <p className="text-[15px] text-danger">{preview.message}</p>
         )}
 
-        {challenge && exercises && savedName !== undefined && (
+        {challenge && savedName !== undefined && (
           <form onSubmit={join} className="flex flex-col gap-4">
             <Card className="flex flex-col gap-0.5 px-3 py-2.5">
               <span className="text-sm font-semibold">{challenge.name}</span>
@@ -139,8 +129,12 @@ export function JoinPage() {
               </span>
             </Card>
             <h1 className="text-[22px] font-semibold tracking-[-0.02em]">
-              {challenge.isMember ? 'Update your entry' : 'Join the challenge'}
+              {challenge.isMember ? 'Update your name' : 'Join the challenge'}
             </h1>
+            <p className="text-[13px] leading-relaxed text-muted">
+              Every {challenge.exerciseName.toLowerCase()} set you log on this
+              phone counts toward it.
+            </p>
 
             <TextField
               label="Name on the leaderboard"
@@ -150,19 +144,6 @@ export function JoinPage() {
               autoComplete="nickname"
               maxLength={24}
             />
-
-            <div className="flex flex-col gap-2">
-              <span className="text-[13px] font-medium">
-                Which of your exercises counts
-              </span>
-              <ExercisePicker
-                exercises={exercises}
-                selectedId={selectedId}
-                onSelect={setExerciseId}
-                suggestName={challenge.exerciseName}
-                onCreate={(n) => void createMatching(n)}
-              />
-            </div>
 
             <Button type="submit" size="lg" fullWidth disabled={!valid || busy}>
               {busy

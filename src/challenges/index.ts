@@ -2,6 +2,7 @@
 export * from './api.ts'
 export * from './codes.ts'
 export * from './hooks.ts'
+export * from './localExercise.ts'
 export * from './logic.ts'
 export * from './social.ts'
 export * from './types.ts'
