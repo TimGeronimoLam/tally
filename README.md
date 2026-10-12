@@ -47,7 +47,7 @@ Rule of thumb: if a component needs `db`, it belongs in `app` or `routes`, never
 Optional. Without it the app is fully local.
 
 1. Create a project at https://supabase.com.
-2. Run `supabase/migrations/20261012000000_init.sql` in the dashboard SQL Editor
+2. Run `supabase/migrations/20261012000000_init.sql`, then `20261012000001_grants.sql`, in the dashboard SQL Editor
    (or `supabase link` + `supabase db push` with the CLI).
 3. Authentication → Sign In / Providers → enable **Anonymous sign-ins**.
    Optionally enable the Turnstile captcha under Attack Protection to keep
