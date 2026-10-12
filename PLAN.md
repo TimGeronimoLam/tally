@@ -18,7 +18,7 @@ Each phase ends with something usable on a phone.
   - Manifest: name, icons, `display: standalone`, theme color
   - Workbox precaching of the app shell
 - [ ] Verify "Add to Home Screen" on Android Chrome and iOS Safari
-- [ ] Deploy from `main` to Cloudflare Pages or Vercel so every push is live
+- [ ] Deploy from `main` to Cloudflare Pages or Vercel so every push is live (configs and README steps ready; needs your account)
 - [x] Routing: bottom tab bar with Log / Stats / Challenges / Achievements, plus a Settings route
 
 ---
@@ -152,10 +152,10 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
 ## Phase 6 – Polish and hardening (ongoing)
 
 - [x] Dark / light mode (System / Light / Dark in Account)
-- [ ] iOS "Add to Home Screen" hint for Safari users
-- [ ] Offline indicator
+- [x] iOS "Add to Home Screen" hint for Safari users (and native install prompt on Chrome)
+- [x] Offline indicator
 - [x] Export / import JSON in settings (plus Delete all data with confirm)
-- [ ] Scheduled Postgres function to purge anonymous users (`is_anonymous = true`) inactive for 90 days
+- [x] Scheduled Postgres function to purge anonymous users (`is_anonymous = true`) inactive for 90 days (`20261012000003_purge_anonymous.sql`, pg_cron)
 - [x] Wire up social achievements (first challenge, won, host) via cached social stats
 - [ ] Tests
   - Vitest: `computeStats`, achievement checks, sync merge logic

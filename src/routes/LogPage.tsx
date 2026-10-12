@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { evaluateAchievements } from '../achievements/index.ts'
-import { ExerciseChips, ExerciseSheet } from '../components/app/index.ts'
+import {
+  ExerciseChips,
+  ExerciseSheet,
+  InstallBanner,
+} from '../components/app/index.ts'
 import {
   BigNumber,
   Button,
@@ -90,6 +94,10 @@ export function LogPage() {
   return (
     <Screen>
       <ScreenHeader title="Log" meta={formatHeaderDate()} />
+
+      <Gutter className="pt-3 empty:hidden">
+        <InstallBanner />
+      </Gutter>
 
       <Gutter className="pt-4">
         <ExerciseChips

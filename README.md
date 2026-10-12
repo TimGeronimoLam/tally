@@ -55,7 +55,10 @@ Optional. Without it the app is fully local.
 4. Copy `.env.example` to `.env.local` and paste the Project URL and anon key
    from Project Settings → API. Restart `npm run dev`.
 
-5. Authentication → URL Configuration: set **Site URL** to where the app is
+5. For the nightly cleanup of stale anonymous users, enable the **pg_cron**
+   extension (Database → Extensions) and run
+   `supabase/migrations/20261012000003_purge_anonymous.sql`.
+6. Authentication → URL Configuration: set **Site URL** to where the app is
    served and add it to **Redirect URLs** (plus `http://localhost:5173` for
    dev), so confirmation and magic-link emails land back in the app.
 
@@ -71,6 +74,21 @@ sync markers so everything is pushed to the new account.
 
 Free-tier projects pause after a week of inactivity; the Restore button is on
 the project's dashboard home.
+
+## Deploy
+
+Static build, no server of its own. Either host works; push to `main` and let
+it build.
+
+- **Cloudflare Pages**: Workers & Pages → Create → connect the repo. Build
+  command `npm run build`, output directory `dist`. Add the two
+  `VITE_SUPABASE_*` variables under Settings → Environment variables.
+  `public/_redirects` makes every path serve the app (deep links, `/join/CODE`).
+- **Vercel**: Import the repo (framework preset Vite), add the same env vars.
+  `vercel.json` holds the SPA rewrite.
+
+After the first deploy: put the site URL into Supabase → Authentication →
+URL Configuration (Site URL + Redirect URLs) so email links land in the app.
 
 ## PWA notes
 

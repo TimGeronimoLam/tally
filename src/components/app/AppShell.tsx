@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router'
+import { OfflineBanner } from './OfflineBanner.tsx'
 import { TabBar } from './TabBar.tsx'
 
 /**
@@ -9,6 +10,7 @@ import { TabBar } from './TabBar.tsx'
 export function AppShell({ tabs = true }: { tabs?: boolean }) {
   return (
     <div className="mx-auto flex h-full w-full max-w-app flex-col md:border-x md:border-border">
+      <OfflineBanner />
       <main className="min-h-0 flex-1 overflow-y-auto">
         <Outlet />
       </main>
