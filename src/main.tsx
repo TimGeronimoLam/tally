@@ -4,10 +4,12 @@ import { BrowserRouter } from 'react-router'
 import { registerSW } from 'virtual:pwa-register'
 import './index.css'
 import App from './App.tsx'
-import { ToastProvider } from './components/Toast.tsx'
+import { ToastProvider } from './components/ui/index.ts'
 import { seedIfNeeded } from './db/index.ts'
+import { initTheme } from './lib/theme.ts'
 
 registerSW({ immediate: true })
+initTheme()
 
 const root = createRoot(document.getElementById('root')!)
 

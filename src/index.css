@@ -1,19 +1,167 @@
 @import 'tailwindcss';
 
-@theme {
-  --color-bg: #0f172a;
-  --color-surface: #1e293b;
-  --color-accent: #22c55e;
+/*
+ * Design tokens. Values come from the Tally design canvas.
+ * Light is the default; dark is switched by `data-theme` on <html>
+ * (set in index.html before paint and by src/lib/theme.ts afterwards).
+ */
+:root {
+  --bg: #ffffff;
+  --fg: #171717;
+  --fg-muted: #6b6b6b;
+  --fg-faint: #8a8a86;
+  --fg-disabled: #b5b5b1;
+  --fg-placeholder: #c4c4c0;
+
+  --surface: #f4f4f2;
+  --surface-2: #ededea;
+  --surface-faint: #fafaf8;
+  --border: #e6e6e3;
+  --border-strong: #d4d4d0;
+
+  --accent: #0f8a5f;
+  --accent-fg: #ffffff;
+  --accent-text: #0f8a5f;
+
+  --inverse-bg: #171717;
+  --inverse-fg: #ffffff;
+  --accent-on-inverse: #4fd1a0;
+
+  --danger: #b42318;
+
+  --heat-0: #ededea;
+  --heat-1: #bfe6d4;
+  --heat-2: #7fcca8;
+  --heat-3: #3fae7f;
+  --heat-4: #0f8a5f;
+
+  --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.12);
+  --shadow-toast: 0 8px 24px rgba(0, 0, 0, 0.18);
+  --shadow-sheet: 0 -12px 40px rgba(0, 0, 0, 0.18);
+  --scrim: rgba(0, 0, 0, 0.18);
 }
 
-html,
-body,
-#root {
-  height: 100%;
+:root[data-theme='dark'] {
+  --bg: #0e0e0e;
+  --fg: #f2f2f0;
+  --fg-muted: #9a9a96;
+  --fg-faint: #8a8a86;
+  --fg-disabled: #6b6b68;
+  --fg-placeholder: #4a4a48;
+
+  --surface: #1e1e1e;
+  --surface-2: #2c2c2c;
+  --surface-faint: #161616;
+  --border: #2c2c2c;
+  --border-strong: #3a3a3a;
+
+  --accent: #0f8a5f;
+  --accent-fg: #ffffff;
+  --accent-text: #4fd1a0;
+
+  --inverse-bg: #f2f2f0;
+  --inverse-fg: #0e0e0e;
+  --accent-on-inverse: #0f8a5f;
+
+  --danger: #f0665a;
+
+  --heat-0: #1e1e1e;
+  --heat-1: #1f4a38;
+  --heat-2: #23765a;
+  --heat-3: #2ea57a;
+  --heat-4: #4fd1a0;
+
+  --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-toast: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-sheet: 0 -12px 40px rgba(0, 0, 0, 0.5);
+  --scrim: rgba(0, 0, 0, 0.5);
 }
 
-body {
-  @apply bg-bg text-slate-100 antialiased;
-  overscroll-behavior-y: none;
-  -webkit-tap-highlight-color: transparent;
+/* Expose the tokens to Tailwind utilities (bg-surface, text-muted, ...). */
+@theme inline {
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-muted: var(--fg-muted);
+  --color-faint: var(--fg-faint);
+  --color-disabled: var(--fg-disabled);
+  --color-placeholder: var(--fg-placeholder);
+
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-faint: var(--surface-faint);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-text: var(--accent-text);
+
+  --color-inverse: var(--inverse-bg);
+  --color-inverse-fg: var(--inverse-fg);
+  --color-accent-on-inverse: var(--accent-on-inverse);
+
+  --color-danger: var(--danger);
+
+  --color-heat-0: var(--heat-0);
+  --color-heat-1: var(--heat-1);
+  --color-heat-2: var(--heat-2);
+  --color-heat-3: var(--heat-3);
+  --color-heat-4: var(--heat-4);
+
+  --color-scrim: var(--scrim);
+
+  --shadow-raised: var(--shadow-raised);
+  --shadow-toast: var(--shadow-toast);
+  --shadow-sheet: var(--shadow-sheet);
+
+  --radius-control: 12px;
+  --radius-card: 14px;
+  --radius-sheet: 24px;
+}
+
+/*
+ * Base styles must live in Tailwind's `base` layer: an unlayered rule like
+ * `button { color: inherit }` would outrank every layered utility (text-*).
+ */
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button,
+  input {
+    font: inherit;
+    color: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: default;
+  }
+}
+
+@utility no-scrollbar {
+  /* Hide scrollbars on horizontal chip rows without disabling scroll. */
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }

@@ -3,8 +3,9 @@
 import { deflateSync } from 'node:zlib'
 import { writeFileSync } from 'node:fs'
 
-const BG = [0x0f, 0x17, 0x2a]
-const FG = [0x22, 0xc5, 0x5e]
+const BG = [0x17, 0x17, 0x17]
+const FG = [0xff, 0xff, 0xff]
+const ACCENT = [0x0f, 0x8a, 0x5f]
 
 function crc32(buf) {
   let c
@@ -75,7 +76,7 @@ function tally(size) {
     if (t >= 0 && t <= 1) {
       const px = x0 + t * (x1 - x0),
         py = y0 + t * (y1 - y0)
-      if (Math.hypot(x - px, y - py) <= w / 2) return FG
+      if (Math.hypot(x - px, y - py) <= w / 2) return ACCENT
     }
     return BG
   }

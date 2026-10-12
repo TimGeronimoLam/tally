@@ -1,5 +1,11 @@
-import { Page } from '../components/Page.tsx'
+import { ComingSoon } from '../components/app/index.ts'
+import { Screen, ScreenHeader } from '../components/ui/index.ts'
 
 export function AchievementsPage() {
-  return <Page title="Achievements" />
+  return (
+    <Screen>
+      <ScreenHeader title="Achievements" />
+      <ComingSoon />
+    </Screen>
+  )
 }

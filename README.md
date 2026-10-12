@@ -19,6 +19,26 @@ Vite + React + TypeScript · Tailwind v4 · react-router · vite-plugin-pwa (Wor
 | `npm run format`    | Prettier write / `format:check` to verify     |
 | `npm run icons`     | Regenerate placeholder PNG icons in `public/` |
 
+## Design
+
+Screens follow the Tally design canvas: https://claude.ai/artifact/6T6fTGkoBAK7KiVJiwqGN9
+
+Tokens (colors, radii, shadows) are CSS variables in `src/index.css`, exposed to
+Tailwind via `@theme inline` so utilities like `bg-surface` / `text-muted` follow
+the active theme. Light and dark are switched by `data-theme` on `<html>`.
+
+## Project structure
+
+| Path                  | What lives there                                                          |
+| --------------------- | ------------------------------------------------------------------------- |
+| `src/components/ui/`  | Design-system primitives. No data access. Button, Chip, Sheet, Keypad…    |
+| `src/components/app/` | Composites that know the data model: TabBar, ExerciseChips, ExerciseSheet |
+| `src/routes/`         | One file per screen. Screens compose `app` + `ui` and call `db` hooks     |
+| `src/db/`             | Dexie schema, types, mutations, live-query hooks, import/export           |
+| `src/lib/`            | Pure helpers: `cn`, `format`, `date`, `theme`, `toast` hook               |
+
+Rule of thumb: if a component needs `db`, it belongs in `app` or `routes`, never `ui`.
+
 ## PWA notes
 
 - Service worker is only generated on `build`; test install with `npm run preview`.

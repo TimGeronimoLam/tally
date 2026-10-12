@@ -2,6 +2,8 @@
 
 Tally is a minimal workout-stats PWA for Android and iOS. Logging a set takes one tap and one number. No accounts required; data is local-first, with optional sync and anonymous-account challenges via Supabase.
 
+**Design:** https://claude.ai/artifact/6T6fTGkoBAK7KiVJiwqGN9 (canvas with all core screens, light + dark)
+
 **Stack:** Vite + React + TypeScript · Dexie (IndexedDB) · vite-plugin-pwa · Supabase (Postgres, Auth, Realtime) · Cloudflare Pages or Vercel
 
 Each phase ends with something usable on a phone.
@@ -149,10 +151,10 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
 
 ## Phase 6 – Polish and hardening (ongoing)
 
-- [ ] Dark / light mode
+- [x] Dark / light mode (System / Light / Dark in Account)
 - [ ] iOS "Add to Home Screen" hint for Safari users
 - [ ] Offline indicator
-- [ ] Export / import JSON in settings
+- [x] Export / import JSON in settings (plus Delete all data with confirm)
 - [ ] Scheduled Postgres function to purge anonymous users (`is_anonymous = true`) inactive for 90 days
 - [ ] Wire up social achievements (first challenge joined, first won, invited 3 people)
 - [ ] Tests

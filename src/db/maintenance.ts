@@ -1,0 +1,80 @@
+import { db } from './db.ts'
+import { seedIfNeeded } from './seed.ts'
+import type { Entry, Exercise } from './types.ts'
+
+export interface Snapshot {
+  app: 'tally'
+  version: 1
+  exportedAt: string
+  exercises: Exercise[]
+  entries: Entry[]
+}
+
+export async function exportSnapshot(): Promise<Snapshot> {
+  const [exercises, entries] = await Promise.all([
+    db.exercises.toArray(),
+    db.entries.toArray(),
+  ])
+  return {
+    app: 'tally',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    exercises,
+    entries,
+  }
+}
+
+/** Trigger a browser download of the current data as JSON. */
+export async function downloadSnapshot(): Promise<void> {
+  const snapshot = await exportSnapshot()
+  const blob = new Blob([JSON.stringify(snapshot, null, 2)], {
+    type: 'application/json',
+  })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `tally-${snapshot.exportedAt.slice(0, 10)}.json`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+function isSnapshot(value: unknown): value is Snapshot {
+  if (typeof value !== 'object' || value === null) return false
+  const v = value as Record<string, unknown>
+  return (
+    v.app === 'tally' &&
+    v.version === 1 &&
+    Array.isArray(v.exercises) &&
+    Array.isArray(v.entries)
+  )
+}
+
+/**
+ * Merge a snapshot into the local database. Rows are matched by id; existing
+ * rows are overwritten, so importing your own export is idempotent.
+ */
+export async function importSnapshot(
+  file: File,
+): Promise<{ exercises: number; entries: number }> {
+  const parsed: unknown = JSON.parse(await file.text())
+  if (!isSnapshot(parsed)) {
+    throw new Error('Not a Tally export file')
+  }
+  await db.transaction('rw', db.exercises, db.entries, async () => {
+    await db.exercises.bulkPut(parsed.exercises)
+    await db.entries.bulkPut(parsed.entries)
+  })
+  return { exercises: parsed.exercises.length, entries: parsed.entries.length }
+}
+
+/** Wipe everything and re-seed defaults. Irreversible. */
+export async function resetAllData(): Promise<void> {
+  await db.transaction('rw', db.exercises, db.entries, db.meta, async () => {
+    await Promise.all([
+      db.exercises.clear(),
+      db.entries.clear(),
+      db.meta.clear(),
+    ])
+  })
+  await seedIfNeeded()
+}
