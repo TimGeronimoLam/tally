@@ -62,12 +62,21 @@ Optional. Without it the app is fully local.
 6. Authentication → URL Configuration: set **Site URL** to where the app is
    served and add it to **Redirect URLs** (plus `http://localhost:5173` for
    dev), so confirmation and magic-link emails land back in the app.
+7. Authentication → Emails → Templates: add the one-time code to the
+   **Confirm signup**, **Magic Link** and **Change Email Address** templates,
+   e.g. `<p>Your code: {{ .Token }}</p>` next to the existing
+   `{{ .ConfirmationURL }}` link. The app asks for this code after sending
+   the email. It matters on iPhone: iOS opens every link in Safari, never in
+   a home-screen web app, and the two do not share a session, so the link
+   alone can never sign the installed app in. Without `{{ .Token }}` in the
+   template the code step cannot complete.
 
 How sync works (`src/sync/`): on sign-in, on each local change (debounced),
 on tab focus and on reconnect, the app pulls rows with `updated_at` newer than
 the last pull, merges them (latest `deleted_at` wins; unsynced local edits to
 an exercise's name/unit win), then pushes rows without `syncedAt`. Users sign in
-with an email magic link, or not at all. Joining a challenge without an
+with an emailed one-time code (the same email carries a magic link for
+platforms where links do open the app), or not at all. Joining a challenge without an
 account silently creates an anonymous Supabase user; the UI never calls it
 that, and a later email sign-in upgrades that same user in place so nothing is
 orphaned. Sign out keeps local data; signing in as a different user resets the
@@ -92,6 +101,11 @@ it build.
 
 After the first deploy: put the site URL into Supabase → Authentication →
 URL Configuration (Site URL + Redirect URLs) so email links land in the app.
+
+Invite links (`/join/CODE`) have the same iOS limit as sign-in links: on an
+iPhone they open in Safari, not in the installed app. The join page then
+shows the code with a Copy button and tells the user to enter it in the
+app's Challenges tab, where the code field already lives.
 
 ## PWA notes
 

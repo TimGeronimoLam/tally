@@ -5,6 +5,7 @@ export interface EmailSheetProps {
   title: string
   description: string
   submitLabel: string
+  busyLabel?: string
   onSubmit: (email: string) => Promise<void>
   onClose: () => void
 }

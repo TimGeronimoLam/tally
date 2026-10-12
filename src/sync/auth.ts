@@ -53,20 +53,29 @@ export async function signInAnonymously(): Promise<void> {
   if (error) throw error
 }
 
+/** Which one-time code the sign-in email carries; needed to verify it. */
+export type EmailCodeType = 'email' | 'email_change'
+
 /**
- * Start an email sign-in. The user never sees anonymous accounts, so:
+ * Start an email sign-in. The email carries a link and a one-time code
+ * (when the Supabase templates include `{{ .Token }}`, see README): on an
+ * iPhone the link opens Safari rather than the installed app, whose
+ * storage is separate, so the code is the only way to sign in inside it.
+ * Returns the code type `verifyEmailCode` needs.
+ *
+ * The user never sees anonymous accounts, so:
  * - with an anonymous session (created silently by a challenge join), the
  *   email is attached to that same user via updateUser, keeping its id and
- *   memberships; Supabase emails a confirmation link;
+ *   memberships; Supabase emails a confirmation link and code;
  * - otherwise, or if that email already belongs to another account, a
  *   magic link is sent (creating the account on first use).
  */
-export async function signInWithEmail(email: string): Promise<void> {
+export async function signInWithEmail(email: string): Promise<EmailCodeType> {
   const client = requireClient()
   const anonymous = state.session?.user.is_anonymous === true
   if (anonymous) {
     const { error } = await client.auth.updateUser({ email })
-    if (!error) return
+    if (!error) return 'email_change'
     if (!/already|registered|exists/i.test(error.message)) throw error
     // Fall through: the email has an account; sign into that one instead.
   }
@@ -75,6 +84,33 @@ export async function signInWithEmail(email: string): Promise<void> {
     options: { emailRedirectTo: window.location.origin },
   })
   if (error) throw error
+  return 'email'
+}
+
+/** Digits only; Supabase codes are 6 long but the length is configurable. */
+export function normalizeEmailCode(input: string): string {
+  return input.replace(/\D/g, '')
+}
+
+/**
+ * Finish an email sign-in with the code from the email, as an alternative
+ * to tapping its link. Works inside an installed app on any platform.
+ */
+export async function verifyEmailCode(
+  email: string,
+  code: string,
+  type: EmailCodeType,
+): Promise<void> {
+  const token = normalizeEmailCode(code)
+  if (token.length < 6) throw new Error('Enter the whole code from the email')
+  const { error } = await requireClient().auth.verifyOtp({ email, token, type })
+  if (error) {
+    throw new Error(
+      /expired|invalid/i.test(error.message)
+        ? 'That code is wrong or has expired. Ask for a new one.'
+        : error.message,
+    )
+  }
 }
 
 /** Ends the session. Local data stays on the device. */

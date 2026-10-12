@@ -11,11 +11,19 @@ import {
   syncNow,
   useSession,
   useSyncStatus,
+  type EmailCodeType,
 } from '../../sync/index.ts'
 import { Avatar, Button, Card, InputSheet } from '../ui/index.ts'
+import { EmailCodeSheet } from './EmailCodeSheet.tsx'
 import { EmailSheet } from './EmailSheet.tsx'
 
-type SheetMode = 'closed' | 'name' | 'email'
+type SheetMode = 'closed' | 'name' | 'email' | 'code'
+
+/** The sign-in email just sent; the code sheet verifies against it. */
+interface PendingSignIn {
+  email: string
+  type: EmailCodeType
+}
 
 /**
  * Account block at the top of the Account screen: the user's name, then
@@ -29,6 +37,7 @@ export function SyncCard() {
   const status = useSyncStatus()
   const name = useDisplayName()
   const [sheet, setSheet] = useState<SheetMode>('closed')
+  const [pending, setPending] = useState<PendingSignIn | null>(null)
   const [busy, setBusy] = useState(false)
 
   async function act(fn: () => Promise<unknown>, success?: string) {
@@ -148,12 +157,24 @@ export function SyncCard() {
         key={`email-${sheet}`}
         open={sheet === 'email'}
         title="Sign in"
-        description="We'll email you a sign-in link. No password needed; the same link creates your account the first time."
-        submitLabel="Send link"
+        description="We'll email you a code and a link. No password needed; your account is created the first time."
+        submitLabel="Send code"
+        busyLabel="Sending…"
         onSubmit={async (addr) => {
-          await signInWithEmail(addr)
+          const type = await signInWithEmail(addr)
+          setPending({ email: addr, type })
+          setSheet('code')
+        }}
+        onClose={() => setSheet('closed')}
+      />
+      <EmailCodeSheet
+        key={`code-${sheet}-${pending?.email ?? ''}`}
+        open={sheet === 'code' && pending !== null}
+        pending={pending}
+        onSignedIn={(addr) => {
           setSheet('closed')
-          toast({ message: `Link sent to ${addr}` })
+          setPending(null)
+          toast({ message: `Signed in as ${addr}` })
         }}
         onClose={() => setSheet('closed')}
       />

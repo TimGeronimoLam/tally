@@ -16,6 +16,8 @@ import {
   TextField,
 } from '../components/ui/index.ts'
 import { useDisplayName } from '../db/index.ts'
+import { isIOS, isStandalone } from '../lib/install.ts'
+import { copyText } from '../lib/share.ts'
 import { useToast } from '../lib/toast.ts'
 import { setDisplayName, useSession } from '../sync/index.ts'
 
@@ -40,6 +42,10 @@ export function JoinPage() {
   const [preview, setPreview] = useState<Preview>({ state: 'loading' })
   const [nameInput, setNameInput] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  // iOS never routes a link into an installed web app: it opens in Safari,
+  // whose storage the home-screen app does not share. Joining here would
+  // land the membership on a Safari-only account, so point at the code.
+  const [openedOutsideApp] = useState(() => isIOS() && !isStandalone())
 
   useEffect(() => {
     let cancelled = false
@@ -126,6 +132,36 @@ export function JoinPage() {
                 })}
               </span>
             </Card>
+            {openedOutsideApp && (
+              <Card
+                variant="outline"
+                className="flex items-center justify-between gap-3 px-3.5 py-3"
+              >
+                <div className="flex min-w-0 flex-col gap-0.5">
+                  <span className="text-[13px] font-semibold">
+                    Have Tally on your home screen?
+                  </span>
+                  <span className="text-xs leading-relaxed text-muted">
+                    This link opened in the browser instead. Open the app, go to
+                    Challenges and enter the code {code} there.
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0"
+                  onClick={async () =>
+                    toast({
+                      message: (await copyText(code))
+                        ? 'Code copied'
+                        : 'Could not copy',
+                    })
+                  }
+                >
+                  Copy code
+                </Button>
+              </Card>
+            )}
             <h1 className="text-[22px] font-semibold tracking-[-0.02em]">
               {challenge.isMember ? 'Update your name' : 'Join the challenge'}
             </h1>

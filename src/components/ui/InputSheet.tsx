@@ -10,6 +10,8 @@ export interface InputSheetProps {
   label: string
   initialValue?: string
   submitLabel: string
+  /** Shown on the submit button while `onSubmit` runs. */
+  busyLabel?: string
   cancelLabel?: string
   /** Return false (or a message) to block submit. Trimmed value. */
   validate?: (value: string) => boolean | string
@@ -30,6 +32,7 @@ export function InputSheet({
   label,
   initialValue = '',
   submitLabel,
+  busyLabel = 'Saving…',
   cancelLabel = 'Not now',
   validate,
   onSubmit,
@@ -80,7 +83,7 @@ export function InputSheet({
         )}
         <div className="flex flex-col gap-2">
           <Button type="submit" size="lg" fullWidth disabled={!valid || busy}>
-            {busy ? 'Saving…' : submitLabel}
+            {busy ? busyLabel : submitLabel}
           </Button>
           <Button variant="ghost" fullWidth onClick={onClose}>
             {cancelLabel}

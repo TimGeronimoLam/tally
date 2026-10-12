@@ -1,6 +1,7 @@
 /** Composites that know about Tally's data model. Built from ../ui. */
 export * from './AppShell.tsx'
 export * from './ChallengeCard.tsx'
+export * from './EmailCodeSheet.tsx'
 export * from './EmailSheet.tsx'
 export * from './ExerciseChips.tsx'
 export * from './ExercisePicker.tsx'
