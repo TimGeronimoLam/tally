@@ -90,7 +90,7 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
 - [x] Create Supabase project (ref mayxypiipcbgrvjgqzft; keys in `.env.local`)
 - [x] Tables mirroring Dexie (`exercises`, `entries`) plus `user_id` and `updated_at` (`supabase/migrations/20261012000000_init.sql`)
 - [x] Row Level Security on all tables: `user_id = auth.uid()` for select / insert / update / delete
-- [ ] Enable anonymous sign-ins (Authentication → Sign In / Providers; app currently gets "Anonymous sign-ins are disabled")
+- [x] Enable anonymous sign-ins (verified end-to-end 2026-10-12: push, debounced push after log, soft-delete propagation, fresh-install pull with seed dedupe)
 - [ ] Enable Turnstile captcha for anonymous sign-ins (free, prevents junk users)
 
 ### Sync module
