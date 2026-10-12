@@ -1,20 +1,31 @@
+import { serverNow } from '../lib/clock.ts'
+import { dayKey, parseDayKey, shiftDayKey, startOfDay } from '../lib/date.ts'
 import type { Challenge, ChallengeSummary } from './types.ts'
 
 export type ChallengeStatus = 'upcoming' | 'active' | 'ended'
 
 export function challengeStatus(
   c: Pick<Challenge, 'startsAt' | 'endsAt'>,
-  now: number = Date.now(),
+  now: number = serverNow(),
 ): ChallengeStatus {
   if (now < Date.parse(c.startsAt)) return 'upcoming'
   if (now >= Date.parse(c.endsAt)) return 'ended'
   return 'active'
 }
 
+/** Whole days until the start, rounded up; 0 once started. */
+export function daysUntilStart(
+  c: Pick<Challenge, 'startsAt'>,
+  now: number = serverNow(),
+): number {
+  const ms = Date.parse(c.startsAt) - now
+  return ms <= 0 ? 0 : Math.ceil(ms / 86_400_000)
+}
+
 /** Whole days until the end, rounded up; 0 once ended. */
 export function daysLeft(
   c: Pick<Challenge, 'endsAt'>,
-  now: number = Date.now(),
+  now: number = serverNow(),
 ): number {
   const ms = Date.parse(c.endsAt) - now
   return ms <= 0 ? 0 : Math.ceil(ms / 86_400_000)
@@ -42,7 +53,7 @@ export function isWon(
     ChallengeSummary,
     'goalType' | 'goalValue' | 'myTotal' | 'myRank' | 'startsAt' | 'endsAt'
   >,
-  now: number = Date.now(),
+  now: number = serverNow(),
 ): boolean {
   if (s.goalType === 'first_to') {
     return s.goalValue !== null && s.myTotal >= s.goalValue && s.myRank === 1
@@ -62,6 +73,7 @@ export const DURATION_OPTIONS = [
   { value: '3d', label: '3 days', days: 3 },
   { value: '1w', label: '1 week', days: 7 },
   { value: '1m', label: '1 month', days: 30 },
+  { value: 'custom', label: 'Custom', days: null },
 ] as const
 export type DurationValue = (typeof DURATION_OPTIONS)[number]['value']
 
@@ -71,6 +83,52 @@ export function endOfDayIn(days: number, now: Date = new Date()): Date {
   d.setDate(d.getDate() + days)
   d.setHours(23, 59, 59, 999)
   return d
+}
+
+/** Local day keys (`YYYY-MM-DD`) picked in the custom date fields. */
+export interface DateRangeInput {
+  startKey: string
+  endKey: string
+}
+
+/** Default custom range: today through a week from today. */
+export function defaultDateRange(now: Date = new Date()): DateRangeInput {
+  const startKey = dayKey(now)
+  return { startKey, endKey: shiftDayKey(startKey, 7) }
+}
+
+/**
+ * Turn a preset or custom range into the challenge window: local midnight
+ * at the start of the first day through the last moment of the last day.
+ * Returns null when the range is unusable.
+ */
+export function challengeWindow(
+  duration: DurationValue,
+  range: DateRangeInput,
+  now: Date = new Date(),
+): { startsAt: Date; endsAt: Date } | null {
+  const preset = DURATION_OPTIONS.find((d) => d.value === duration)
+  if (!preset) return null
+  if (preset.days !== null) {
+    return {
+      // From the start of today, so reps logged earlier today already count.
+      startsAt: new Date(startOfDay(now)),
+      endsAt: endOfDayIn(preset.days, now),
+    }
+  }
+  if (!isDayKey(range.startKey) || !isDayKey(range.endKey)) return null
+  const startsAt = parseDayKey(range.startKey)
+  const endsAt = endOfDayIn(0, parseDayKey(range.endKey))
+  if (Number.isNaN(startsAt.getTime()) || Number.isNaN(endsAt.getTime()))
+    return null
+  if (endsAt <= startsAt) return null
+  // No point creating a challenge that is already over.
+  if (endsAt.getTime() <= now.getTime()) return null
+  return { startsAt, endsAt }
+}
+
+function isDayKey(s: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(s)
 }
 
 /** "Pushups · Most reps · 19 days left" */
@@ -89,12 +147,9 @@ export function challengeSubtitle(
   )
   const status = challengeStatus(c, opts.now)
   if (status === 'ended') {
-    parts.push(
-      `ended ${new Date(c.endsAt).toLocaleDateString(undefined, {
-        day: 'numeric',
-        month: 'short',
-      })}`,
-    )
+    parts.push(`ended ${shortDate(c.endsAt)}`)
+  } else if (status === 'upcoming') {
+    parts.push(`starts ${shortDate(c.startsAt)}`)
   } else if (opts.memberCount !== undefined && c.goalType === 'first_to') {
     parts.push(
       `${opts.memberCount} ${opts.memberCount === 1 ? 'person' : 'people'}`,
@@ -104,6 +159,13 @@ export function challengeSubtitle(
     parts.push(`${d} ${d === 1 ? 'day' : 'days'} left`)
   }
   return parts.join(' · ')
+}
+
+function shortDate(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'short',
+  })
 }
 
 function formatInt(n: number): string {

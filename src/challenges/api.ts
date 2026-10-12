@@ -1,4 +1,4 @@
-import { startOfDay } from '../lib/date.ts'
+import { calibrate } from '../lib/clock.ts'
 import { supabase } from '../lib/supabase.ts'
 import { signInAnonymously } from '../sync/auth.ts'
 import { syncNow } from '../sync/sync.ts'
@@ -116,8 +116,7 @@ export async function createChallenge(
       p_unit: input.unit,
       p_goal_type: input.goalType,
       p_goal_value: input.goalValue,
-      // From the start of today, so reps logged earlier today already count.
-      p_starts_at: new Date(startOfDay()).toISOString(),
+      p_starts_at: input.startsAt.toISOString(),
       p_ends_at: input.endsAt.toISOString(),
       p_invite_code: generateInviteCode(),
       p_display_name: input.displayName,
@@ -157,11 +156,35 @@ export async function joinChallenge(
   return str(data)
 }
 
+/** Host only: close the window now. Returns the updated challenge. */
+export async function endChallenge(challengeId: string): Promise<Challenge> {
+  const { data, error } = await client().rpc('end_challenge', {
+    p_challenge_id: challengeId,
+  })
+  if (error) fail('Could not end challenge', error)
+  const ended = toChallenge((Array.isArray(data) ? data[0] : data) as Raw)
+  // The window closed at the server's "now"; that is the best clock reading
+  // available, so the challenge shows as ended at once.
+  calibrate(ended.endsAt)
+  return ended
+}
+
+/** Host only: remove the challenge for everyone. */
+export async function deleteChallenge(challengeId: string): Promise<void> {
+  const { error } = await client().rpc('delete_challenge', {
+    p_challenge_id: challengeId,
+  })
+  if (error) fail('Could not delete challenge', error)
+}
+
 export async function fetchMyChallenges(): Promise<ChallengeSummary[]> {
   if (!(await currentUserId())) return []
   const { data, error } = await client().rpc('my_challenges')
   if (error) fail('Could not load challenges', error)
-  return ((data ?? []) as Raw[]).map(toSummary)
+  const rows = (data ?? []) as Raw[]
+  // Every row carries the server's clock reading for this request.
+  if (rows.length) calibrate(rows[0].server_now as string | undefined)
+  return rows.map(toSummary)
 }
 
 export async function fetchLeaderboard(

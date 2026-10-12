@@ -1,7 +1,11 @@
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import {
   challengeStatus,
   daysLeft,
+  daysUntilStart,
+  deleteChallenge,
+  endChallenge,
   gapToFirst,
   inviteUrl,
   useChallengeSummary,
@@ -11,6 +15,7 @@ import { InviteCodeCard, LeaderboardList } from '../components/app/index.ts'
 import {
   Button,
   ChevronLeftIcon,
+  ConfirmSheet,
   Gutter,
   IconButton,
   Screen,
@@ -37,8 +42,10 @@ export function ChallengeDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const toast = useToast()
-  const { data: c, missing, loading, userId } = useChallengeSummary(id)
+  const { data: c, missing, loading, userId, refresh } = useChallengeSummary(id)
   const board = useLeaderboard(c?.id)
+  const [confirm, setConfirm] = useState<'end' | 'delete' | null>(null)
+  const [busy, setBusy] = useState(false)
 
   if (missing) {
     return (
@@ -64,6 +71,7 @@ export function ChallengeDetailPage() {
   const status = challengeStatus(c)
   const rows = board.data ?? c.top
   const unit = c.unit === 'reps' ? 'reps' : c.unit
+  const isHost = userId !== null && c.creatorId === userId
 
   async function share() {
     const outcome = await shareLink({
@@ -77,6 +85,39 @@ export function ChallengeDetailPage() {
   async function logThis() {
     await setMeta(META_KEYS.lastExerciseId, c!.myExerciseId)
     navigate('/')
+  }
+
+  async function endNow() {
+    if (busy) return
+    setBusy(true)
+    try {
+      await endChallenge(c!.id)
+      await refresh()
+      setConfirm(null)
+      toast({ message: 'Challenge ended. Final standings are in.' })
+    } catch (err) {
+      toast({ message: err instanceof Error ? err.message : 'Could not end' })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function remove() {
+    if (busy) return
+    setBusy(true)
+    try {
+      await deleteChallenge(c!.id)
+      await refresh()
+      setConfirm(null)
+      toast({ message: 'Challenge deleted' })
+      navigate('/challenges', { replace: true })
+    } catch (err) {
+      toast({
+        message: err instanceof Error ? err.message : 'Could not delete',
+      })
+    } finally {
+      setBusy(false)
+    }
   }
 
   return (
@@ -105,10 +146,13 @@ export function ChallengeDetailPage() {
 
       <Gutter className="pt-5">
         <TileGrid>
-          <Tile
-            label={status === 'ended' ? 'Ended' : 'Days left'}
-            value={status === 'ended' ? '—' : daysLeft(c)}
-          />
+          {status === 'ended' ? (
+            <Tile label="Ended" value="—" />
+          ) : status === 'upcoming' ? (
+            <Tile label="Starts in" value={daysUntilStart(c)} />
+          ) : (
+            <Tile label="Days left" value={daysLeft(c)} />
+          )}
           <Tile label={`Your ${unit}`} value={formatNumber(c.myTotal)} />
           {c.goalType === 'first_to' ? (
             <Tile
@@ -144,6 +188,30 @@ export function ChallengeDetailPage() {
         <InviteCodeCard code={c.inviteCode} challengeName={c.name} />
       </Gutter>
 
+      {isHost && (
+        <Gutter className="pt-5">
+          <SectionLabel>Host</SectionLabel>
+          <div className="flex flex-col gap-1 pt-1">
+            {status === 'active' && (
+              <Button
+                variant="outline"
+                fullWidth
+                onClick={() => setConfirm('end')}
+              >
+                End challenge now
+              </Button>
+            )}
+            <Button
+              variant="danger"
+              fullWidth
+              onClick={() => setConfirm('delete')}
+            >
+              Delete challenge
+            </Button>
+          </div>
+        </Gutter>
+      )}
+
       <div className="flex-1" />
 
       {status !== 'ended' && (
@@ -153,6 +221,24 @@ export function ChallengeDetailPage() {
           </Button>
         </Gutter>
       )}
+
+      <ConfirmSheet
+        open={confirm === 'end'}
+        title="End challenge now?"
+        message={`"${c.name}" closes for everyone right away. Totals so far become the final standings. This cannot be undone.`}
+        confirmLabel={busy ? 'Ending…' : 'End challenge'}
+        onConfirm={endNow}
+        onClose={() => !busy && setConfirm(null)}
+      />
+      <ConfirmSheet
+        open={confirm === 'delete'}
+        title="Delete challenge?"
+        message={`"${c.name}" and its leaderboard are removed for all ${c.memberCount} ${c.memberCount === 1 ? 'member' : 'members'}. Everyone keeps their logged reps. This cannot be undone.`}
+        confirmLabel={busy ? 'Deleting…' : 'Delete challenge'}
+        destructive
+        onConfirm={remove}
+        onClose={() => !busy && setConfirm(null)}
+      />
     </Screen>
   )
 }

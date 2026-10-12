@@ -1,4 +1,5 @@
 import { getMeta, setMeta } from '../db/meta.ts'
+import { serverNow } from '../lib/clock.ts'
 import { META_KEYS } from '../db/types.ts'
 import { isWon } from './logic.ts'
 import type { ChallengeSummary } from './types.ts'
@@ -15,7 +16,7 @@ export const EMPTY_SOCIAL: SocialStats = { joined: 0, hosted: 0, won: 0 }
 export function socialStatsFrom(
   challenges: ChallengeSummary[],
   userId: string,
-  now: number = Date.now(),
+  now: number = serverNow(),
 ): SocialStats {
   return {
     joined: challenges.length,

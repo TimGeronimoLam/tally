@@ -7,7 +7,10 @@ import {
 import {
   challengeStatus,
   challengeSubtitle,
+  challengeWindow,
   daysLeft,
+  daysUntilStart,
+  defaultDateRange,
   endOfDayIn,
   gapToFirst,
   isWon,
@@ -49,11 +52,63 @@ describe('status and timing', () => {
     expect(daysLeft(c, NOW + 3 * DAY)).toBe(0)
   })
 
+  it('counts days until an upcoming start', () => {
+    expect(daysUntilStart(c, NOW)).toBe(0)
+    expect(daysUntilStart(c, NOW - 2 * DAY)).toBe(1)
+    expect(daysUntilStart(c, NOW - 3 * DAY - 1)).toBe(3)
+  })
+
   it('ends challenges at the end of a local day', () => {
     const end = endOfDayIn(7, new Date(2026, 9, 12, 15, 30))
     expect(end.getDate()).toBe(19)
     expect(end.getHours()).toBe(23)
     expect(end.getMinutes()).toBe(59)
+  })
+})
+
+describe('challenge window', () => {
+  const now = new Date(2026, 9, 12, 15, 30)
+
+  it('presets start today and end at the end of the last day', () => {
+    const w = challengeWindow('1w', defaultDateRange(now), now)!
+    expect(w.startsAt).toEqual(new Date(2026, 9, 12))
+    expect(w.endsAt).toEqual(new Date(2026, 9, 19, 23, 59, 59, 999))
+  })
+
+  it('defaults the custom range to a week from today', () => {
+    expect(defaultDateRange(now)).toEqual({
+      startKey: '2026-10-12',
+      endKey: '2026-10-19',
+    })
+  })
+
+  it('builds a custom window from local day keys', () => {
+    const w = challengeWindow(
+      'custom',
+      { startKey: '2026-10-01', endKey: '2026-10-31' },
+      now,
+    )!
+    expect(w.startsAt).toEqual(new Date(2026, 9, 1))
+    expect(w.endsAt).toEqual(new Date(2026, 9, 31, 23, 59, 59, 999))
+  })
+
+  it('allows a single-day custom window', () => {
+    const w = challengeWindow(
+      'custom',
+      { startKey: '2026-10-12', endKey: '2026-10-12' },
+      now,
+    )!
+    expect(w.startsAt).toEqual(new Date(2026, 9, 12))
+    expect(w.endsAt.getDate()).toBe(12)
+  })
+
+  it('rejects reversed, past or malformed custom ranges', () => {
+    const custom = (startKey: string, endKey: string) =>
+      challengeWindow('custom', { startKey, endKey }, now)
+    expect(custom('2026-10-20', '2026-10-19')).toBeNull()
+    expect(custom('2026-10-01', '2026-10-11')).toBeNull()
+    expect(custom('', '2026-10-19')).toBeNull()
+    expect(custom('2026-10-12', 'soon')).toBeNull()
   })
 })
 
@@ -183,5 +238,16 @@ describe('subtitle', () => {
         { now: NOW },
       ),
     ).toMatch(/^Pushups · Most reps · ended /)
+    expect(
+      challengeSubtitle(
+        {
+          ...base,
+          goalType: 'most_reps',
+          goalValue: null,
+          startsAt: iso(NOW + 2 * DAY),
+        },
+        { now: NOW },
+      ),
+    ).toMatch(/^Pushups · Most reps · starts /)
   })
 })

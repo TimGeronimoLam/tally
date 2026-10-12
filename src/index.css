@@ -6,6 +6,9 @@
  * (set in index.html before paint and by src/lib/theme.ts afterwards).
  */
 :root {
+  /* Native widgets (date pickers, scrollbars, selects) follow the theme. */
+  color-scheme: light;
+
   --bg: #ffffff;
   --fg: #171717;
   --fg-muted: #6b6b6b;
@@ -42,6 +45,8 @@
 }
 
 :root[data-theme='dark'] {
+  color-scheme: dark;
+
   --bg: #0e0e0e;
   --fg: #f2f2f0;
   --fg-muted: #9a9a96;
@@ -152,6 +157,22 @@
     color: inherit;
   }
 
+  /* Form controls that keep a native look (checkbox, date picker UI). */
+  input {
+    accent-color: var(--accent);
+  }
+
+  /* Date fields: match text inputs. iOS Safari otherwise centers the text,
+     ignores the height and draws its own chrome. */
+  input[type='date'] {
+    appearance: none;
+    -webkit-appearance: none;
+    text-align: left;
+    min-width: 0;
+  }
+  input[type='date']::-webkit-date-and-time-value {
+    text-align: left;
+  }
   button {
     cursor: pointer;
   }

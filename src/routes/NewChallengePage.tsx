@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router'
 import {
   DURATION_OPTIONS,
   GOAL_TYPES,
+  challengeWindow,
   createChallenge,
-  endOfDayIn,
+  defaultDateRange,
   type DurationValue,
   type GoalType,
 } from '../challenges/index.ts'
@@ -39,6 +40,7 @@ export function NewChallengePage() {
   const [goalType, setGoalType] = useState<GoalType>('most_reps')
   const [goalValue, setGoalValue] = useState('')
   const [duration, setDuration] = useState<DurationValue>('1w')
+  const [range, setRange] = useState(defaultDateRange)
   const [displayName, setDisplayNameInput] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [monthName] = useState(() =>
@@ -52,25 +54,27 @@ export function NewChallengePage() {
   const yourName = displayName ?? savedName
   const defaultTitle = exercise ? `${monthName} ${exercise.name}` : ''
   const goal = Number(goalValue)
+  const timeWindow = challengeWindow(duration, range)
   const valid =
     exercise !== null &&
     yourName.trim().length > 0 &&
-    (goalType === 'most_reps' || goal > 0)
+    (goalType === 'most_reps' || goal > 0) &&
+    timeWindow !== null
 
   async function submit(e: FormEvent) {
     e.preventDefault()
-    if (!valid || !exercise || busy) return
+    if (!valid || !exercise || !timeWindow || busy) return
     setBusy(true)
     try {
       if (yourName.trim() !== savedName) await setDisplayName(yourName)
-      const days = DURATION_OPTIONS.find((d) => d.value === duration)!.days
       const created = await createChallenge({
         name: name.trim() || defaultTitle,
         exerciseName: exercise.name,
         unit: exercise.unit,
         goalType,
         goalValue: goalType === 'first_to' ? goal : null,
-        endsAt: endOfDayIn(days),
+        startsAt: timeWindow.startsAt,
+        endsAt: timeWindow.endsAt,
         exerciseId: exercise.id,
         displayName: yourName.trim(),
       })
@@ -152,6 +156,38 @@ export function NewChallengePage() {
             onChange={setDuration}
           />
         </Field>
+
+        {duration === 'custom' && (
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-3">
+              <TextField
+                label="Starts"
+                type="date"
+                value={range.startKey}
+                max={range.endKey}
+                onChange={(e) =>
+                  setRange((r) => ({ ...r, startKey: e.target.value }))
+                }
+                className="min-w-0 flex-1"
+              />
+              <TextField
+                label="Ends"
+                type="date"
+                value={range.endKey}
+                min={range.startKey}
+                onChange={(e) =>
+                  setRange((r) => ({ ...r, endKey: e.target.value }))
+                }
+                className="min-w-0 flex-1"
+              />
+            </div>
+            <p className="text-[13px] text-muted">
+              {timeWindow
+                ? 'Runs from the start of the first day to the end of the last.'
+                : 'Pick an end date that is today or later, after the start.'}
+            </p>
+          </div>
+        )}
 
         <TextField
           label="Your name on the leaderboard"
