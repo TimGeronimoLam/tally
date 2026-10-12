@@ -25,10 +25,10 @@ const variants: Record<ButtonVariant, string> = {
   inverse: 'bg-inverse text-inverse-fg disabled:opacity-40',
   secondary: 'bg-surface text-fg disabled:opacity-40',
   outline:
-    'border-[1.5px] border-border bg-bg text-fg font-medium disabled:opacity-40',
+    'border-[1.5px] border-border-strong bg-bg text-fg font-medium disabled:opacity-40',
   ghost: 'bg-transparent text-muted font-medium disabled:opacity-40',
   danger: 'bg-transparent text-danger font-medium disabled:opacity-40',
-  destructive: 'bg-danger text-white disabled:opacity-40',
+  destructive: 'bg-danger text-danger-fg disabled:opacity-40',
 }
 
 const sizes: Record<ButtonSize, string> = {

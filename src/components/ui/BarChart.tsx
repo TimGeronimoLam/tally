@@ -29,7 +29,7 @@ export function BarChart({
       role="img"
       aria-label={rest['aria-label']}
       className={cn('flex items-end', dense ? 'gap-[3px]' : 'gap-2', className)}
-      style={{ height: height + 18 }}
+      style={{ height: height + 20 }}
     >
       {bars.map((b, i) => (
         <div
@@ -45,7 +45,7 @@ export function BarChart({
               height: Math.max(2, Math.round((b.value / max) * height)),
             }}
           />
-          <span className="h-[10px] text-[10px] leading-[10px] text-faint">
+          <span className="h-[12px] text-[11px] leading-[12px] text-faint">
             {b.label}
           </span>
         </div>

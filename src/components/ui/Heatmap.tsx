@@ -71,7 +71,7 @@ export function Heatmap({
           </div>
           <div className="flex items-start">
             <div
-              className="sticky left-0 z-10 flex shrink-0 flex-col bg-bg text-[10px] text-faint"
+              className="sticky left-0 z-10 flex shrink-0 flex-col bg-bg text-[11px] text-faint"
               style={{ width: ROW_LABEL_WIDTH }}
             >
               {ROW_LABELS.map((label, i) => (

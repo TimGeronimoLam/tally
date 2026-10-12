@@ -11,7 +11,10 @@ export interface BadgeProps {
   highlight?: boolean
 }
 
-/** Achievement badge card. Locked badges are greyed out. */
+/**
+ * Achievement badge card. Locked badges are greyed out, but their text
+ * stays readable and the state is also spoken, not only coloured.
+ */
 export function Badge({
   icon,
   title,
@@ -23,26 +26,26 @@ export function Badge({
     <div
       className={cn(
         'flex flex-col items-center gap-2 rounded-card px-2 pt-3.5 pb-3 text-center',
-        unlocked ? 'bg-surface text-fg' : 'bg-surface-faint text-disabled',
+        unlocked ? 'bg-surface text-fg' : 'bg-surface-faint text-muted',
       )}
     >
       <span
         className={cn(
           'flex size-12 items-center justify-center rounded-full text-[15px] font-semibold tracking-[-0.02em]',
-          !unlocked && 'bg-surface-2 text-disabled',
+          !unlocked && 'bg-surface-2 text-faint',
           unlocked && !highlight && 'bg-inverse text-inverse-fg',
           unlocked && highlight && 'bg-accent text-accent-fg',
         )}
       >
         {icon}
       </span>
-      <span className="text-[13px] font-semibold">{title}</span>
+      <span className="text-[13px] font-semibold">
+        {title}
+        {!unlocked && <span className="sr-only"> (locked)</span>}
+      </span>
       {caption && (
         <span
-          className={cn(
-            'text-[11px]',
-            unlocked ? 'text-muted' : 'text-disabled',
-          )}
+          className={cn('text-[11px]', unlocked ? 'text-muted' : 'text-faint')}
         >
           {caption}
         </span>

@@ -2,7 +2,7 @@ import { useId, type InputHTMLAttributes } from 'react'
 import { cn } from '../../lib/cn.ts'
 
 export const inputClassName =
-  'h-[52px] w-full rounded-control border-[1.5px] border-border bg-bg px-3.5 text-base text-fg outline-none placeholder:text-placeholder focus:border-fg'
+  'h-[52px] w-full rounded-control border-[1.5px] border-border-strong bg-bg px-3.5 text-base text-fg placeholder:text-placeholder focus:border-fg'
 
 export interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string

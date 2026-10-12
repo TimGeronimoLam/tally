@@ -4,7 +4,7 @@ export interface BigNumberProps {
   value: string
   /** Caption under the number, e.g. "pushups". */
   unit?: string
-  /** Dim the number (nothing entered yet). */
+  /** Dim the number (nothing entered yet). Still 3:1, the large-text minimum. */
   placeholder?: boolean
   className?: string
 }
@@ -22,7 +22,7 @@ export function BigNumber({
         aria-live="polite"
         className={cn(
           'text-[112px] leading-none font-medium tracking-[-0.04em]',
-          placeholder ? 'text-placeholder' : 'text-fg',
+          placeholder ? 'text-disabled' : 'text-fg',
         )}
       >
         {value}

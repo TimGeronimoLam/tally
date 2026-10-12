@@ -13,7 +13,10 @@ export interface ConfirmSheetProps {
   onClose: () => void
 }
 
-/** Yes/no bottom sheet for actions that deserve a second look. */
+/**
+ * Yes/no bottom sheet for actions that deserve a second look. Destructive
+ * confirms start with focus on Cancel, so Enter twice never deletes.
+ */
 export function ConfirmSheet({
   open,
   title,
@@ -35,7 +38,13 @@ export function ConfirmSheet({
         >
           {confirmLabel}
         </Button>
-        <Button variant="ghost" size="md" fullWidth onClick={onClose}>
+        <Button
+          variant="ghost"
+          size="md"
+          fullWidth
+          autoFocus={destructive}
+          onClick={onClose}
+        >
           Cancel
         </Button>
       </div>

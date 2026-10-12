@@ -64,7 +64,7 @@ export function IconButton({
       type={type}
       className={cn(
         'inline-flex size-11 shrink-0 items-center justify-center rounded-full text-fg',
-        variant === 'outline' && 'border-[1.5px] border-border bg-bg',
+        variant === 'outline' && 'border-[1.5px] border-border-strong bg-bg',
         className,
       )}
       {...rest}

@@ -9,34 +9,40 @@
   /* Native widgets (date pickers, scrollbars, selects) follow the theme. */
   color-scheme: light;
 
+  /*
+   * Contrast targets (WCAG 2.2 AA): text tokens reach 4.5:1 on --bg and
+   * --surface; --fg-disabled and --border-strong reach 3:1 on --bg for
+   * large text, control boundaries and chart marks. --border is decorative.
+   */
   --bg: #ffffff;
   --fg: #171717;
-  --fg-muted: #6b6b6b;
-  --fg-faint: #8a8a86;
-  --fg-disabled: #b5b5b1;
-  --fg-placeholder: #c4c4c0;
+  --fg-muted: #5c5c58; /* 6.7:1 on bg, 6.1:1 on surface */
+  --fg-faint: #6d6d69; /* 5.2:1 on bg, 4.7:1 on surface */
+  --fg-disabled: #8f8f8b; /* 3.3:1 on bg: large text only */
+  --fg-placeholder: #767672; /* 4.6:1 on bg */
 
   --surface: #f4f4f2;
   --surface-2: #ededea;
   --surface-faint: #fafaf8;
-  --border: #e6e6e3;
-  --border-strong: #d4d4d0;
+  --border: #d9d9d5;
+  --border-strong: #8a8a86; /* 3.5:1 on bg, 3.2:1 on surface */
 
-  --accent: #0f8a5f;
+  --accent: #0b7a52; /* white on it 5.4:1 */
   --accent-fg: #ffffff;
-  --accent-text: #0f8a5f;
+  --accent-text: #0b7a52; /* 5.4:1 on bg, 4.9:1 on surface */
 
   --inverse-bg: #171717;
   --inverse-fg: #ffffff;
-  --accent-on-inverse: #4fd1a0;
+  --accent-on-inverse: #4fd1a0; /* 9.4:1 on inverse */
 
-  --danger: #b42318;
+  --danger: #b42318; /* 6.6:1 on bg */
+  --danger-fg: #ffffff; /* 6.6:1 on danger */
 
-  --heat-0: #ededea;
-  --heat-1: #bfe6d4;
-  --heat-2: #7fcca8;
-  --heat-3: #3fae7f;
-  --heat-4: #0f8a5f;
+  --heat-0: #ebebe8;
+  --heat-1: #96d6b6;
+  --heat-2: #5fbf93;
+  --heat-3: #2a9a6c;
+  --heat-4: #0b7a52;
 
   --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.12);
   --shadow-toast: 0 8px 24px rgba(0, 0, 0, 0.18);
@@ -49,32 +55,33 @@
 
   --bg: #0e0e0e;
   --fg: #f2f2f0;
-  --fg-muted: #9a9a96;
-  --fg-faint: #8a8a86;
-  --fg-disabled: #6b6b68;
-  --fg-placeholder: #4a4a48;
+  --fg-muted: #a3a39f; /* 7.6:1 on bg, 5.5:1 on surface-2 */
+  --fg-faint: #8f8f8b; /* 6.0:1 on bg, 5.1:1 on surface */
+  --fg-disabled: #6b6b68; /* 3.6:1 on bg: large text only */
+  --fg-placeholder: #858581; /* 5.2:1 on bg */
 
   --surface: #1e1e1e;
   --surface-2: #2c2c2c;
   --surface-faint: #161616;
-  --border: #2c2c2c;
-  --border-strong: #3a3a3a;
+  --border: #333333;
+  --border-strong: #6b6b68; /* 3.6:1 on bg, 3.1:1 on surface */
 
-  --accent: #0f8a5f;
+  --accent: #0e845b; /* white on it 4.7:1; 4.1:1 on bg */
   --accent-fg: #ffffff;
-  --accent-text: #4fd1a0;
+  --accent-text: #4fd1a0; /* 10:1 on bg */
 
   --inverse-bg: #f2f2f0;
   --inverse-fg: #0e0e0e;
-  --accent-on-inverse: #0f8a5f;
+  --accent-on-inverse: #0b6e4b; /* 5.6:1 on inverse */
 
-  --danger: #f0665a;
+  --danger: #f0665a; /* 6.2:1 on bg */
+  --danger-fg: #0e0e0e; /* 6.2:1 on danger; white would be 3.1:1 */
 
-  --heat-0: #1e1e1e;
-  --heat-1: #1f4a38;
-  --heat-2: #23765a;
-  --heat-3: #2ea57a;
-  --heat-4: #4fd1a0;
+  --heat-0: #262626;
+  --heat-1: #1e5a40;
+  --heat-2: #23805c;
+  --heat-3: #34b184;
+  --heat-4: #6fe0b3;
 
   --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.5);
   --shadow-toast: 0 8px 24px rgba(0, 0, 0, 0.5);
@@ -108,6 +115,7 @@
   --color-accent-on-inverse: var(--accent-on-inverse);
 
   --color-danger: var(--danger);
+  --color-danger-fg: var(--danger-fg);
 
   --color-heat-0: var(--heat-0);
   --color-heat-1: var(--heat-1);
@@ -179,6 +187,35 @@
 
   button:disabled {
     cursor: default;
+  }
+
+  /* One high-contrast focus ring for keyboard users, on every control. */
+  :focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Stronger separators and secondary text when the OS asks for more contrast. */
+@media (prefers-contrast: more) {
+  :root,
+  :root[data-theme='dark'] {
+    --fg-muted: var(--fg);
+    --fg-faint: var(--fg);
+    --fg-placeholder: var(--fg-muted);
+    --border: var(--border-strong);
+    --border-strong: var(--fg);
   }
 }
 
