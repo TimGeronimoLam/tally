@@ -3,7 +3,7 @@ import { createContext, useContext } from 'react'
 export interface ToastOptions {
   message: string
   action?: { label: string; onClick: () => void }
-  /** ms before auto-dismiss */
+  /** ms before auto-dismiss. Defaults to 4 s, longer for long messages. */
   duration?: number
   /**
    * Wait behind the toast currently showing instead of replacing it.
