@@ -50,22 +50,25 @@ export async function signInAnonymously(): Promise<void> {
 }
 
 /**
- * Attach an email to the current (anonymous) account. Supabase emails a
- * confirmation link; once clicked, the same user id carries the email.
+ * Start an email sign-in. The user never sees anonymous accounts, so:
+ * - with an anonymous session (created silently by a challenge join), the
+ *   email is attached to that same user via updateUser, keeping its id and
+ *   memberships; Supabase emails a confirmation link;
+ * - otherwise, or if that email already belongs to another account, a
+ *   magic link is sent (creating the account on first use).
  */
-export async function addEmail(email: string): Promise<void> {
-  const { error } = await requireClient().auth.updateUser({ email })
-  if (error) throw error
-}
-
-/** Magic-link sign-in for an account that already has an email. */
 export async function signInWithEmail(email: string): Promise<void> {
-  const { error } = await requireClient().auth.signInWithOtp({
+  const client = requireClient()
+  const anonymous = state.session?.user.is_anonymous === true
+  if (anonymous) {
+    const { error } = await client.auth.updateUser({ email })
+    if (!error) return
+    if (!/already|registered|exists/i.test(error.message)) throw error
+    // Fall through: the email has an account; sign into that one instead.
+  }
+  const { error } = await client.auth.signInWithOtp({
     email,
-    options: {
-      emailRedirectTo: window.location.origin,
-      shouldCreateUser: false,
-    },
+    options: { emailRedirectTo: window.location.origin },
   })
   if (error) throw error
 }

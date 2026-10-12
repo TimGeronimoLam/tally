@@ -103,7 +103,7 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
 
 ### Settings screen
 
-- [x] "Link an email / Google" using `supabase.auth.updateUser({ email })` or `linkIdentity({ provider: 'google' })` on the **existing** session
+- [x] "Sign in with email": on an anonymous session, `supabase.auth.updateUser({ email })` upgrades it in place; otherwise a magic link. The UI never mentions anonymous accounts
   - Never call a fresh `signInWithOAuth` here; that creates a second user and orphans the anonymous one
 - [x] Sign out keeps local data (different user signing in later resets sync markers)
 
@@ -166,7 +166,7 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
 ## Key decisions (for reference)
 
 - **No accounts required.** Stats and achievements are fully local.
-- **Joining a challenge creates an anonymous Supabase user** silently; only a display name is asked.
+- **Joining a challenge creates an anonymous Supabase user** silently; only a display name is asked. The UI never exposes that an account is anonymous: Account shows "Local only" until an email is attached.
 - **Linking an email or Google** upgrades the anonymous user in place, keeping the same `uid`, memberships and data.
 - **Exercises are per-user**; a challenge defines its own exercise name and each member maps a local exercise to it.
 - **Entries are an append-only log** with soft deletes, which keeps sync trivial.

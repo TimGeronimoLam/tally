@@ -62,10 +62,12 @@ Optional. Without it the app is fully local.
 How sync works (`src/sync/`): on sign-in, on each local change (debounced),
 on tab focus and on reconnect, the app pulls rows with `updated_at` newer than
 the last pull, merges them (latest `deleted_at` wins; unsynced local edits to
-an exercise's name/unit win), then pushes rows without `syncedAt`. Signing in
-starts as an anonymous user; adding an email upgrades that same user in place,
-so nothing is orphaned. Sign out keeps local data; signing in as a different
-user resets the sync markers so everything is pushed to the new account.
+an exercise's name/unit win), then pushes rows without `syncedAt`. Users sign in
+with an email magic link, or not at all. Joining a challenge without an
+account silently creates an anonymous Supabase user; the UI never calls it
+that, and a later email sign-in upgrades that same user in place so nothing is
+orphaned. Sign out keeps local data; signing in as a different user resets the
+sync markers so everything is pushed to the new account.
 
 Free-tier projects pause after a week of inactivity; the Restore button is on
 the project's dashboard home.
