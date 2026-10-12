@@ -42,6 +42,22 @@ stretched UI. Fixed overlays (toast, sheet) share the same cap.
 
 Rule of thumb: if a component needs `db`, it belongs in `app` or `routes`, never `ui`.
 
+## Supabase (sync + challenges)
+
+Optional. Without it the app is fully local.
+
+1. Create a project at https://supabase.com.
+2. Run `supabase/migrations/20261012000000_init.sql` in the dashboard SQL Editor
+   (or `supabase link` + `supabase db push` with the CLI).
+3. Authentication → Sign In / Providers → enable **Anonymous sign-ins**.
+   Optionally enable the Turnstile captcha under Attack Protection to keep
+   junk anonymous users out.
+4. Copy `.env.example` to `.env.local` and paste the Project URL and anon key
+   from Project Settings → API. Restart `npm run dev`.
+
+Free-tier projects pause after a week of inactivity; the Restore button is on
+the project's dashboard home.
+
 ## PWA notes
 
 - Service worker is only generated on `build`; test install with `npm run preview`.
