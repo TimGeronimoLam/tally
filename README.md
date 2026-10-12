@@ -80,10 +80,15 @@ the project's dashboard home.
 Static build, no server of its own. Either host works; push to `main` and let
 it build.
 
-- **Cloudflare Pages**: Workers & Pages → Create → connect the repo. Build
-  command `npm run build`, output directory `dist`. Add the two
-  `VITE_SUPABASE_*` variables under Settings → Environment variables.
-  `public/_redirects` makes every path serve the app (deep links, `/join/CODE`).
+- **Cloudflare Workers** (what the dashboard's "Create an app" flow sets up):
+  connect the repo, keep build command `npm run build` and deploy command
+  `npx wrangler deploy`. `wrangler.jsonc` serves `dist/` as static assets with
+  SPA fallback, so deep links like `/join/CODE` work. Under Advanced settings →
+  Build variables add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (the
+  build bakes them in). `.node-version` pins the build to Node 24.
+- **Cloudflare Pages** (older flow): build `npm run build`, output `dist`, same
+  env vars under Settings → Environment variables. `public/_redirects` handles
+  deep links there.
 - **Vercel**: Import the repo (framework preset Vite), add the same env vars.
   `vercel.json` holds the SPA rewrite.
 

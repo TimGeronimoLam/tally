@@ -1,0 +1,12 @@
+// Cloudflare Workers: serve the Vite build as static assets, no Worker code.
+// Deployed by `npx wrangler deploy` after `npm run build`.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "tally",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    // Unknown paths (/stats, /join/CODE) serve index.html so the router handles them.
+    "not_found_handling": "single-page-application",
+  },
+}
