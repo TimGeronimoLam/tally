@@ -22,7 +22,7 @@ import {
   type ExerciseFilter,
 } from '../stats/index.ts'
 
-const HEATMAP_WEEKS = 26
+const HEATMAP_WEEKS = 13
 const RANGE_OPTIONS = [
   { value: '7', label: '7d' },
   { value: '30', label: '30d' },
@@ -85,7 +85,7 @@ export function StatsPage() {
 
   return (
     <Screen>
-      <ScreenHeader title="Stats" meta="Last 6 months" />
+      <ScreenHeader title="Stats" meta="Last 3 months" />
 
       <Gutter className="pt-4">
         {filterOptions.length <= 4 ? (

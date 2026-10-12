@@ -58,7 +58,7 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
   - current streak, longest streak
   - Use the device-local date string (`YYYY-MM-DD`) as the day key everywhere
   - Unit-test streak logic across midnight and timezones
-- [x] Heatmap component (26 weeks per the design; tap shows a day card rather than a sheet)
+- [x] Heatmap component (13 weeks with 20px cells and 24px tap targets for touch; tap shows a day card rather than a sheet)
   - 53 columns × 7 rows of small squares in a horizontally scrollable container, scrolled to the right by default
   - Intensity by quantile of daily totals (one huge day shouldn't flatten the rest)
   - Tap a day → bottom sheet listing that day's entries

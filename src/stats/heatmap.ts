@@ -55,7 +55,7 @@ export function levelFor(total: number, thresholds: number[]): HeatLevel {
 /** Lay out `weeks` columns of Monday-first weeks ending with the week containing `today`. */
 export function buildHeatmap(
   dailyTotals: ReadonlyMap<string, number>,
-  { weeks = 26, today = dayKey() }: HeatmapOptions = {},
+  { weeks = 13, today = dayKey() }: HeatmapOptions = {},
 ): HeatmapData {
   const thresholds = quantileThresholds(dailyTotals.values())
   const lastMonday = startOfWeekKey(today)
