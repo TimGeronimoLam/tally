@@ -1,3 +1,4 @@
+import type { SocialStats } from '../challenges/social.ts'
 import type { Entry, Exercise } from '../db/types.ts'
 import { parseDayKey } from '../lib/date.ts'
 import { formatNumber } from '../lib/format.ts'
@@ -22,6 +23,8 @@ export interface AchievementContext {
   stats: Stats
   entries: Entry[]
   exercises: Exercise[]
+  /** Challenge counts, cached locally by src/challenges/social.ts. */
+  social: SocialStats
 }
 
 export interface Achievement {
@@ -137,14 +140,13 @@ export const ACHIEVEMENTS: Achievement[] = [
     progress: ({ entries }) => `${exercisesTracked(entries)} of 5 exercises`,
   },
 
-  // Social: wired up in Phase 5 (challenges). Locked until then.
   {
     id: 'first-challenge',
     section: 'social',
     title: 'First challenge',
     description: 'Join a challenge',
     icon: { icon: 'flag' },
-    check: () => false,
+    check: ({ social }) => social.joined >= 1,
   },
   {
     id: 'challenge-won',
@@ -152,7 +154,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Won a challenge',
     description: 'Finish first',
     icon: { icon: 'trophy' },
-    check: () => false,
+    check: ({ social }) => social.won >= 1,
   },
   {
     id: 'host',
@@ -160,7 +162,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     title: 'Host',
     description: 'Start a challenge',
     icon: { icon: 'people' },
-    check: () => false,
+    check: ({ social }) => social.hosted >= 1,
   },
 ]
 

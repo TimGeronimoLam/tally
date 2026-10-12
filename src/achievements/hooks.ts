@@ -1,4 +1,6 @@
+import { useLiveQuery } from 'dexie-react-hooks'
 import { useMemo } from 'react'
+import { EMPTY_SOCIAL, readSocialStats } from '../challenges/social.ts'
 import {
   useAllEntries,
   useExercises,
@@ -28,12 +30,14 @@ export function useAchievements(): AchievementsView {
   const entries = useAllEntries()
   const exercises = useExercises()
   const unlocked = useUnlockedAchievements()
+  const social = useLiveQuery(readSocialStats, [])
 
   return useMemo(() => {
     const ctx = {
       stats: computeStats(entries ?? []),
       entries: entries ?? [],
       exercises: exercises ?? [],
+      social: social ?? EMPTY_SOCIAL,
     }
     const when = new Map((unlocked ?? []).map((u) => [u.id, u.unlockedAt]))
     const items: AchievementStatus[] = ACHIEVEMENTS.map((a) => {
@@ -59,5 +63,5 @@ export function useAchievements(): AchievementsView {
       latestId: latest?.id ?? null,
       loading: entries === undefined || unlocked === undefined,
     }
-  }, [entries, exercises, unlocked])
+  }, [entries, exercises, unlocked, social])
 }

@@ -22,8 +22,17 @@ function entry(
   return { id: `e${++seq}`, exerciseId, amount, loggedAt, createdAt: loggedAt }
 }
 
-function ctx(entries: Entry[], today = '2026-10-12'): AchievementContext {
-  return { stats: computeStats(entries, { today }), entries, exercises: [] }
+function ctx(
+  entries: Entry[],
+  today = '2026-10-12',
+  social = { joined: 0, hosted: 0, won: 0 },
+): AchievementContext {
+  return {
+    stats: computeStats(entries, { today }),
+    entries,
+    exercises: [],
+    social,
+  }
 }
 
 const byId = (id: string) => ACHIEVEMENTS.find((a) => a.id === id)!
@@ -106,10 +115,18 @@ describe('findNewUnlocks', () => {
     expect(findNewUnlocks(c, ['reps-100'])).toEqual([])
   })
 
-  it('keeps social achievements locked for now', () => {
+  it('keeps social achievements locked without challenge activity', () => {
     const c = ctx([entry('2026-10-01', 99_999)])
     const ids = findNewUnlocks(c, []).map((a) => a.id)
     expect(ids).not.toContain('first-challenge')
     expect(ids).toContain('reps-10k')
+  })
+
+  it('unlocks social achievements from cached challenge counts', () => {
+    const ids = findNewUnlocks(
+      ctx([], '2026-10-12', { joined: 2, hosted: 1, won: 0 }),
+      [],
+    ).map((a) => a.id)
+    expect(ids).toEqual(['first-challenge', 'host'])
   })
 })

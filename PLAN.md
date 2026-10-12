@@ -123,9 +123,9 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
 | `challenge_members`      | `challenge_id`, `user_id`, `display_name`, `joined_at`                                                                               |
 | `challenge_exercise_map` | `challenge_id`, `user_id`, `exercise_id` (maps the user's local exercise to the challenge)                                           |
 
-- [ ] Leaderboard as a Postgres view or RPC: sum of `entries.amount` per member where `loggedAt` is within the challenge window and the exercise is mapped to the challenge
-- [ ] RLS: members can read the challenge and the aggregated leaderboard view, never other members' raw entries
-- [ ] Rate limit on challenge creation per `user_id`
+- [x] Leaderboard as a Postgres view or RPC (`challenge_leaderboard`, `my_challenges` RPCs; member row carries `exercise_id`, no separate map table): sum of `entries.amount` per member where `loggedAt` is within the challenge window and the exercise is mapped to the challenge
+- [x] RLS: members can read the challenge and the aggregated leaderboard view, never other members' raw entries (security-definer RPCs)
+- [x] Rate limit on challenge creation per `user_id` (10 per day, inside `create_challenge`)
 
 ### Join flow (`/join/CODE`)
 
@@ -138,14 +138,14 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
 
 ### Create flow
 
-- [ ] Form: exercise, goal type, goal value, duration (3 days / 1 week / 1 month / custom)
-- [ ] Generate a 6-character invite code
-- [ ] Share link via the Web Share API
+- [x] Form: exercise, goal type, goal value, duration (3 days / 1 week / 1 month)
+- [x] Generate a 6-character invite code
+- [x] Share link via the Web Share API (clipboard fallback)
 
 ### Leaderboard screen
 
-- [ ] Refetch every 30 s and on focus (good enough for v1); Realtime subscription later if needed
-- [ ] Logging on the home screen counts toward challenges automatically; no separate challenge mode
+- [x] Refetch every 30 s and on focus (plus after each sync) (good enough for v1); Realtime subscription later if needed
+- [x] Logging on the home screen counts toward challenges automatically; no separate challenge mode
 
 ---
 
@@ -156,7 +156,7 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
 - [ ] Offline indicator
 - [x] Export / import JSON in settings (plus Delete all data with confirm)
 - [ ] Scheduled Postgres function to purge anonymous users (`is_anonymous = true`) inactive for 90 days
-- [ ] Wire up social achievements (first challenge joined, first won, invited 3 people)
+- [x] Wire up social achievements (first challenge, won, host) via cached social stats
 - [ ] Tests
   - Vitest: `computeStats`, achievement checks, sync merge logic
   - Playwright: one smoke flow (optional)
