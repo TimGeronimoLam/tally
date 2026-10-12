@@ -97,4 +97,4 @@ URL Configuration (Site URL + Redirect URLs) so email links land in the app.
 
 - Service worker is only generated on `build`; test install with `npm run preview`.
 - Manifest and Workbox config live in `vite.config.ts`.
-- Icons are generated placeholders; replace `public/pwa-*.png` and `apple-touch-icon.png` with real artwork.
+- Icons are rendered from the logo in the design canvas by `npm run icons` (`scripts/gen-icons.mjs`); `public/logo.svg` is the mark for in-app use.

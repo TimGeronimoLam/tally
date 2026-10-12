@@ -22,25 +22,67 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      includeAssets: ['favicon.svg', 'logo.svg', 'apple-touch-icon.png'],
       manifest: {
+        id: '/',
         name: 'Tally',
         short_name: 'Tally',
-        description: 'Minimal workout stats. One tap, one number.',
-        theme_color: '#FFFFFF',
-        background_color: '#FFFFFF',
-        display: 'standalone',
-        orientation: 'portrait',
+        description:
+          'Minimal workout stats. Log a set with one tap and one number, track streaks, and run challenges with friends. Works offline.',
+        lang: 'en',
+        dir: 'ltr',
         start_url: '/',
         scope: '/',
+        display: 'standalone',
+        display_override: ['standalone', 'minimal-ui'],
+        orientation: 'portrait',
+        theme_color: '#FFFFFF',
+        background_color: '#FFFFFF',
+        categories: ['fitness', 'health', 'sports', 'lifestyle'],
+        prefer_related_applications: false,
+        launch_handler: { client_mode: 'navigate-existing' },
         icons: [
-          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+          {
+            src: 'pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any',
+          },
           {
             src: 'pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable',
+            purpose: 'any',
+          },
+          {
+            src: 'pwa-maskable-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+        ],
+        shortcuts: [
+          {
+            name: 'Log a set',
+            short_name: 'Log',
+            url: '/',
+            icons: [
+              { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+            ],
+          },
+          {
+            name: 'Stats',
+            url: '/stats',
+            icons: [
+              { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+            ],
+          },
+          {
+            name: 'Challenges',
+            url: '/challenges',
+            icons: [
+              { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+            ],
           },
         ],
       },

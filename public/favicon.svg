@@ -1,10 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#171717"/>
-  <g stroke="#ffffff" stroke-width="5" stroke-linecap="round">
-    <line x1="18" y1="18" x2="18" y2="46"/>
-    <line x1="27" y1="18" x2="27" y2="46"/>
-    <line x1="36" y1="18" x2="36" y2="46"/>
-    <line x1="45" y1="18" x2="45" y2="46"/>
-    <line x1="12" y1="42" x2="52" y2="22" stroke="#0f8a5f"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <rect width="96" height="96" rx="22" fill="#0F8A5F"/>
+  <g transform="translate(16 16)" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round">
+    <path d="M13 12v40M25 12v40M37 12v40M49 12v40M7 50L55 14"/>
   </g>
 </svg>
