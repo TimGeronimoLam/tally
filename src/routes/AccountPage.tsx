@@ -156,7 +156,7 @@ export function AccountPage() {
       </Gutter>
 
       <Gutter className="pt-5 pb-6 text-xs leading-relaxed text-faint">
-        Tally {__APP_VERSION__} · Works offline · No tracking
+        Tally {__APP_VERSION__}
       </Gutter>
 
       <ExerciseSheet
