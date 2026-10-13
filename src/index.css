@@ -77,12 +77,11 @@
   --danger: #f0665a; /* 6.2:1 on bg */
   --danger-fg: #0e0e0e; /* 6.2:1 on danger; white would be 3.1:1 */
 
-  /* Same light-to-dark ramp as light mode: darker always means more. */
   --heat-0: #262626;
-  --heat-1: #96d6b6;
-  --heat-2: #5fbf93;
-  --heat-3: #2a9a6c;
-  --heat-4: #0b7a52;
+  --heat-1: #1e5a40;
+  --heat-2: #23805c;
+  --heat-3: #34b184;
+  --heat-4: #6fe0b3;
 
   --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.5);
   --shadow-toast: 0 8px 24px rgba(0, 0, 0, 0.5);
