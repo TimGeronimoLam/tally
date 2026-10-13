@@ -1,5 +1,6 @@
 import type { Session } from '@supabase/supabase-js'
 import { useSyncExternalStore } from 'react'
+import { messages } from '../i18n/index.ts'
 import { supabase } from '../lib/supabase.ts'
 import { reconcileDisplayName } from './profile.ts'
 import { syncNow } from './sync.ts'
@@ -43,7 +44,7 @@ export function initAuth(): void {
 }
 
 function requireClient() {
-  if (!supabase) throw new Error('Sync is not configured in this build')
+  if (!supabase) throw new Error(messages().errors.syncNotConfigured)
   return supabase
 }
 
@@ -102,12 +103,12 @@ export async function verifyEmailCode(
   type: EmailCodeType,
 ): Promise<void> {
   const token = normalizeEmailCode(code)
-  if (token.length < 6) throw new Error('Enter the whole code from the email')
+  if (token.length < 6) throw new Error(messages().sync.wholeCode)
   const { error } = await requireClient().auth.verifyOtp({ email, token, type })
   if (error) {
     throw new Error(
       /expired|invalid/i.test(error.message)
-        ? 'That code is wrong or has expired. Ask for a new one.'
+        ? messages().sync.codeWrong
         : error.message,
     )
   }

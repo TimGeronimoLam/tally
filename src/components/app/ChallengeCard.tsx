@@ -1,5 +1,6 @@
-import { challengeSubtitle, isWon, ordinal } from '../../challenges/logic.ts'
+import { challengeSubtitle, isWon } from '../../challenges/logic.ts'
 import type { ChallengeSummary } from '../../challenges/types.ts'
+import { useT } from '../../i18n/index.ts'
 import { cn } from '../../lib/cn.ts'
 import { formatNumber } from '../../lib/format.ts'
 import { Card, ProgressBar } from '../ui/index.ts'
@@ -12,6 +13,7 @@ export interface ChallengeCardProps {
 
 /** Active challenge: leaderboard preview (most reps) or goal progress (first to). */
 export function ChallengeCard({ challenge: c, meId }: ChallengeCardProps) {
+  const t = useT()
   const leading = c.myRank === 1
   return (
     <Card to={`/challenges/${c.id}`} className="flex flex-col gap-3">
@@ -19,7 +21,7 @@ export function ChallengeCard({ challenge: c, meId }: ChallengeCardProps) {
         <div className="flex min-w-0 flex-col gap-0.5">
           <span className="truncate text-[17px] font-semibold">{c.name}</span>
           <span className="text-[13px] text-muted">
-            {challengeSubtitle(c, { memberCount: c.memberCount })}
+            {challengeSubtitle(c, t, { memberCount: c.memberCount })}
           </span>
         </div>
         <RankPill rank={c.myRank} highlight={leading} />
@@ -29,7 +31,8 @@ export function ChallengeCard({ challenge: c, meId }: ChallengeCardProps) {
         <div className="flex flex-col gap-1.5">
           <div className="flex justify-between text-[13px]">
             <span className="font-semibold">
-              {c.top.find((r) => r.userId === meId)?.displayName ?? 'You'}
+              {c.top.find((r) => r.userId === meId)?.displayName ??
+                t.common.you}
             </span>
             <span>
               {formatNumber(c.myTotal)} / {formatNumber(c.goalValue ?? 0)}
@@ -38,7 +41,7 @@ export function ChallengeCard({ challenge: c, meId }: ChallengeCardProps) {
           <ProgressBar
             value={c.myTotal}
             max={c.goalValue ?? 1}
-            aria-label="Progress to goal"
+            aria-label={t.challenges.progressToGoal}
           />
         </div>
       ) : (
@@ -46,7 +49,7 @@ export function ChallengeCard({ challenge: c, meId }: ChallengeCardProps) {
           <LeaderboardList rows={c.top} meId={meId} compact />
           {c.memberCount > c.top.length && (
             <span className="pl-8 text-[13px] text-muted">
-              {c.memberCount - c.top.length} more
+              {t.challenges.more(c.memberCount - c.top.length)}
             </span>
           )}
         </>
@@ -57,6 +60,7 @@ export function ChallengeCard({ challenge: c, meId }: ChallengeCardProps) {
 
 /** Past challenge: one line with the final placing. */
 export function PastChallengeRow({ challenge: c }: ChallengeCardProps) {
+  const t = useT()
   const won = isWon(c)
   return (
     <Card
@@ -66,7 +70,9 @@ export function PastChallengeRow({ challenge: c }: ChallengeCardProps) {
     >
       <div className="flex min-w-0 flex-col gap-0.5">
         <span className="truncate text-[15px] font-semibold">{c.name}</span>
-        <span className="text-[13px] text-muted">{challengeSubtitle(c)}</span>
+        <span className="text-[13px] text-muted">
+          {challengeSubtitle(c, t)}
+        </span>
       </div>
       <span
         className={cn(
@@ -74,7 +80,9 @@ export function PastChallengeRow({ challenge: c }: ChallengeCardProps) {
           won ? 'text-accent-text' : 'text-muted',
         )}
       >
-        {won ? 'Won' : `${ordinal(c.myRank)} of ${c.memberCount}`}
+        {won
+          ? t.challenges.won
+          : t.challenges.placing(t.ordinal(c.myRank), c.memberCount)}
       </span>
     </Card>
   )
@@ -87,6 +95,7 @@ export function RankPill({
   rank: number
   highlight?: boolean
 }) {
+  const t = useT()
   return (
     <span
       className={cn(
@@ -94,7 +103,7 @@ export function RankPill({
         highlight ? 'bg-accent text-accent-fg' : 'bg-border text-fg',
       )}
     >
-      {ordinal(rank)}
+      {t.ordinal(rank)}
     </span>
   )
 }

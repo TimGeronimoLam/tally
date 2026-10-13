@@ -27,6 +27,7 @@ import {
   useTodayEntries,
   type Exercise,
 } from '../db/index.ts'
+import { useT } from '../i18n/index.ts'
 import { formatHeaderDate, formatNumber, unitLabel } from '../lib/format.ts'
 import { haptic } from '../lib/haptics.ts'
 import { useToast } from '../lib/toast.ts'
@@ -35,6 +36,7 @@ type SheetState =
   { mode: 'closed' } | { mode: 'add' } | { mode: 'edit'; exercise: Exercise }
 
 export function LogPage() {
+  const t = useT()
   const toast = useToast()
   const exercises = useExercises()
   const selected = useSelectedExercise(exercises)
@@ -59,11 +61,14 @@ export function LogPage() {
     const entry = await logEntry(selected.id, n)
     keypad.clear()
     toast({
-      message: `${formatNumber(n)} ${unitLabel(selected)} logged`,
-      action: { label: 'Undo', onClick: () => void deleteEntry(entry.id) },
+      message: t.log.logged(formatNumber(n), unitLabel(selected, t)),
+      action: {
+        label: t.log.undo,
+        onClick: () => void deleteEntry(entry.id),
+      },
     })
     for (const a of await evaluateAchievements()) {
-      toast({ message: `Achievement unlocked: ${a.title}`, queue: true })
+      toast({ message: t.log.achievementUnlocked(a.title(t)), queue: true })
     }
   }
   useEffect(() => {
@@ -88,14 +93,14 @@ export function LogPage() {
     if (sheet.mode !== 'edit') return
     await archiveExercise(sheet.exercise.id)
     setSheet({ mode: 'closed' })
-    toast({ message: `${sheet.exercise.name} archived` })
+    toast({ message: t.exerciseSheet.archived(sheet.exercise.name) })
   }
 
   if (!exercises) return null
 
   return (
     <Screen>
-      <ScreenHeader title="Log" meta={formatHeaderDate()} />
+      <ScreenHeader title={t.log.title} meta={formatHeaderDate()} />
 
       <Gutter className="pt-3 empty:hidden">
         <InstallBanner />
@@ -116,26 +121,24 @@ export function LogPage() {
           <BigNumber
             value={keypad.value || '0'}
             placeholder={!keypad.value}
-            unit={unitLabel(selected)}
+            unit={unitLabel(selected, t)}
           />
         ) : (
-          <p className="text-[15px] text-muted">
-            Add an exercise to start logging.
-          </p>
+          <p className="text-[15px] text-muted">{t.log.addExerciseHint}</p>
         )}
       </div>
 
       {selected && (
         <>
           <Gutter className="flex items-center justify-between pb-3 text-[15px]">
-            <span className="text-muted">Today</span>
+            <span className="text-muted">{t.log.today}</span>
             <span className="font-semibold">
-              {formatNumber(todayTotal)} {unitLabel(selected)}
+              {formatNumber(todayTotal)} {unitLabel(selected, t)}
             </span>
           </Gutter>
           <Gutter className="pb-3">
             <Button size="lg" fullWidth disabled={!canLog} onClick={log}>
-              Log
+              {t.log.logButton}
             </Button>
           </Gutter>
           <Keypad onKey={keypad.press} className="px-3 pb-2.5" />

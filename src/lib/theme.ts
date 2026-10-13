@@ -3,11 +3,8 @@ import { useSyncExternalStore } from 'react'
 export type ThemePreference = 'system' | 'light' | 'dark'
 export type ResolvedTheme = 'light' | 'dark'
 
-export const THEME_OPTIONS: Array<{ value: ThemePreference; label: string }> = [
-  { value: 'system', label: 'System' },
-  { value: 'light', label: 'Light' },
-  { value: 'dark', label: 'Dark' },
-]
+/** Picker order; labels come from `m.account.themes[value]`. */
+export const THEME_PREFERENCES: ThemePreference[] = ['system', 'light', 'dark']
 
 // Keep in sync with the inline bootstrap script in index.html.
 const STORAGE_KEY = 'tally.theme'

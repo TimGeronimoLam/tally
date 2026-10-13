@@ -1,14 +1,19 @@
+import { messages } from '../i18n/index.ts'
 import { uuid } from '../lib/uuid.ts'
 import { db } from './db.ts'
 import { getMeta, setMeta } from './meta.ts'
 import { META_KEYS, type Exercise } from './types.ts'
 
-const DEFAULT_EXERCISES: Array<Pick<Exercise, 'name' | 'unit'>> = [
-  { name: 'Pushups', unit: 'reps' },
-  { name: 'Squats', unit: 'reps' },
-  { name: 'Pull-ups', unit: 'reps' },
-  { name: 'Plank', unit: 'sec' },
-]
+/** Named in the device language at first launch; renamed freely afterwards. */
+function defaultExercises(): Array<Pick<Exercise, 'name' | 'unit'>> {
+  const names = messages().defaultExercises
+  return [
+    { name: names.pushups, unit: 'reps' },
+    { name: names.squats, unit: 'reps' },
+    { name: names.pullups, unit: 'reps' },
+    { name: names.plank, unit: 'sec' },
+  ]
+}
 
 /** Idempotent first-launch setup: device id + default exercises. */
 export async function seedIfNeeded(): Promise<void> {
@@ -20,7 +25,7 @@ export async function seedIfNeeded(): Promise<void> {
     if ((await db.exercises.count()) === 0) {
       const now = Date.now()
       await db.exercises.bulkAdd(
-        DEFAULT_EXERCISES.map((e, i) => ({
+        defaultExercises().map((e, i) => ({
           id: uuid(),
           ...e,
           // Stagger createdAt so default ordering is stable.

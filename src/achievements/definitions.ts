@@ -1,5 +1,6 @@
 import type { SocialStats } from '../challenges/social.ts'
 import type { Entry, Exercise } from '../db/types.ts'
+import type { Messages } from '../i18n/index.ts'
 import { parseDayKey } from '../lib/date.ts'
 import { formatNumber } from '../lib/format.ts'
 import type { Stats } from '../stats/computeStats.ts'
@@ -7,11 +8,12 @@ import type { Stats } from '../stats/computeStats.ts'
 export type AchievementSection =
   'milestones' | 'streaks' | 'consistency' | 'social'
 
-export const SECTIONS: Array<{ id: AchievementSection; title: string }> = [
-  { id: 'milestones', title: 'Milestones' },
-  { id: 'streaks', title: 'Streaks' },
-  { id: 'consistency', title: 'Consistency' },
-  { id: 'social', title: 'Social' },
+/** Display order of the sections; titles come from `m.achievements.sections`. */
+export const SECTIONS: AchievementSection[] = [
+  'milestones',
+  'streaks',
+  'consistency',
+  'social',
 ]
 
 export type AchievementIcon =
@@ -27,16 +29,17 @@ export interface AchievementContext {
   social: SocialStats
 }
 
+/** Text is resolved against the active dictionary when shown. */
 export interface Achievement {
   id: string
   section: AchievementSection
-  title: string
+  title: (m: Messages) => string
   /** How to earn it. Shown under a locked badge when there is no progress note. */
-  description: string
+  description: (m: Messages) => string
   icon: AchievementIcon
   check: (ctx: AchievementContext) => boolean
   /** Short progress note while locked, e.g. "41 best so far". */
-  progress?: (ctx: AchievementContext) => string
+  progress?: (ctx: AchievementContext, m: Messages) => string
 }
 
 /* ---------- helpers shared by checks ---------- */
@@ -84,11 +87,12 @@ function milestone(total: number, text: string, id: string): Achievement {
   return {
     id,
     section: 'milestones',
-    title: `${formatNumber(total)} reps`,
-    description: `Log ${formatNumber(total)} in total`,
+    title: (m) => m.achievements.reps.title(formatNumber(total)),
+    description: (m) => m.achievements.reps.description(formatNumber(total)),
     icon: { text },
     check: ({ stats }) => stats.allTime >= total,
-    progress: ({ stats }) => `${formatNumber(stats.allTime)} so far`,
+    progress: ({ stats }, m) =>
+      m.achievements.reps.progress(formatNumber(stats.allTime)),
   }
 }
 
@@ -96,11 +100,12 @@ function streak(days: number, id: string): Achievement {
   return {
     id,
     section: 'streaks',
-    title: `${days}-day streak`,
-    description: `Log ${days} days in a row`,
+    title: (m) => m.achievements.streak.title(days),
+    description: (m) => m.achievements.streak.description(days),
     icon: { text: String(days) },
     check: ({ stats }) => stats.longestStreak >= days,
-    progress: ({ stats }) => `${stats.longestStreak} best so far`,
+    progress: ({ stats }, m) =>
+      m.achievements.streak.progress(stats.longestStreak),
   }
 }
 
@@ -116,51 +121,53 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: 'full-month',
     section: 'consistency',
-    title: 'Full month',
-    description: 'Log every day of a month',
+    title: (m) => m.achievements.fullMonth.title,
+    description: (m) => m.achievements.fullMonth.description,
     icon: { icon: 'calendar' },
     check: ({ stats }) => hasFullMonth(stats.dailyTotals),
   },
   {
     id: 'early-bird',
     section: 'consistency',
-    title: 'Early bird',
-    description: '10 logs before 7am',
+    title: (m) => m.achievements.earlyBird.title,
+    description: (m) => m.achievements.earlyBird.description,
     icon: { icon: 'clock' },
     check: ({ entries }) => earlyBirdCount(entries) >= 10,
-    progress: ({ entries }) => `${earlyBirdCount(entries)} of 10 before 7am`,
+    progress: ({ entries }, m) =>
+      m.achievements.earlyBird.progress(earlyBirdCount(entries)),
   },
   {
     id: 'variety',
     section: 'consistency',
-    title: 'Variety',
-    description: 'Track 5 exercises',
+    title: (m) => m.achievements.variety.title,
+    description: (m) => m.achievements.variety.description,
     icon: { icon: 'layers' },
     check: ({ entries }) => exercisesTracked(entries) >= 5,
-    progress: ({ entries }) => `${exercisesTracked(entries)} of 5 exercises`,
+    progress: ({ entries }, m) =>
+      m.achievements.variety.progress(exercisesTracked(entries)),
   },
 
   {
     id: 'first-challenge',
     section: 'social',
-    title: 'First challenge',
-    description: 'Join a challenge',
+    title: (m) => m.achievements.firstChallenge.title,
+    description: (m) => m.achievements.firstChallenge.description,
     icon: { icon: 'flag' },
     check: ({ social }) => social.joined >= 1,
   },
   {
     id: 'challenge-won',
     section: 'social',
-    title: 'Won a challenge',
-    description: 'Finish first',
+    title: (m) => m.achievements.challengeWon.title,
+    description: (m) => m.achievements.challengeWon.description,
     icon: { icon: 'trophy' },
     check: ({ social }) => social.won >= 1,
   },
   {
     id: 'host',
     section: 'social',
-    title: 'Host',
-    description: 'Start a challenge',
+    title: (m) => m.achievements.host.title,
+    description: (m) => m.achievements.host.description,
     icon: { icon: 'people' },
     check: ({ social }) => social.hosted >= 1,
   },

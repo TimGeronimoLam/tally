@@ -14,8 +14,12 @@ import {
   endOfDayIn,
   gapToFirst,
   isWon,
-  ordinal,
 } from './logic.ts'
+import { en } from '../i18n/en.ts'
+import { setLocalePreference } from '../i18n/locale.ts'
+
+// Dates and numbers follow the app locale, not the machine running the tests.
+setLocalePreference('en')
 
 const NOW = Date.UTC(2026, 9, 12, 12, 0, 0)
 const iso = (ms: number) => new Date(ms).toISOString()
@@ -114,7 +118,7 @@ describe('challenge window', () => {
 
 describe('ranking', () => {
   it('formats ordinals', () => {
-    expect([1, 2, 3, 4, 11, 12, 13, 21, 22, 101].map(ordinal)).toEqual([
+    expect([1, 2, 3, 4, 11, 12, 13, 21, 22, 101].map(en.ordinal)).toEqual([
       '1st',
       '2nd',
       '3rd',
@@ -211,6 +215,7 @@ describe('subtitle', () => {
     expect(
       challengeSubtitle(
         { ...base, goalType: 'most_reps', goalValue: null },
+        en,
         { now: NOW },
       ),
     ).toBe('Pushups · Most reps · 19 days left')
@@ -222,10 +227,11 @@ describe('subtitle', () => {
           goalType: 'first_to',
           goalValue: 1000,
         },
+        en,
         { now: NOW, memberCount: 3 },
       ),
     ).toBe(
-      `Squats · First to ${new Intl.NumberFormat().format(1000)} · 3 people`,
+      `Squats · First to ${new Intl.NumberFormat('en').format(1000)} · 3 people`,
     )
     expect(
       challengeSubtitle(
@@ -235,6 +241,7 @@ describe('subtitle', () => {
           goalValue: null,
           endsAt: iso(NOW - DAY),
         },
+        en,
         { now: NOW },
       ),
     ).toMatch(/^Pushups · Most reps · ended /)
@@ -246,6 +253,7 @@ describe('subtitle', () => {
           goalValue: null,
           startsAt: iso(NOW + 2 * DAY),
         },
+        en,
         { now: NOW },
       ),
     ).toMatch(/^Pushups · Most reps · starts /)

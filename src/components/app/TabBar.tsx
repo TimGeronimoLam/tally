@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router'
+import { useT, type Messages } from '../../i18n/index.ts'
 import { cn } from '../../lib/cn.ts'
 import { markNav } from '../../lib/nav.ts'
 import {
@@ -12,16 +13,16 @@ import {
 
 interface Tab {
   to: string
-  label: string
+  label: keyof Messages['tabs']
   icon: (props: IconProps) => React.JSX.Element
 }
 
 const TABS: Tab[] = [
-  { to: '/', label: 'Log', icon: LogIcon },
-  { to: '/stats', label: 'Stats', icon: StatsIcon },
-  { to: '/challenges', label: 'Challenges', icon: FlagIcon },
-  { to: '/achievements', label: 'Achievements', icon: MedalIcon },
-  { to: '/account', label: 'Account', icon: UserIcon },
+  { to: '/', label: 'log', icon: LogIcon },
+  { to: '/stats', label: 'stats', icon: StatsIcon },
+  { to: '/challenges', label: 'challenges', icon: FlagIcon },
+  { to: '/achievements', label: 'achievements', icon: MedalIcon },
+  { to: '/account', label: 'account', icon: UserIcon },
 ]
 
 /** Height of the tab row (px), excluding the home-indicator inset. */
@@ -33,6 +34,7 @@ export const TAB_BAR_HEIGHT = 50
  * for view transitions so it stays put while screens slide underneath.
  */
 export function TabBar() {
+  const t = useT()
   return (
     <nav
       aria-label="Main"
@@ -55,7 +57,7 @@ export function TabBar() {
           {({ isActive }) => (
             <>
               <Icon strokeWidth={isActive ? 2 : 1.75} />
-              {label}
+              {t.tabs[label]}
             </>
           )}
         </NavLink>

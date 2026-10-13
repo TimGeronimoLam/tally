@@ -25,21 +25,18 @@ import {
   TileGrid,
 } from '../components/ui/index.ts'
 import { META_KEYS, setMeta } from '../db/index.ts'
-import { formatNumber } from '../lib/format.ts'
+import { useT } from '../i18n/index.ts'
+import { formatDayMonth, formatNumber, unitName } from '../lib/format.ts'
 import { shareLink } from '../lib/share.ts'
 import { useToast } from '../lib/toast.ts'
 import { useNav } from '../lib/nav.ts'
 
 function windowLabel(startsAt: string, endsAt: string): string {
-  const fmt = (s: string) =>
-    new Date(s).toLocaleDateString(undefined, {
-      day: 'numeric',
-      month: 'short',
-    })
-  return `${fmt(startsAt)} – ${fmt(endsAt)}`
+  return `${formatDayMonth(startsAt)} – ${formatDayMonth(endsAt)}`
 }
 
 export function ChallengeDetailPage() {
+  const t = useT()
   const { id } = useParams()
   const nav = useNav()
   const toast = useToast()
@@ -52,12 +49,12 @@ export function ChallengeDetailPage() {
     return (
       <Screen>
         <ScreenNav
-          title="Challenge"
-          backLabel="Back to challenges"
+          title={t.challengeDetail.title}
+          backLabel={t.challengeDetail.backLabel}
           onBack={() => nav.pop('/challenges')}
         />
         <Gutter className="pt-4 text-[15px] text-muted">
-          This challenge is not on your list.
+          {t.challengeDetail.notOnList}
         </Gutter>
       </Screen>
     )
@@ -66,12 +63,14 @@ export function ChallengeDetailPage() {
     return (
       <Screen>
         <ScreenNav
-          title="Challenge"
-          backLabel="Back to challenges"
+          title={t.challengeDetail.title}
+          backLabel={t.challengeDetail.backLabel}
           onBack={() => nav.pop('/challenges')}
         />
         {loading && (
-          <Gutter className="pt-4 text-[15px] text-muted">Loading…</Gutter>
+          <Gutter className="pt-4 text-[15px] text-muted">
+            {t.common.loading}
+          </Gutter>
         )}
       </Screen>
     )
@@ -79,16 +78,16 @@ export function ChallengeDetailPage() {
 
   const status = challengeStatus(c)
   const rows = board.data ?? c.top
-  const unit = c.unit === 'reps' ? 'reps' : c.unit
+  const unit = unitName(c.unit, t)
   const isHost = userId !== null && c.creatorId === userId
 
   async function share() {
     const outcome = await shareLink({
-      title: `Join ${c!.name} on Tally`,
-      text: `Join my challenge "${c!.name}" with code ${c!.inviteCode}`,
+      title: t.challengeDetail.shareTitle(c!.name),
+      text: t.challengeDetail.shareText(c!.name, c!.inviteCode),
       url: inviteUrl(c!.inviteCode),
     })
-    if (outcome === 'copied') toast({ message: 'Link copied' })
+    if (outcome === 'copied') toast({ message: t.challengeDetail.linkCopied })
   }
 
   async function logThis() {
@@ -103,9 +102,12 @@ export function ChallengeDetailPage() {
       await endChallenge(c!.id)
       await refresh()
       setConfirm(null)
-      toast({ message: 'Challenge ended. Final standings are in.' })
+      toast({ message: t.challengeDetail.endedToast })
     } catch (err) {
-      toast({ message: err instanceof Error ? err.message : 'Could not end' })
+      toast({
+        message:
+          err instanceof Error ? err.message : t.challengeDetail.couldNotEnd,
+      })
     } finally {
       setBusy(false)
     }
@@ -118,11 +120,12 @@ export function ChallengeDetailPage() {
       await deleteChallenge(c!.id)
       await refresh()
       setConfirm(null)
-      toast({ message: 'Challenge deleted' })
+      toast({ message: t.challengeDetail.deletedToast })
       nav.pop('/challenges', { replace: true })
     } catch (err) {
       toast({
-        message: err instanceof Error ? err.message : 'Could not delete',
+        message:
+          err instanceof Error ? err.message : t.challengeDetail.couldNotDelete,
       })
     } finally {
       setBusy(false)
@@ -132,10 +135,10 @@ export function ChallengeDetailPage() {
   return (
     <Screen>
       <ScreenNav
-        backLabel="Back to challenges"
+        backLabel={t.challengeDetail.backLabel}
         onBack={() => nav.pop('/challenges')}
         action={
-          <IconButton aria-label="Share challenge" onClick={share}>
+          <IconButton aria-label={t.challengeDetail.share} onClick={share}>
             <ShareIcon />
           </IconButton>
         }
@@ -144,8 +147,8 @@ export function ChallengeDetailPage() {
         <span className="text-sm text-muted">
           {c.exerciseName} ·{' '}
           {c.goalType === 'first_to'
-            ? `First to ${formatNumber(c.goalValue ?? 0)} wins`
-            : 'Most reps wins'}{' '}
+            ? t.challengeDetail.firstToWins(formatNumber(c.goalValue ?? 0))
+            : t.challengeDetail.mostRepsWins}{' '}
           · {windowLabel(c.startsAt, c.endsAt)}
         </span>
       </ScreenNav>
@@ -153,22 +156,32 @@ export function ChallengeDetailPage() {
       <Gutter className="pt-5">
         <TileGrid>
           {status === 'ended' ? (
-            <Tile label="Ended" value="—" />
+            <Tile label={t.challengeDetail.ended} value="—" />
           ) : status === 'upcoming' ? (
-            <Tile label="Starts in" value={daysUntilStart(c)} />
+            <Tile
+              label={t.challengeDetail.startsIn}
+              value={daysUntilStart(c)}
+            />
           ) : (
-            <Tile label="Days left" value={daysLeft(c)} />
+            <Tile label={t.challengeDetail.daysLeft} value={daysLeft(c)} />
           )}
-          <Tile label={`Your ${unit}`} value={formatNumber(c.myTotal)} />
+          <Tile
+            label={t.challengeDetail.yourUnit(unit)}
+            value={formatNumber(c.myTotal)}
+          />
           {c.goalType === 'first_to' ? (
             <Tile
-              label="To goal"
+              label={t.challengeDetail.toGoal}
               value={formatNumber(Math.max(0, (c.goalValue ?? 0) - c.myTotal))}
               emphasis
             />
           ) : (
             <Tile
-              label={c.myRank === 1 ? 'Lead' : 'To 1st'}
+              label={
+                c.myRank === 1
+                  ? t.challengeDetail.lead
+                  : t.challengeDetail.toFirst
+              }
               value={formatNumber(
                 c.myRank === 1
                   ? c.myTotal - (rows[1]?.total ?? 0)
@@ -182,7 +195,9 @@ export function ChallengeDetailPage() {
 
       <Gutter>
         <div className="flex items-center justify-between pt-6 pb-2">
-          <SectionLabel className="pt-0 pb-0">Leaderboard</SectionLabel>
+          <SectionLabel className="pt-0 pb-0">
+            {t.challengeDetail.leaderboard}
+          </SectionLabel>
           {board.error && (
             <span className="text-xs text-danger">{board.error}</span>
           )}
@@ -196,7 +211,7 @@ export function ChallengeDetailPage() {
 
       {isHost && (
         <Gutter className="pt-5">
-          <SectionLabel>Host</SectionLabel>
+          <SectionLabel>{t.challengeDetail.host}</SectionLabel>
           <div className="flex flex-col gap-1 pt-1">
             {status === 'active' && (
               <Button
@@ -204,7 +219,7 @@ export function ChallengeDetailPage() {
                 fullWidth
                 onClick={() => setConfirm('end')}
               >
-                End challenge now
+                {t.challengeDetail.endNow}
               </Button>
             )}
             <Button
@@ -212,7 +227,7 @@ export function ChallengeDetailPage() {
               fullWidth
               onClick={() => setConfirm('delete')}
             >
-              Delete challenge
+              {t.challengeDetail.deleteChallenge}
             </Button>
           </div>
         </Gutter>
@@ -223,24 +238,28 @@ export function ChallengeDetailPage() {
       {status !== 'ended' && (
         <Gutter className="pt-6 pb-5">
           <Button size="lg" fullWidth onClick={logThis}>
-            Log {c.exerciseName.toLowerCase()}
+            {t.challengeDetail.logExercise(c.exerciseName)}
           </Button>
         </Gutter>
       )}
 
       <ConfirmSheet
         open={confirm === 'end'}
-        title="End challenge now?"
-        message={`"${c.name}" closes for everyone right away. Totals so far become the final standings. This cannot be undone.`}
-        confirmLabel={busy ? 'Ending…' : 'End challenge'}
+        title={t.challengeDetail.endTitle}
+        message={t.challengeDetail.endMessage(c.name)}
+        confirmLabel={
+          busy ? t.challengeDetail.ending : t.challengeDetail.endConfirm
+        }
         onConfirm={endNow}
         onClose={() => !busy && setConfirm(null)}
       />
       <ConfirmSheet
         open={confirm === 'delete'}
-        title="Delete challenge?"
-        message={`"${c.name}" and its leaderboard are removed for all ${c.memberCount} ${c.memberCount === 1 ? 'member' : 'members'}. Everyone keeps their logged reps. This cannot be undone.`}
-        confirmLabel={busy ? 'Deleting…' : 'Delete challenge'}
+        title={t.challengeDetail.deleteTitle}
+        message={t.challengeDetail.deleteMessage(c.name, c.memberCount)}
+        confirmLabel={
+          busy ? t.challengeDetail.deleting : t.challengeDetail.deleteChallenge
+        }
         destructive
         onConfirm={remove}
         onClose={() => !busy && setConfirm(null)}

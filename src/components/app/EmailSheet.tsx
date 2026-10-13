@@ -1,3 +1,4 @@
+import { useT } from '../../i18n/index.ts'
 import { InputSheet } from '../ui/index.ts'
 
 export interface EmailSheetProps {
@@ -12,13 +13,14 @@ export interface EmailSheetProps {
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-/** Collects an email address for magic-link sign-in. */
+/** Collects an email address for code sign-in. */
 export function EmailSheet({ onSubmit, ...rest }: EmailSheetProps) {
+  const t = useT()
   return (
     <InputSheet
       {...rest}
-      label="Email"
-      validate={(v) => EMAIL.test(v) || 'Enter a valid email address'}
+      label={t.sync.email}
+      validate={(v) => EMAIL.test(v) || t.sync.emailInvalid}
       onSubmit={onSubmit}
       inputProps={{
         type: 'email',

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useT } from '../../i18n/index.ts'
 import { cn } from '../../lib/cn.ts'
 
 export interface BadgeProps {
@@ -22,6 +23,7 @@ export function Badge({
   unlocked,
   highlight,
 }: BadgeProps) {
+  const t = useT()
   return (
     <div
       className={cn(
@@ -41,7 +43,7 @@ export function Badge({
       </span>
       <span className="text-[13px] font-semibold">
         {title}
-        {!unlocked && <span className="sr-only"> (locked)</span>}
+        {!unlocked && <span className="sr-only"> {t.achievements.locked}</span>}
       </span>
       {caption && (
         <span

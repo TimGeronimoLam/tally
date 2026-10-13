@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
+import { messages } from '../../i18n/index.ts'
 import { recordError } from '../../lib/diagnostics.ts'
 import { Button } from '../ui/index.ts'
 
@@ -26,19 +27,20 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
   render() {
     const { error } = this.state
     if (!error) return this.props.children
+    // A class component cannot use the hook; the language will not change
+    // while this screen is up anyway.
+    const t = messages().errorBoundary
     return (
       <div className="mx-auto flex h-full w-full max-w-app flex-col justify-center gap-4 px-5 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
         <h1 className="text-[22px] font-semibold tracking-[-0.02em]">
-          Something went wrong
+          {t.title}
         </h1>
-        <p className="text-[15px] text-muted">
-          Your data is still on this phone. Reloading usually fixes it.
-        </p>
+        <p className="text-[15px] text-muted">{t.body}</p>
         <pre className="overflow-x-auto rounded-xl bg-surface p-3 text-xs break-words whitespace-pre-wrap text-faint select-text">
           {error.name}: {error.message}
         </pre>
         <Button size="lg" fullWidth onClick={() => window.location.reload()}>
-          Reload
+          {t.reload}
         </Button>
       </div>
     )

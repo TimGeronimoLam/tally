@@ -1,3 +1,4 @@
+import { useT } from '../../i18n/index.ts'
 import {
   normalizeEmailCode,
   verifyEmailCode,
@@ -25,23 +26,19 @@ export function EmailCodeSheet({
   onSignedIn,
   onClose,
 }: EmailCodeSheetProps) {
-  const description = pending
-    ? `We sent a code to ${pending.email}. Enter it here.`
-    : ''
+  const t = useT()
+  const description = pending ? t.sync.codeSent(pending.email) : ''
 
   return (
     <InputSheet
       open={open}
-      title="Enter your code"
+      title={t.sync.enterCode}
       description={description}
-      label="Code"
-      submitLabel="Sign in"
-      busyLabel="Signing in…"
-      cancelLabel="Cancel"
-      validate={(v) =>
-        normalizeEmailCode(v).length >= 6 ||
-        'Enter the whole code from the email'
-      }
+      label={t.sync.code}
+      submitLabel={t.sync.signIn}
+      busyLabel={t.sync.signingIn}
+      cancelLabel={t.common.cancel}
+      validate={(v) => normalizeEmailCode(v).length >= 6 || t.sync.wholeCode}
       onSubmit={async (code) => {
         if (!pending) return
         await verifyEmailCode(pending.email, code, pending.type)

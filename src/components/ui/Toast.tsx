@@ -6,6 +6,7 @@ import {
   type PointerEvent,
   type ReactNode,
 } from 'react'
+import { useT } from '../../i18n/index.ts'
 import { ToastContext, type ToastOptions } from '../../lib/toast.ts'
 import { CloseIcon } from './icons.tsx'
 
@@ -70,6 +71,7 @@ function Toast({
   toast: ToastState
   onDismiss: () => void
 }) {
+  const t = useT()
   const [drag, setDrag] = useState<Drag>(null)
   const [exit, setExit] = useState<-1 | 1 | 0>(0)
   const exiting = exit !== 0
@@ -159,7 +161,7 @@ function Toast({
       )}
       <button
         type="button"
-        aria-label="Dismiss"
+        aria-label={t.common.dismiss}
         className="flex size-10 shrink-0 items-center justify-center rounded-full text-inverse-fg"
         onClick={onDismiss}
       >

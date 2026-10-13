@@ -1,4 +1,5 @@
 import { useState, type FormEvent, type InputHTMLAttributes } from 'react'
+import { useT } from '../../i18n/index.ts'
 import { Button } from './Button.tsx'
 import { Sheet } from './Sheet.tsx'
 import { TextField } from './TextField.tsx'
@@ -32,13 +33,14 @@ export function InputSheet({
   label,
   initialValue = '',
   submitLabel,
-  busyLabel = 'Saving…',
-  cancelLabel = 'Not now',
+  busyLabel,
+  cancelLabel,
   validate,
   onSubmit,
   onClose,
   inputProps,
 }: InputSheetProps) {
+  const t = useT()
   const [value, setValue] = useState(initialValue)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -54,7 +56,7 @@ export function InputSheet({
     try {
       await onSubmit(trimmed)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong')
+      setError(err instanceof Error ? err.message : t.common.somethingWentWrong)
     } finally {
       setBusy(false)
     }
@@ -83,10 +85,10 @@ export function InputSheet({
         )}
         <div className="flex flex-col gap-2">
           <Button type="submit" size="lg" fullWidth disabled={!valid || busy}>
-            {busy ? busyLabel : submitLabel}
+            {busy ? (busyLabel ?? t.sync.saving) : submitLabel}
           </Button>
           <Button variant="ghost" fullWidth onClick={onClose}>
-            {cancelLabel}
+            {cancelLabel ?? t.common.notNow}
           </Button>
         </div>
       </form>

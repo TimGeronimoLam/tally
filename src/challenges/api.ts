@@ -1,3 +1,4 @@
+import { messages } from '../i18n/index.ts'
 import { calibrate } from '../lib/clock.ts'
 import { supabase } from '../lib/supabase.ts'
 import { signInAnonymously } from '../sync/auth.ts'
@@ -14,7 +15,7 @@ import type {
 } from './types.ts'
 
 function client() {
-  if (!supabase) throw new Error('Challenges need the Tally server')
+  if (!supabase) throw new Error(messages().errors.needServer)
   return supabase
 }
 
@@ -28,7 +29,7 @@ export async function ensureSession(): Promise<string> {
   if (!session) {
     await signInAnonymously()
     session = (await c.auth.getSession()).data.session
-    if (!session) throw new Error('Could not sign in')
+    if (!session) throw new Error(messages().errors.couldNotSignIn)
   }
   // Local rows may be re-keyed when the account changes, so the local
   // exercise id a challenge points at is only resolved after this. A full
@@ -37,7 +38,7 @@ export async function ensureSession(): Promise<string> {
   await withTimeout(
     ensureSyncOwner(session.user.id),
     15_000,
-    'Local data did not get ready in time. Please try again.',
+    messages().errors.localDataNotReady,
   )
   return session.user.id
 }
@@ -148,9 +149,10 @@ export async function createChallenge(
       void syncNow()
       return toChallenge((Array.isArray(data) ? data[0] : data) as Raw)
     }
-    if (error.code !== '23505') fail('Could not create challenge', error)
+    if (error.code !== '23505')
+      fail(messages().errors.couldNotCreateChallenge, error)
   }
-  throw new Error('Could not create challenge: code collision')
+  throw new Error(messages().errors.codeCollision)
 }
 
 export async function previewChallenge(
@@ -159,7 +161,7 @@ export async function previewChallenge(
   const { data, error } = await client().rpc('preview_challenge', {
     p_code: code,
   })
-  if (error) fail('Could not look up challenge', error)
+  if (error) fail(messages().errors.couldNotLookUp, error)
   const rows = (data ?? []) as Raw[]
   return rows.length ? toPreview(rows[0]) : null
 }
@@ -181,7 +183,7 @@ export async function joinChallenge(
     p_display_name: displayName,
     p_exercise_id: exerciseId,
   })
-  if (error) fail('Could not join', error)
+  if (error) fail(messages().errors.couldNotJoin, error)
   // Entries logged earlier today should count right away.
   void syncNow()
   return str(data)
@@ -192,7 +194,7 @@ export async function endChallenge(challengeId: string): Promise<Challenge> {
   const { data, error } = await client().rpc('end_challenge', {
     p_challenge_id: challengeId,
   })
-  if (error) fail('Could not end challenge', error)
+  if (error) fail(messages().errors.couldNotEnd, error)
   const ended = toChallenge((Array.isArray(data) ? data[0] : data) as Raw)
   // The window closed at the server's "now"; that is the best clock reading
   // available, so the challenge shows as ended at once.
@@ -205,13 +207,13 @@ export async function deleteChallenge(challengeId: string): Promise<void> {
   const { error } = await client().rpc('delete_challenge', {
     p_challenge_id: challengeId,
   })
-  if (error) fail('Could not delete challenge', error)
+  if (error) fail(messages().errors.couldNotDelete, error)
 }
 
 export async function fetchMyChallenges(): Promise<ChallengeSummary[]> {
   if (!(await currentUserId())) return []
   const { data, error } = await client().rpc('my_challenges')
-  if (error) fail('Could not load challenges', error)
+  if (error) fail(messages().errors.couldNotLoadChallenges, error)
   const rows = (data ?? []) as Raw[]
   // Every row carries the server's clock reading for this request.
   if (rows.length) calibrate(rows[0].server_now as string | undefined)
@@ -224,6 +226,6 @@ export async function fetchLeaderboard(
   const { data, error } = await client().rpc('challenge_leaderboard', {
     p_challenge_id: challengeId,
   })
-  if (error) fail('Could not load leaderboard', error)
+  if (error) fail(messages().errors.couldNotLoadLeaderboard, error)
   return ((data ?? []) as Raw[]).map(toRow)
 }

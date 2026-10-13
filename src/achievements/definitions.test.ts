@@ -9,6 +9,7 @@ import {
   hasFullMonth,
   type AchievementContext,
 } from './definitions.ts'
+import { en } from '../i18n/en.ts'
 
 let seq = 0
 function entry(
@@ -53,7 +54,7 @@ describe('milestones', () => {
     const c = ctx([entry('2026-10-01', 60), entry('2026-10-02', 40, 'squat')])
     expect(byId('reps-100').check(c)).toBe(true)
     expect(byId('reps-1k').check(c)).toBe(false)
-    expect(byId('reps-100').progress?.(c)).toBe('100 so far')
+    expect(byId('reps-100').progress?.(c, en)).toBe('100 so far')
   })
 })
 
@@ -66,7 +67,7 @@ describe('streaks', () => {
     expect(c.stats.currentStreak).toBe(0)
     expect(byId('streak-7').check(c)).toBe(true)
     expect(byId('streak-30').check(c)).toBe(false)
-    expect(byId('streak-30').progress?.(c)).toBe('7 best so far')
+    expect(byId('streak-30').progress?.(c, en)).toBe('7 best so far')
   })
 })
 
@@ -88,7 +89,7 @@ describe('consistency', () => {
     ]
     expect(earlyBirdCount(entries)).toBe(9)
     expect(byId('early-bird').check(ctx(entries))).toBe(false)
-    expect(byId('early-bird').progress?.(ctx(entries))).toBe(
+    expect(byId('early-bird').progress?.(ctx(entries), en)).toBe(
       '9 of 10 before 7am',
     )
     expect(

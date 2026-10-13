@@ -18,11 +18,13 @@ import {
   SectionLabel,
   inputClassName,
 } from '../components/ui/index.ts'
+import { useT } from '../i18n/index.ts'
 import { isSyncConfigured } from '../lib/supabase.ts'
 import { useToast } from '../lib/toast.ts'
 import { useNav } from '../lib/nav.ts'
 
 export function ChallengesPage() {
+  const t = useT()
   const nav = useNav()
   const toast = useToast()
   const { data, error, loading, userId } = useMyChallenges()
@@ -34,16 +36,16 @@ export function ChallengesPage() {
     void (async () => {
       await recordSocialStats(socialStatsFrom(data, userId))
       for (const a of await evaluateAchievements()) {
-        toast({ message: `Achievement unlocked: ${a.title}`, queue: true })
+        toast({ message: t.log.achievementUnlocked(a.title(t)), queue: true })
       }
     })()
-  }, [data, userId, toast])
+  }, [data, userId, toast, t])
 
   function join(e: FormEvent) {
     e.preventDefault()
     const normalized = normalizeInviteCode(code)
     if (!isValidInviteCode(normalized)) {
-      toast({ message: 'Codes are 6 letters or digits' })
+      toast({ message: t.challenges.codeFormat })
       return
     }
     nav.push(`/join/${normalized}`)
@@ -55,10 +57,10 @@ export function ChallengesPage() {
   return (
     <Screen>
       <ScreenHeader
-        title="Challenges"
+        title={t.challenges.title}
         action={
           <ButtonLink to="/challenges/new" variant="outline" size="sm">
-            New
+            {t.common.newButton}
           </ButtonLink>
         }
       />
@@ -66,12 +68,12 @@ export function ChallengesPage() {
       <Gutter className="pt-4">
         <form onSubmit={join} className="flex gap-2">
           <label htmlFor="invite-code" className="sr-only">
-            Challenge code
+            {t.challenges.codeLabel}
           </label>
           <input
             id="invite-code"
             className={`${inputClassName} h-12 min-w-0 flex-1`}
-            placeholder="Enter a code, e.g. 7K2QXY"
+            placeholder={t.challenges.codePlaceholder}
             autoCapitalize="characters"
             autoComplete="off"
             spellCheck={false}
@@ -79,17 +81,14 @@ export function ChallengesPage() {
             onChange={(e) => setCode(e.target.value)}
           />
           <Button type="submit" variant="inverse" disabled={!code.trim()}>
-            Join
+            {t.challenges.join}
           </Button>
         </form>
       </Gutter>
 
       {!isSyncConfigured && (
         <Gutter className="pt-6">
-          <p className="text-[15px] text-muted">
-            Challenges need the Tally server, which this build is not configured
-            for.
-          </p>
+          <p className="text-[15px] text-muted">{t.challenges.notConfigured}</p>
         </Gutter>
       )}
 
@@ -100,13 +99,12 @@ export function ChallengesPage() {
       )}
 
       <Gutter>
-        <SectionLabel>Active</SectionLabel>
+        <SectionLabel>{t.challenges.active}</SectionLabel>
         {loading && !data ? (
-          <p className="pt-2 text-[15px] text-muted">Loading…</p>
+          <p className="pt-2 text-[15px] text-muted">{t.common.loading}</p>
         ) : active.length === 0 ? (
           <p className="pt-2 text-[15px] leading-relaxed text-muted">
-            No active challenges. Start one with New, or enter a friend's code
-            above.
+            {t.challenges.noneActive}
           </p>
         ) : (
           <div className="flex flex-col gap-2.5 pt-1">
@@ -119,7 +117,7 @@ export function ChallengesPage() {
 
       {past.length > 0 && (
         <Gutter className="pb-6">
-          <SectionLabel>Past</SectionLabel>
+          <SectionLabel>{t.challenges.past}</SectionLabel>
           <div className="flex flex-col gap-2 pt-1">
             {past.map((c) => (
               <PastChallengeRow key={c.id} challenge={c} meId={userId} />

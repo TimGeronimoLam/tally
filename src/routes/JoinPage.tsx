@@ -16,6 +16,7 @@ import {
   TextField,
 } from '../components/ui/index.ts'
 import { useDisplayName } from '../db/index.ts'
+import { useT } from '../i18n/index.ts'
 import { isIOS, isStandalone } from '../lib/install.ts'
 import { copyText } from '../lib/share.ts'
 import { useToast } from '../lib/toast.ts'
@@ -34,6 +35,7 @@ type Preview =
  * created on join.
  */
 export function JoinPage() {
+  const t = useT()
   const code = normalizeInviteCode(useParams().code ?? '')
   const nav = useNav()
   const toast = useToast()
@@ -59,13 +61,13 @@ export function JoinPage() {
         if (!cancelled)
           setPreview({
             state: 'error',
-            message: err instanceof Error ? err.message : 'Could not load',
+            message: err instanceof Error ? err.message : t.join.couldNotLoad,
           })
       })
     return () => {
       cancelled = true
     }
-  }, [code])
+  }, [code, t])
 
   const challenge = preview.state === 'ready' ? preview.challenge : null
   const yourName = nameInput ?? savedName ?? ''
@@ -83,18 +85,19 @@ export function JoinPage() {
         challenge.exerciseName,
         challenge.unit,
       )
-      toast({ message: `You're in: ${challenge.name}` })
+      toast({ message: t.join.youreIn(challenge.name) })
       if (!session?.user.email) {
         toast({
-          message:
-            'Add an email in Account to keep your challenges if you switch phones',
+          message: t.newChallenge.keepChallengesHint,
           queue: true,
           duration: 6000,
         })
       }
       nav.push(`/challenges/${id}`, { replace: true })
     } catch (err) {
-      toast({ message: err instanceof Error ? err.message : 'Could not join' })
+      toast({
+        message: err instanceof Error ? err.message : t.join.couldNotJoin,
+      })
     } finally {
       setBusy(false)
     }
@@ -104,18 +107,16 @@ export function JoinPage() {
     <Screen>
       <Gutter className="flex flex-col gap-4 pt-[calc(env(safe-area-inset-top)_+_20px)] pb-8">
         {preview.state === 'loading' && (
-          <p className="text-[15px] text-muted">Looking up {code}…</p>
+          <p className="text-[15px] text-muted">{t.join.lookingUp(code)}</p>
         )}
         {preview.state === 'missing' && (
           <>
             <h1 className="text-[22px] font-semibold tracking-[-0.02em]">
-              No challenge found
+              {t.join.notFound}
             </h1>
-            <p className="text-[15px] text-muted">
-              Nothing matches the code {code}. Check it with whoever shared it.
-            </p>
+            <p className="text-[15px] text-muted">{t.join.noMatch(code)}</p>
             <ButtonLink to="/challenges" direction="pop" variant="ghost">
-              Back to challenges
+              {t.join.backToChallenges}
             </ButtonLink>
           </>
         )}
@@ -128,7 +129,7 @@ export function JoinPage() {
             <Card className="flex flex-col gap-0.5 px-3 py-2.5">
               <span className="text-sm font-semibold">{challenge.name}</span>
               <span className="text-xs text-muted">
-                {challengeSubtitle(challenge, {
+                {challengeSubtitle(challenge, t, {
                   memberCount: challenge.memberCount,
                 })}
               </span>
@@ -140,11 +141,10 @@ export function JoinPage() {
               >
                 <div className="flex min-w-0 flex-col gap-0.5">
                   <span className="text-[13px] font-semibold">
-                    Have Tally on your home screen?
+                    {t.join.haveOnHomeScreen}
                   </span>
                   <span className="text-xs leading-relaxed text-muted">
-                    This link opened in the browser instead. Open the app, go to
-                    Challenges and enter the code {code} there.
+                    {t.join.openedInBrowser(code)}
                   </span>
                 </div>
                 <Button
@@ -154,38 +154,37 @@ export function JoinPage() {
                   onClick={async () =>
                     toast({
                       message: (await copyText(code))
-                        ? 'Code copied'
-                        : 'Could not copy',
+                        ? t.challengeDetail.codeCopied
+                        : t.challengeDetail.couldNotCopy,
                     })
                   }
                 >
-                  Copy code
+                  {t.join.copyCode}
                 </Button>
               </Card>
             )}
             <h1 className="text-[22px] font-semibold tracking-[-0.02em]">
-              {challenge.isMember ? 'Update your name' : 'Join the challenge'}
+              {challenge.isMember ? t.join.updateName : t.join.joinTitle}
             </h1>
             <p className="text-[13px] leading-relaxed text-muted">
-              Every {challenge.exerciseName.toLowerCase()} set you log on this
-              phone counts toward it.
+              {t.join.everySetCounts(challenge.exerciseName)}
             </p>
 
             <TextField
-              label="Name on the leaderboard"
+              label={t.join.nameLabel}
               value={yourName}
               onChange={(e) => setNameInput(e.target.value)}
-              placeholder="e.g. Tim"
+              placeholder={t.newChallenge.namePlaceholderPerson}
               autoComplete="nickname"
               maxLength={24}
             />
 
             <Button type="submit" size="lg" fullWidth disabled={!valid || busy}>
               {busy
-                ? 'Joining…'
+                ? t.join.joining
                 : challenge.isMember
-                  ? 'Save'
-                  : 'Join challenge'}
+                  ? t.common.save
+                  : t.join.joinButton}
             </Button>
 
             {!session?.user.email && (
@@ -195,20 +194,20 @@ export function JoinPage() {
               >
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[13px] font-semibold">
-                    Switching phones later?
+                    {t.join.switchingPhones}
                   </span>
                   <span className="text-xs leading-relaxed text-muted">
-                    Sign in to keep your spot and sync your reps.
+                    {t.join.signInToKeep}
                   </span>
                 </div>
                 <ButtonLink to="/account" variant="inverse" size="sm">
-                  Sign in
+                  {t.join.signIn}
                 </ButtonLink>
               </Card>
             )}
 
             <ButtonLink to="/challenges" direction="pop" variant="ghost">
-              Not now
+              {t.common.notNow}
             </ButtonLink>
           </form>
         )}

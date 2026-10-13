@@ -39,8 +39,22 @@ stretched UI. Fixed overlays (toast, sheet) share the same cap.
 | `src/routes/`         | One file per screen. Screens compose `app` + `ui` and call `db` hooks     |
 | `src/db/`             | Dexie schema, types, mutations, live-query hooks, import/export           |
 | `src/lib/`            | Pure helpers: `cn`, `format`, `date`, `theme`, `toast` hook               |
+| `src/i18n/`           | Languages. `en.ts` is the typed source; every other locale must match it  |
 
 Rule of thumb: if a component needs `db`, it belongs in `app` or `routes`, never `ui`.
+
+## Languages
+
+English, German, French, Spanish, Italian, Dutch and Portuguese. The app
+follows the device language (Account → Language overrides it; stored as
+`tally.locale`). Dates, numbers and weekday names come from `Intl` with the
+same locale, so an `en-GB` phone keeps its date order.
+
+Components call `useT()` and read `t.screen.key`; code outside React calls
+`messages()`. Strings that need values are functions, so each language owns
+its own plurals and word order. To add a language: copy `src/i18n/en.ts`,
+type the object as `Messages`, and register it in `LOCALES` and `MESSAGES`
+in `src/i18n/locale.ts`. `tsc` reports any key that is missing.
 
 ## Supabase (sync + challenges)
 

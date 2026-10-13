@@ -1,4 +1,5 @@
 import type { LeaderboardRow } from '../../challenges/types.ts'
+import { useT } from '../../i18n/index.ts'
 import { cn } from '../../lib/cn.ts'
 import { formatNumber } from '../../lib/format.ts'
 import { Avatar } from '../ui/index.ts'
@@ -19,6 +20,7 @@ export function LeaderboardList({
   compact,
   className,
 }: LeaderboardListProps) {
+  const t = useT()
   return (
     <ol className={cn('flex flex-col', className)}>
       {rows.map((r) => {
@@ -36,10 +38,15 @@ export function LeaderboardList({
             <Avatar initial={r.displayName} highlight={me} />
             <span className="min-w-0 flex-1 truncate text-[15px]">
               {r.displayName}
-              {me && <span className="font-normal text-muted"> (you)</span>}
+              {me && (
+                <span className="font-normal text-muted">
+                  {' '}
+                  {t.challenges.youSuffix}
+                </span>
+              )}
             </span>
             <span className="text-xs font-normal text-faint">
-              +{formatNumber(r.today)} today
+              {t.challenges.today(formatNumber(r.today))}
             </span>
             <span className="w-14 text-right text-[15px] tabular-nums">
               {formatNumber(r.total)}

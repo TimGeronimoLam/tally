@@ -7,6 +7,7 @@ import { router } from './App.tsx'
 import { ErrorBoundary } from './components/app/ErrorBoundary.tsx'
 import { ToastProvider } from './components/ui/index.ts'
 import { seedIfNeeded } from './db/index.ts'
+import { initLocale } from './i18n/index.ts'
 import { installErrorCapture, recordError } from './lib/diagnostics.ts'
 import { initNavDirection } from './lib/nav.ts'
 import { initTheme } from './lib/theme.ts'
@@ -15,6 +16,7 @@ import { initAuth, startSyncTriggers } from './sync/index.ts'
 installErrorCapture()
 registerSW({ immediate: true })
 initTheme()
+initLocale()
 initNavDirection()
 
 const root = createRoot(document.getElementById('root')!)

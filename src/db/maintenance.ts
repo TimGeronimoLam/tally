@@ -1,3 +1,4 @@
+import { messages } from '../i18n/index.ts'
 import { db } from './db.ts'
 import { seedIfNeeded } from './seed.ts'
 import type { Entry, Exercise, UnlockedAchievement } from './types.ts'
@@ -62,7 +63,7 @@ export async function importSnapshot(
 ): Promise<{ exercises: number; entries: number }> {
   const parsed: unknown = JSON.parse(await file.text())
   if (!isSnapshot(parsed)) {
-    throw new Error('Not a Tally export file')
+    throw new Error(messages().errors.notExportFile)
   }
   await db.transaction(
     'rw',

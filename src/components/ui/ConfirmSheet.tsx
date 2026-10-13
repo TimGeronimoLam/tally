@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useT } from '../../i18n/index.ts'
 import { Button } from './Button.tsx'
 import { Sheet } from './Sheet.tsx'
 
@@ -26,6 +27,7 @@ export function ConfirmSheet({
   onConfirm,
   onClose,
 }: ConfirmSheetProps) {
+  const t = useT()
   return (
     <Sheet open={open} onClose={onClose} title={title}>
       <p className="text-[15px] leading-relaxed text-muted">{message}</p>
@@ -45,7 +47,7 @@ export function ConfirmSheet({
           autoFocus={destructive}
           onClick={onClose}
         >
-          Cancel
+          {t.common.cancel}
         </Button>
       </div>
     </Sheet>

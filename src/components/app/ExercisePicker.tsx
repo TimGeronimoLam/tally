@@ -1,4 +1,5 @@
 import type { Exercise } from '../../db/index.ts'
+import { useT } from '../../i18n/index.ts'
 import { Chip, ChipRow } from '../ui/index.ts'
 
 export interface ExercisePickerProps {
@@ -18,6 +19,7 @@ export function ExercisePicker({
   suggestName,
   onCreate,
 }: ExercisePickerProps) {
+  const t = useT()
   const hasMatch =
     !suggestName ||
     exercises.some(
@@ -41,7 +43,7 @@ export function ExercisePicker({
           className="border border-dashed border-border-strong bg-transparent"
           onClick={() => onCreate(suggestName)}
         >
-          + Create {suggestName}
+          {t.newChallenge.createExercise(suggestName)}
         </Chip>
       )}
     </ChipRow>

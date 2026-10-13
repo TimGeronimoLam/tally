@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react'
+import { useT } from '../../i18n/index.ts'
 import { cn } from '../../lib/cn.ts'
+import { weekdayNames } from '../../lib/format.ts'
 import type { HeatLevel, HeatmapData } from '../../stats/heatmap.ts'
 
 export interface HeatmapProps {
@@ -14,7 +16,8 @@ export interface HeatmapProps {
   className?: string
 }
 
-const ROW_LABELS = ['Mon', '', 'Wed', '', 'Fri', '', 'Sun']
+/** Mon, Wed, Fri, Sun rows carry a label; the rest stay blank. */
+const LABELLED_ROWS = new Set([0, 2, 4, 6])
 const ROW_LABEL_WIDTH = 28
 
 const levelClass: Record<HeatLevel, string> = {
@@ -40,6 +43,9 @@ export function Heatmap({
   gap = 3,
   className,
 }: HeatmapProps) {
+  const t = useT()
+  const weekdays = weekdayNames('short')
+  const rowLabels = weekdays.map((d, i) => (LABELLED_ROWS.has(i) ? d : ''))
   const scroller = useRef<HTMLDivElement>(null)
   const step = cellSize + gap
 
@@ -74,7 +80,7 @@ export function Heatmap({
               className="sticky left-0 z-10 flex shrink-0 flex-col bg-bg text-[11px] text-faint"
               style={{ width: ROW_LABEL_WIDTH }}
             >
-              {ROW_LABELS.map((label, i) => (
+              {rowLabels.map((label, i) => (
                 <span
                   key={i}
                   className="flex items-center"
@@ -120,16 +126,16 @@ export function Heatmap({
         </div>
       </div>
       <div className="flex items-center justify-between text-[11px] text-faint">
-        <span>Tap a day to see its total</span>
+        <span>{t.stats.heatmapHint}</span>
         <span className="flex items-center gap-[3px]">
-          Less
+          {t.stats.less}
           {([0, 1, 2, 3, 4] as HeatLevel[]).map((l) => (
             <span
               key={l}
               className={cn('size-[10px] rounded-[2px]', levelClass[l])}
             />
           ))}
-          More
+          {t.stats.more}
         </span>
       </div>
     </div>

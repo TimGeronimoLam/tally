@@ -1,3 +1,4 @@
+import { useT } from '../../i18n/index.ts'
 import { cn } from '../../lib/cn.ts'
 import { haptic } from '../../lib/haptics.ts'
 import { BackspaceIcon } from './icons.tsx'
@@ -28,6 +29,7 @@ export interface KeypadProps {
 
 /** 3×4 numeric keypad. */
 export function Keypad({ onKey, disabled, className }: KeypadProps) {
+  const t = useT()
   return (
     <div className={cn('grid grid-cols-3 gap-1.5', className)}>
       {LAYOUT.map((key, i) =>
@@ -38,7 +40,7 @@ export function Keypad({ onKey, disabled, className }: KeypadProps) {
             key={key}
             type="button"
             disabled={disabled}
-            aria-label={key === 'delete' ? 'Delete' : undefined}
+            aria-label={key === 'delete' ? t.log.keypadDelete : undefined}
             onClick={() => {
               haptic('tap')
               onKey(key)

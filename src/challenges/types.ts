@@ -1,9 +1,7 @@
 export type GoalType = 'most_reps' | 'first_to'
 
-export const GOAL_TYPES: Array<{ value: GoalType; label: string }> = [
-  { value: 'most_reps', label: 'Most reps' },
-  { value: 'first_to', label: 'First to' },
-]
+/** Picker order; labels come from `m.challenges.goalType[value]`. */
+export const GOAL_TYPES: GoalType[] = ['most_reps', 'first_to']
 
 /** A challenge as the server describes it. Timestamps are ISO strings. */
 export interface Challenge {

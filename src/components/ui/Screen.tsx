@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useT } from '../../i18n/index.ts'
 import { cn } from '../../lib/cn.ts'
 import { IconButton } from './Button.tsx'
 import { ChevronLeftIcon } from './icons.tsx'
@@ -66,11 +67,12 @@ export interface ScreenNavProps {
  */
 export function ScreenNav({
   onBack,
-  backLabel = 'Back',
+  backLabel,
   action,
   title,
   children,
 }: ScreenNavProps) {
+  const t = useT()
   const bar = useRef<HTMLDivElement>(null)
   const heading = useRef<HTMLHeadingElement>(null)
   const [collapsed, setCollapsed] = useState(false)
@@ -96,7 +98,7 @@ export function ScreenNav({
           'flex items-center justify-between px-3 pt-[calc(env(safe-area-inset-top)_+_8px)] pb-1',
         )}
       >
-        <IconButton aria-label={backLabel} onClick={onBack}>
+        <IconButton aria-label={backLabel ?? t.common.back} onClick={onBack}>
           <ChevronLeftIcon />
         </IconButton>
         <span

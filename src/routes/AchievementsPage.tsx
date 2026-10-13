@@ -19,6 +19,7 @@ import {
   SectionLabel,
   TrophyIcon,
 } from '../components/ui/index.ts'
+import { useT } from '../i18n/index.ts'
 
 const ICONS = {
   calendar: CalendarIcon,
@@ -36,6 +37,7 @@ function renderIcon(icon: AchievementIcon) {
 }
 
 export function AchievementsPage() {
+  const t = useT()
   const { items, unlockedCount, total, latestId, loading } = useAchievements()
 
   // Catch up on anything earned outside the Log screen (imports, old data).
@@ -48,15 +50,17 @@ export function AchievementsPage() {
   return (
     <Screen>
       <ScreenHeader
-        title="Achievements"
-        meta={`${unlockedCount} of ${total}`}
+        title={t.achievements.title}
+        meta={t.achievements.meta(unlockedCount, total)}
       />
       {SECTIONS.map((section) => (
-        <Gutter key={section.id}>
-          <SectionLabel className="pt-5 pb-2">{section.title}</SectionLabel>
+        <Gutter key={section}>
+          <SectionLabel className="pt-5 pb-2">
+            {t.achievements.sections[section]}
+          </SectionLabel>
           <BadgeGrid>
             {items
-              .filter((a) => a.section === section.id)
+              .filter((a) => a.section === section)
               .map((a) => (
                 <Badge
                   key={a.id}

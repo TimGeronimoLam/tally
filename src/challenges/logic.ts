@@ -1,5 +1,7 @@
+import type { Messages } from '../i18n/index.ts'
 import { serverNow } from '../lib/clock.ts'
 import { dayKey, parseDayKey, shiftDayKey, startOfDay } from '../lib/date.ts'
+import { formatDayMonth, formatNumber } from '../lib/format.ts'
 import type { Challenge, ChallengeSummary } from './types.ts'
 
 export type ChallengeStatus = 'upcoming' | 'active' | 'ended'
@@ -31,22 +33,6 @@ export function daysLeft(
   return ms <= 0 ? 0 : Math.ceil(ms / 86_400_000)
 }
 
-/** 1 → "1st", 2 → "2nd", 11 → "11th", 23 → "23rd" */
-export function ordinal(n: number): string {
-  const mod100 = n % 100
-  if (mod100 >= 11 && mod100 <= 13) return `${n}th`
-  switch (n % 10) {
-    case 1:
-      return `${n}st`
-    case 2:
-      return `${n}nd`
-    case 3:
-      return `${n}rd`
-    default:
-      return `${n}th`
-  }
-}
-
 /** True when the caller has won: first_to reached, or most_reps ended in 1st. */
 export function isWon(
   s: Pick<
@@ -69,11 +55,12 @@ export function gapToFirst(
   return Math.max(0, s.leaderTotal - s.myTotal + 1)
 }
 
+/** Duration presets; labels come from `m.newChallenge.durations[value]`. */
 export const DURATION_OPTIONS = [
-  { value: '3d', label: '3 days', days: 3 },
-  { value: '1w', label: '1 week', days: 7 },
-  { value: '1m', label: '1 month', days: 30 },
-  { value: 'custom', label: 'Custom', days: null },
+  { value: '3d', days: 3 },
+  { value: '1w', days: 7 },
+  { value: '1m', days: 30 },
+  { value: 'custom', days: null },
 ] as const
 export type DurationValue = (typeof DURATION_OPTIONS)[number]['value']
 
@@ -131,43 +118,31 @@ function isDayKey(s: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(s)
 }
 
-/** "Pushups · Most reps · 19 days left" */
+/** "Pushups · Most reps · 19 days left", in the language of `m`. */
 export function challengeSubtitle(
   c: Pick<
     Challenge,
     'exerciseName' | 'goalType' | 'goalValue' | 'startsAt' | 'endsAt'
   >,
+  m: Messages,
   opts: { memberCount?: number; now?: number } = {},
 ): string {
+  const s = m.challenges.subtitle
   const parts = [c.exerciseName]
   parts.push(
     c.goalType === 'first_to'
-      ? `First to ${formatInt(c.goalValue ?? 0)}`
-      : 'Most reps',
+      ? s.firstTo(formatNumber(c.goalValue ?? 0))
+      : s.mostReps,
   )
   const status = challengeStatus(c, opts.now)
   if (status === 'ended') {
-    parts.push(`ended ${shortDate(c.endsAt)}`)
+    parts.push(s.ended(formatDayMonth(c.endsAt)))
   } else if (status === 'upcoming') {
-    parts.push(`starts ${shortDate(c.startsAt)}`)
+    parts.push(s.starts(formatDayMonth(c.startsAt)))
   } else if (opts.memberCount !== undefined && c.goalType === 'first_to') {
-    parts.push(
-      `${opts.memberCount} ${opts.memberCount === 1 ? 'person' : 'people'}`,
-    )
+    parts.push(s.people(opts.memberCount))
   } else {
-    const d = daysLeft(c, opts.now)
-    parts.push(`${d} ${d === 1 ? 'day' : 'days'} left`)
+    parts.push(s.daysLeft(daysLeft(c, opts.now)))
   }
   return parts.join(' · ')
-}
-
-function shortDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
-    day: 'numeric',
-    month: 'short',
-  })
-}
-
-function formatInt(n: number): string {
-  return new Intl.NumberFormat().format(n)
 }

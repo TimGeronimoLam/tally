@@ -1,4 +1,5 @@
 import type { Exercise } from '../../db/index.ts'
+import { useT } from '../../i18n/index.ts'
 import { Chip, ChipRow, IconButton, PlusIcon } from '../ui/index.ts'
 
 export interface ExerciseChipsProps {
@@ -18,6 +19,7 @@ export function ExerciseChips({
   onEdit,
   onAdd,
 }: ExerciseChipsProps) {
+  const t = useT()
   return (
     <ChipRow>
       {exercises.map((ex) => {
@@ -26,14 +28,18 @@ export function ExerciseChips({
           <Chip
             key={ex.id}
             selected={selected}
-            title={selected ? 'Tap again to edit' : undefined}
+            title={selected ? t.log.tapAgainToEdit : undefined}
             onClick={() => (selected ? onEdit(ex) : onSelect(ex.id))}
           >
             {ex.name}
           </Chip>
         )
       })}
-      <IconButton variant="outline" aria-label="Add exercise" onClick={onAdd}>
+      <IconButton
+        variant="outline"
+        aria-label={t.log.addExercise}
+        onClick={onAdd}
+      >
         <PlusIcon size={20} />
       </IconButton>
     </ChipRow>

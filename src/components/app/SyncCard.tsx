@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useDisplayName } from '../../db/index.ts'
+import { useT } from '../../i18n/index.ts'
 import { formatTime } from '../../lib/format.ts'
 import { isSyncConfigured } from '../../lib/supabase.ts'
 import { useToast } from '../../lib/toast.ts'
@@ -32,6 +33,7 @@ interface PendingSignIn {
  * presented exactly like signed out; an email sign-in upgrades that user.
  */
 export function SyncCard() {
+  const t = useT()
   const toast = useToast()
   const { session, ready } = useSession()
   const status = useSyncStatus()
@@ -47,7 +49,8 @@ export function SyncCard() {
       if (success) toast({ message: success })
     } catch (err) {
       toast({
-        message: err instanceof Error ? err.message : 'Something went wrong',
+        message:
+          err instanceof Error ? err.message : t.common.somethingWentWrong,
       })
     } finally {
       setBusy(false)
@@ -62,12 +65,12 @@ export function SyncCard() {
 
   const syncLine =
     status.state === 'syncing'
-      ? 'Syncing…'
+      ? t.sync.syncing
       : status.state === 'error'
-        ? `Sync failed: ${status.error}`
+        ? t.sync.failed(status.error ?? '')
         : status.lastSyncAt
-          ? `Last synced ${formatTime(status.lastSyncAt)}`
-          : 'Waiting for first sync'
+          ? t.sync.lastSynced(formatTime(status.lastSyncAt))
+          : t.sync.waitingFirst
 
   return (
     <>
@@ -90,28 +93,26 @@ export function SyncCard() {
                   disabled={busy}
                   onClick={() => act(syncNow)}
                 >
-                  Sync now
+                  {t.sync.syncNow}
                 </Button>
                 <Button
                   variant="ghost"
                   className="flex-1"
                   disabled={busy}
-                  onClick={() =>
-                    act(signOut, 'Signed out. Your data stays on this phone.')
-                  }
+                  onClick={() => act(signOut, t.sync.signedOut)}
                 >
-                  Sign out
+                  {t.sync.signOut}
                 </Button>
               </div>
             </>
           ) : (
             <>
               <Block
-                title="Local only"
+                title={t.sync.localOnly}
                 body={
                   isSyncConfigured
-                    ? 'Your data lives on this device. Sign in to back it up and sync across phones.'
-                    : 'Your data lives on this device. Sync is not configured in this build.'
+                    ? t.sync.localOnlyBody
+                    : t.sync.notConfiguredBody
                 }
               />
               {isSyncConfigured && (
@@ -120,7 +121,7 @@ export function SyncCard() {
                   fullWidth
                   onClick={() => setSheet('email')}
                 >
-                  Sign in with email
+                  {t.sync.signInWithEmail}
                 </Button>
               )}
             </>
@@ -131,16 +132,16 @@ export function SyncCard() {
       <InputSheet
         key={`name-${sheet}`}
         open={sheet === 'name'}
-        title={name ? 'Your name' : 'Add your name'}
-        description="Shown to others on challenge leaderboards."
-        label="Name"
+        title={name ? t.sync.yourName : t.sync.addYourName}
+        description={t.sync.shownToOthers}
+        label={t.sync.name}
         initialValue={name}
-        submitLabel="Save"
-        cancelLabel="Cancel"
+        submitLabel={t.common.save}
+        cancelLabel={t.common.cancel}
         validate={(v) =>
           v.length > 0 && v.length <= DISPLAY_NAME_MAX
             ? true
-            : `Use 1 to ${DISPLAY_NAME_MAX} characters`
+            : t.sync.nameLength(DISPLAY_NAME_MAX)
         }
         onSubmit={async (value) => {
           await setDisplayName(value)
@@ -148,7 +149,7 @@ export function SyncCard() {
         }}
         onClose={() => setSheet('closed')}
         inputProps={{
-          placeholder: 'e.g. Tim',
+          placeholder: t.newChallenge.namePlaceholderPerson,
           autoComplete: 'nickname',
           maxLength: DISPLAY_NAME_MAX,
         }}
@@ -156,10 +157,10 @@ export function SyncCard() {
       <EmailSheet
         key={`email-${sheet}`}
         open={sheet === 'email'}
-        title="Sign in"
-        description="We'll email you a one-time code. No password needed; your account is created the first time."
-        submitLabel="Send code"
-        busyLabel="Sending…"
+        title={t.sync.signIn}
+        description={t.sync.signInDescription}
+        submitLabel={t.sync.sendCode}
+        busyLabel={t.sync.sending}
         onSubmit={async (addr) => {
           const type = await signInWithEmail(addr)
           setPending({ email: addr, type })
@@ -174,7 +175,7 @@ export function SyncCard() {
         onSignedIn={(addr) => {
           setSheet('closed')
           setPending(null)
-          toast({ message: `Signed in as ${addr}` })
+          toast({ message: t.sync.signedInAs(addr) })
         }}
         onClose={() => setSheet('closed')}
       />
@@ -183,6 +184,7 @@ export function SyncCard() {
 }
 
 function ProfileRow({ name, onEdit }: { name: string; onEdit: () => void }) {
+  const t = useT()
   return (
     <button
       type="button"
@@ -196,13 +198,15 @@ function ProfileRow({ name, onEdit }: { name: string; onEdit: () => void }) {
       />
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="truncate text-[15px] font-semibold">
-          {name || 'Add your name'}
+          {name || t.sync.addYourName}
         </span>
         <span className="text-[12px] text-muted">
-          {name ? 'Name on leaderboards' : 'Shown on challenge leaderboards'}
+          {name ? t.sync.nameOnLeaderboards : t.sync.shownOnLeaderboards}
         </span>
       </span>
-      <span className="text-[13px] font-medium text-muted">Edit</span>
+      <span className="text-[13px] font-medium text-muted">
+        {t.common.edit}
+      </span>
     </button>
   )
 }

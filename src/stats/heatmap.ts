@@ -1,3 +1,4 @@
+import { currentLocale } from '../i18n/index.ts'
 import {
   dayKey,
   parseDayKey,
@@ -79,7 +80,7 @@ export function buildHeatmap(
     const month = mondayDate.getMonth()
     const column: HeatmapColumn = { cells }
     if (month !== prevMonth) {
-      column.monthLabel = mondayDate.toLocaleDateString(undefined, {
+      column.monthLabel = mondayDate.toLocaleDateString(currentLocale(), {
         month: 'short',
       })
       prevMonth = month

@@ -21,11 +21,14 @@ import {
   useExercises,
   useSelectedExercise,
 } from '../db/index.ts'
+import { useT } from '../i18n/index.ts'
+import { formatMonthName, unitName } from '../lib/format.ts'
 import { useToast } from '../lib/toast.ts'
 import { setDisplayName, useSession } from '../sync/index.ts'
 import { useNav } from '../lib/nav.ts'
 
 export function NewChallengePage() {
+  const t = useT()
   const nav = useNav()
   const toast = useToast()
   const exercises = useExercises()
@@ -41,16 +44,15 @@ export function NewChallengePage() {
   const [range, setRange] = useState(defaultDateRange)
   const [displayName, setDisplayNameInput] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
-  const [monthName] = useState(() =>
-    new Date().toLocaleDateString(undefined, { month: 'long' }),
-  )
 
   if (!exercises || savedName === undefined) return null
 
   const exercise =
     exercises.find((e) => e.id === exerciseId) ?? defaultExercise ?? null
   const yourName = displayName ?? savedName
-  const defaultTitle = exercise ? `${monthName} ${exercise.name}` : ''
+  const defaultTitle = exercise
+    ? t.newChallenge.defaultTitle(formatMonthName(), exercise.name)
+    : ''
   const goal = Number(goalValue)
   const timeWindow = challengeWindow(duration, range)
   const valid =
@@ -58,6 +60,15 @@ export function NewChallengePage() {
     yourName.trim().length > 0 &&
     (goalType === 'most_reps' || goal > 0) &&
     timeWindow !== null
+
+  const goalOptions = GOAL_TYPES.map((value) => ({
+    value,
+    label: t.challenges.goalType[value],
+  }))
+  const durationOptions = DURATION_OPTIONS.map(({ value }) => ({
+    value,
+    label: t.newChallenge.durations[value],
+  }))
 
   async function submit(e: FormEvent) {
     e.preventDefault()
@@ -75,11 +86,10 @@ export function NewChallengePage() {
         endsAt: timeWindow.endsAt,
         displayName: yourName.trim(),
       })
-      toast({ message: 'Challenge created. Share the code!' })
+      toast({ message: t.newChallenge.createdToast })
       if (!session?.user.email) {
         toast({
-          message:
-            'Add an email in Account to keep your challenges if you switch phones',
+          message: t.newChallenge.keepChallengesHint,
           queue: true,
           duration: 6000,
         })
@@ -87,7 +97,8 @@ export function NewChallengePage() {
       nav.push(`/challenges/${created.id}`, { replace: true })
     } catch (err) {
       toast({
-        message: err instanceof Error ? err.message : 'Could not create',
+        message:
+          err instanceof Error ? err.message : t.newChallenge.couldNotCreate,
       })
     } finally {
       setBusy(false)
@@ -96,10 +107,13 @@ export function NewChallengePage() {
 
   return (
     <Screen>
-      <ScreenNav title="New challenge" onBack={() => nav.pop('/challenges')} />
+      <ScreenNav
+        title={t.newChallenge.title}
+        onBack={() => nav.pop('/challenges')}
+      />
 
       <form onSubmit={submit} className="flex flex-col gap-5 px-5 pt-5 pb-8">
-        <Field label="Exercise">
+        <Field label={t.newChallenge.exercise}>
           <ExercisePicker
             exercises={exercises}
             selectedId={exercise?.id ?? null}
@@ -108,17 +122,17 @@ export function NewChallengePage() {
         </Field>
 
         <TextField
-          label="Name"
+          label={t.newChallenge.name}
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder={defaultTitle || 'e.g. October Pushups'}
+          placeholder={defaultTitle || t.newChallenge.namePlaceholder}
           autoComplete="off"
         />
 
-        <Field label="Goal">
+        <Field label={t.newChallenge.goal}>
           <SegmentedControl
-            aria-label="Goal type"
-            options={GOAL_TYPES}
+            aria-label={t.newChallenge.goalType}
+            options={goalOptions}
             value={goalType}
             onChange={setGoalType}
           />
@@ -126,20 +140,20 @@ export function NewChallengePage() {
 
         {goalType === 'first_to' && (
           <TextField
-            label={`Target (${exercise?.unit ?? 'reps'})`}
+            label={t.newChallenge.target(unitName(exercise?.unit ?? 'reps', t))}
             type="text"
             inputMode="numeric"
             pattern="[0-9]*"
             value={goalValue}
             onChange={(e) => setGoalValue(e.target.value.replace(/\D/g, ''))}
-            placeholder="e.g. 1000"
+            placeholder={t.newChallenge.targetPlaceholder}
           />
         )}
 
-        <Field label="Duration">
+        <Field label={t.newChallenge.duration}>
           <SegmentedControl
-            aria-label="Duration"
-            options={DURATION_OPTIONS}
+            aria-label={t.newChallenge.duration}
+            options={durationOptions}
             value={duration}
             onChange={setDuration}
           />
@@ -149,7 +163,7 @@ export function NewChallengePage() {
           <div className="flex flex-col gap-2">
             <div className="flex gap-3">
               <TextField
-                label="Starts"
+                label={t.newChallenge.starts}
                 type="date"
                 value={range.startKey}
                 max={range.endKey}
@@ -159,7 +173,7 @@ export function NewChallengePage() {
                 className="min-w-0 flex-1"
               />
               <TextField
-                label="Ends"
+                label={t.newChallenge.ends}
                 type="date"
                 value={range.endKey}
                 min={range.startKey}
@@ -171,23 +185,23 @@ export function NewChallengePage() {
             </div>
             <p className="text-[13px] text-muted">
               {timeWindow
-                ? 'Runs from the start of the first day to the end of the last.'
-                : 'Pick an end date that is today or later, after the start.'}
+                ? t.newChallenge.customHint
+                : t.newChallenge.customInvalid}
             </p>
           </div>
         )}
 
         <TextField
-          label="Your name on the leaderboard"
+          label={t.newChallenge.yourName}
           value={yourName}
           onChange={(e) => setDisplayNameInput(e.target.value)}
-          placeholder="e.g. Tim"
+          placeholder={t.newChallenge.namePlaceholderPerson}
           autoComplete="nickname"
           maxLength={24}
         />
 
         <Button type="submit" size="lg" fullWidth disabled={!valid || busy}>
-          {busy ? 'Creating…' : 'Create challenge'}
+          {busy ? t.newChallenge.creating : t.newChallenge.create}
         </Button>
       </form>
     </Screen>
