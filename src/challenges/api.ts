@@ -1,10 +1,14 @@
+import { isBuiltin } from '../db/builtins.ts'
 import { messages } from '../i18n/index.ts'
 import { calibrate } from '../lib/clock.ts'
 import { supabase } from '../lib/supabase.ts'
 import { signInAnonymously } from '../sync/auth.ts'
 import { ensureSyncOwner, syncNow } from '../sync/sync.ts'
 import { generateInviteCode } from './codes.ts'
-import { resolveLocalExercise } from './localExercise.ts'
+import {
+  resolveLocalExercise,
+  type ChallengeExercise,
+} from './localExercise.ts'
 import type {
   Challenge,
   ChallengeEdit,
@@ -66,6 +70,7 @@ type Raw = Record<string, unknown>
 const str = (v: unknown) => String(v ?? '')
 const num = (v: unknown) => Number(v ?? 0)
 const numOrNull = (v: unknown) => (v == null ? null : Number(v))
+const builtinOrNull = (v: unknown) => (isBuiltin(v) ? v : null)
 
 function toChallenge(r: Raw): Challenge {
   return {
@@ -73,6 +78,7 @@ function toChallenge(r: Raw): Challenge {
     name: str(r.name),
     exerciseName: str(r.exercise_name),
     unit: str(r.unit),
+    exerciseBuiltin: builtinOrNull(r.exercise_builtin),
     goalType: str(r.goal_type) as GoalType,
     goalValue: numOrNull(r.goal_value),
     startsAt: str(r.starts_at),
@@ -110,6 +116,7 @@ function toPreview(r: Raw): ChallengePreview {
     name: str(r.name),
     exerciseName: str(r.exercise_name),
     unit: str(r.unit),
+    exerciseBuiltin: builtinOrNull(r.exercise_builtin),
     goalType: str(r.goal_type) as GoalType,
     goalValue: numOrNull(r.goal_value),
     startsAt: str(r.starts_at),
@@ -130,13 +137,14 @@ export async function createChallenge(
 ): Promise<Challenge> {
   await ensureSession()
   // Resolved after ensureSession: the id must survive any re-key above.
-  const exerciseId = await resolveLocalExercise(input.exerciseName, input.unit)
+  const exerciseId = await resolveLocalExercise(input)
   // Retry on the (very unlikely) invite-code collision.
   for (let attempt = 0; attempt < 5; attempt++) {
     const { data, error } = await client().rpc('create_challenge', {
       p_name: input.name,
       p_exercise_name: input.exerciseName,
       p_unit: input.unit,
+      p_exercise_builtin: input.exerciseBuiltin,
       p_goal_type: input.goalType,
       p_goal_value: input.goalValue,
       p_starts_at: input.startsAt.toISOString(),
@@ -169,16 +177,16 @@ export async function previewChallenge(
 
 /**
  * Join by invite code. The member's local exercise that counts is found or
- * created by the challenge's exercise name. Returns the challenge id.
+ * created from the challenge's exercise (see resolveLocalExercise).
+ * Returns the challenge id.
  */
 export async function joinChallenge(
   code: string,
   displayName: string,
-  exerciseName: string,
-  unit: string,
+  exercise: ChallengeExercise,
 ): Promise<string> {
   await ensureSession()
-  const exerciseId = await resolveLocalExercise(exerciseName, unit)
+  const exerciseId = await resolveLocalExercise(exercise)
   const { data, error } = await client().rpc('join_challenge', {
     p_code: code,
     p_display_name: displayName,

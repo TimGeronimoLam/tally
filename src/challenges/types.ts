@@ -1,3 +1,5 @@
+import type { BuiltinExercise } from '../db/builtins.ts'
+
 export type GoalType = 'most_reps' | 'first_to'
 
 /** Picker order; labels come from `m.challenges.goalType[value]`. */
@@ -7,8 +9,11 @@ export const GOAL_TYPES: GoalType[] = ['most_reps', 'first_to']
 export interface Challenge {
   id: string
   name: string
+  /** As the host named it. Show `challengeExerciseName`, which localizes a built-in. */
   exerciseName: string
   unit: string
+  /** Set when the exercise is a built-in; members match on it, not the name. */
+  exerciseBuiltin: BuiltinExercise | null
   goalType: GoalType
   goalValue: number | null
   startsAt: string
@@ -42,6 +47,7 @@ export interface ChallengePreview {
   name: string
   exerciseName: string
   unit: string
+  exerciseBuiltin: BuiltinExercise | null
   goalType: GoalType
   goalValue: number | null
   startsAt: string
@@ -54,6 +60,7 @@ export interface NewChallengeInput {
   name: string
   exerciseName: string
   unit: string
+  exerciseBuiltin: BuiltinExercise | null
   goalType: GoalType
   goalValue: number | null
   startsAt: Date

@@ -1,4 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie'
+import { builtinNamedInAnyLanguage } from './builtins.ts'
 import type { Entry, Exercise, MetaRow, UnlockedAchievement } from './types.ts'
 
 export class TallyDB extends Dexie {
@@ -18,6 +19,20 @@ export class TallyDB extends Dexie {
     this.version(2).stores({
       achievements: 'id, unlockedAt',
     })
+    // Built-ins got a key (builtins.ts). Defaults seeded before that are
+    // found by name, in whichever language they were seeded. The server
+    // copies get the same key from a migration, so nothing is pushed.
+    this.version(3)
+      .stores({})
+      .upgrade((tx) =>
+        tx
+          .table<Exercise>('exercises')
+          .toCollection()
+          .modify((e) => {
+            const builtin = e.builtin ?? builtinNamedInAnyLanguage(e.name)
+            if (builtin) e.builtin = builtin
+          }),
+      )
   }
 }
 

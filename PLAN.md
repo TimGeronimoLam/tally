@@ -169,6 +169,7 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
 - **Joining a challenge creates an anonymous Supabase user** silently; only a display name is asked. The UI never exposes that an account is anonymous: Account shows "Local only" until an email is attached.
 - **Linking an email or Google** upgrades the anonymous user in place, keeping the same `uid`, memberships and data.
 - **Exercises are per-user**; a challenge defines its own exercise name and each member maps a local exercise to it.
+- **Built-in exercises have a language-independent key** (`pushups`, `squats`, `pullups`, `plank`). They show in the app language, and a challenge on one matches each member's copy by key; custom exercises match by name. Renaming a built-in makes it custom.
 - **Entries are an append-only log** with soft deletes, which keeps sync trivial.
 
 ## Rough total

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useParams } from 'react-router'
 import {
+  challengeExerciseName,
   challengeStatus,
   daysLeft,
   daysUntilStart,
@@ -168,7 +169,7 @@ export function ChallengeDetailPage() {
         title={c.name}
       >
         <span className="text-sm text-muted">
-          {c.exerciseName} ·{' '}
+          {challengeExerciseName(c, t)} ·{' '}
           {c.goalType === 'first_to'
             ? t.challengeDetail.firstToWins(formatNumber(c.goalValue ?? 0))
             : t.challengeDetail.mostRepsWins}{' '}
@@ -282,7 +283,7 @@ export function ChallengeDetailPage() {
       {status !== 'ended' && (
         <Gutter className="pt-6 pb-5">
           <Button size="lg" fullWidth onClick={logThis}>
-            {t.challengeDetail.logExercise(c.exerciseName)}
+            {t.challengeDetail.logExercise(challengeExerciseName(c, t))}
           </Button>
         </Gutter>
       )}

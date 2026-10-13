@@ -1,3 +1,4 @@
+import { isBuiltin } from '../db/builtins.ts'
 import type { Entry, Exercise } from '../db/types.ts'
 
 /* Row shapes as Postgres returns them (see supabase/migrations). */
@@ -6,6 +7,7 @@ export interface ExerciseRow {
   id: string
   name: string
   unit: string
+  builtin: string | null
   created_at: string
   deleted_at: string | null
   updated_at: string
@@ -32,6 +34,7 @@ export function exerciseToRow(e: Exercise): Omit<ExerciseRow, 'updated_at'> {
     id: e.id,
     name: e.name,
     unit: e.unit,
+    builtin: e.builtin ?? null,
     created_at: iso(e.createdAt),
     deleted_at: e.deletedAt == null ? null : iso(e.deletedAt),
   }
@@ -55,6 +58,8 @@ export function rowToExercise(r: ExerciseRow, syncedAt: number): Exercise {
     id: r.id,
     name: r.name,
     unit: r.unit,
+    // A key this version does not know reads as the user's own exercise.
+    builtin: isBuiltin(r.builtin) ? r.builtin : undefined,
     createdAt: ms(r.created_at)!,
     deletedAt: ms(r.deleted_at),
     syncedAt,
@@ -106,8 +111,9 @@ export function mergeEntry(local: Entry | undefined, remote: Entry): Entry {
 }
 
 /**
- * Exercises also carry editable name/unit. Unsynced local edits win over
- * the server copy; otherwise the server copy wins.
+ * Exercises also carry editable name/unit (and the built-in key, which a
+ * rename sets or clears). Unsynced local edits win over the server copy;
+ * otherwise the server copy wins.
  */
 export function mergeExercise(
   local: Exercise | undefined,
@@ -118,15 +124,18 @@ export function mergeExercise(
   const localDirty = local.syncedAt == null
   const name = localDirty ? local.name : remote.name
   const unit = localDirty ? local.unit : remote.unit
+  const builtin = localDirty ? local.builtin : remote.builtin
   const dirty =
     localDirty ||
     deletedAt !== remote.deletedAt ||
     name !== remote.name ||
-    unit !== remote.unit
+    unit !== remote.unit ||
+    builtin !== remote.builtin
   return {
     ...remote,
     name,
     unit,
+    builtin,
     deletedAt,
     syncedAt: dirty ? undefined : remote.syncedAt,
   }

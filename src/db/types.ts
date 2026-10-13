@@ -1,6 +1,11 @@
+import type { BuiltinExercise } from './builtins.ts'
+
 export interface Exercise {
   id: string
+  /** As typed. A built-in shows in the app language instead (`exerciseName`). */
   name: string
+  /** Set on the exercises Tally ships with; see builtins.ts. */
+  builtin?: BuiltinExercise
   /** Free-form unit label: "reps", "sec", "km" ... */
   unit: string
   createdAt: number

@@ -1,3 +1,4 @@
+import { exerciseName } from '../db/builtins.ts'
 import type { Messages } from '../i18n/index.ts'
 import { serverNow } from '../lib/clock.ts'
 import { dayKey, parseDayKey, shiftDayKey, startOfDay } from '../lib/date.ts'
@@ -157,17 +158,31 @@ function isDayKey(s: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(s)
 }
 
+/**
+ * The challenge's exercise in the language of `m` if it is a built-in, else
+ * as the host named it. (`exerciseBuiltin` is missing from summaries cached
+ * before it existed.)
+ */
+export function challengeExerciseName(
+  c: Pick<Challenge, 'exerciseName'> &
+    Partial<Pick<Challenge, 'exerciseBuiltin'>>,
+  m: Messages,
+): string {
+  return exerciseName({ name: c.exerciseName, builtin: c.exerciseBuiltin }, m)
+}
+
 /** "Pushups · Most reps · 19 days left", in the language of `m`. */
 export function challengeSubtitle(
   c: Pick<
     Challenge,
     'exerciseName' | 'goalType' | 'goalValue' | 'startsAt' | 'endsAt'
-  >,
+  > &
+    Partial<Pick<Challenge, 'exerciseBuiltin'>>,
   m: Messages,
   opts: { memberCount?: number; now?: number } = {},
 ): string {
   const s = m.challenges.subtitle
-  const parts = [c.exerciseName]
+  const parts = [challengeExerciseName(c, m)]
   parts.push(
     c.goalType === 'first_to'
       ? s.firstTo(formatNumber(c.goalValue ?? 0))

@@ -49,6 +49,19 @@ describe('row mapping', () => {
     expect(rowToExercise(row, 7).deletedAt).toBe(T0 + 1000)
   })
 
+  it('carries the built-in key, and drops one this version does not know', () => {
+    const row = {
+      ...exerciseToRow({ ...exercise, builtin: 'pushups' }),
+      updated_at: '',
+    }
+    expect(row.builtin).toBe('pushups')
+    expect(rowToExercise(row, 1).builtin).toBe('pushups')
+    expect(exerciseToRow(exercise).builtin).toBeNull()
+    expect(rowToExercise({ ...row, builtin: 'lunges' }, 1).builtin).toBe(
+      undefined,
+    )
+  })
+
   it('coerces numeric amounts that Postgres returns as strings', () => {
     const row = {
       ...entryToRow(entry),
@@ -114,6 +127,13 @@ describe('mergeExercise', () => {
     const merged = mergeExercise(local, remote)
     expect(merged.name).toBe('Pushups')
     expect(merged.unit).toBe('sets')
+    expect(merged.syncedAt).toBeUndefined()
+  })
+
+  it('keeps an unsynced rename that made a built-in custom', () => {
+    const local = { ...exercise, name: 'Push ups' }
+    const merged = mergeExercise(local, { ...remote, builtin: 'pushups' })
+    expect(merged.builtin).toBeUndefined()
     expect(merged.syncedAt).toBeUndefined()
   })
 

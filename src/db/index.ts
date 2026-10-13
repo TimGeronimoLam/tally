@@ -1,6 +1,7 @@
 export { db } from './db.ts'
 export * from './types.ts'
 export * from './units.ts'
+export * from './builtins.ts'
 export * from './meta.ts'
 export * from './seed.ts'
 export * from './exercises.ts'

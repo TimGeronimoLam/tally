@@ -226,10 +226,10 @@ async function pullEntries(): Promise<void> {
 }
 
 /**
- * One live exercise per name (see dedupe.ts). After a pull the account's
- * copy of "Pushups" may sit next to this device's own: the seed of a fresh
- * install, the seed "Delete all data" made, or the copy re-keyed for
- * another account. Each twin is folded into the one to keep: its entries
+ * One live copy of each exercise (see dedupe.ts). After a pull the
+ * account's copy of "Pushups" may sit next to this device's own: the seed
+ * of a fresh install (maybe "Liegestütze", the same built-in), the seed
+ * "Delete all data" made, or the copy re-keyed for another account. Each twin is folded into the one to keep: its entries
  * move over, it is archived (or dropped if the server never saw it), and
  * any challenge membership that counted it is pointed at the survivor so
  * the leaderboard keeps counting. The server is updated first; if that

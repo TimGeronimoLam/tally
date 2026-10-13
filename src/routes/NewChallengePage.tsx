@@ -81,6 +81,7 @@ export function NewChallengePage() {
         name: name.trim() || defaultTitle,
         exerciseName: exercise.name,
         unit: exercise.unit,
+        exerciseBuiltin: exercise.builtin ?? null,
         goalType,
         goalValue: goalType === 'first_to' ? goal : null,
         startsAt: timeWindow.startsAt,

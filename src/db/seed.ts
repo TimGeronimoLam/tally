@@ -1,18 +1,20 @@
 import { messages } from '../i18n/index.ts'
 import { uuid } from '../lib/uuid.ts'
+import { BUILTIN_EXERCISES, BUILTIN_UNITS } from './builtins.ts'
 import { db } from './db.ts'
 import { getMeta, setMeta } from './meta.ts'
 import { META_KEYS, type Exercise } from './types.ts'
 
-/** Named in the device language at first launch; renamed freely afterwards. */
-function defaultExercises(): Array<Pick<Exercise, 'name' | 'unit'>> {
+/** The built-ins, named in the current language (shown in whichever is active). */
+function defaultExercises(): Array<
+  Pick<Exercise, 'name' | 'unit' | 'builtin'>
+> {
   const names = messages().defaultExercises
-  return [
-    { name: names.pushups, unit: 'reps' },
-    { name: names.squats, unit: 'reps' },
-    { name: names.pullups, unit: 'reps' },
-    { name: names.plank, unit: 'sec' },
-  ]
+  return BUILTIN_EXERCISES.map((builtin) => ({
+    name: names[builtin],
+    unit: BUILTIN_UNITS[builtin],
+    builtin,
+  }))
 }
 
 /** Idempotent first-launch setup: device id + default exercises. */

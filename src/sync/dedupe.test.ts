@@ -48,6 +48,19 @@ describe('planExerciseMerges', () => {
     expect(merges[0].losers).toEqual([seed, again])
   })
 
+  it('folds copies of one built-in seeded in different languages', () => {
+    const en = ex('en', { builtin: 'pushups', syncedAt: 1 })
+    const de = ex('de', { name: 'Liegestütze', builtin: 'pushups' })
+    const merges = planExerciseMerges([de, en])
+    expect(merges).toEqual([{ survivor: en, losers: [de] }])
+  })
+
+  it('keeps a built-in apart from a renamed copy of it', () => {
+    const seed = ex('seed', { builtin: 'pushups' })
+    const renamed = ex('renamed', { name: 'Push ups' })
+    expect(planExerciseMerges([seed, renamed])).toEqual([])
+  })
+
   it('ignores archived exercises', () => {
     const live = ex('live')
     const archived = ex('old', { deletedAt: T0, syncedAt: 1 })

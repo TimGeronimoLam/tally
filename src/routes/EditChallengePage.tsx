@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { useParams } from 'react-router'
 import {
   GOAL_TYPES,
+  challengeExerciseName,
   challengeStatus,
   dateRangeOf,
   editedWindow,
@@ -135,7 +136,7 @@ function EditForm({
         onBack={onBack}
       >
         <span className="text-sm text-muted">
-          {c.exerciseName} · {t.editChallenge.appliesToEveryone}
+          {challengeExerciseName(c, t)} · {t.editChallenge.appliesToEveryone}
         </span>
       </ScreenNav>
 

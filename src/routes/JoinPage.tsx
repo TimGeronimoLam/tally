@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useParams } from 'react-router'
 import {
+  challengeExerciseName,
   challengeSubtitle,
   joinChallenge,
   normalizeInviteCode,
@@ -79,12 +80,7 @@ export function JoinPage() {
     setBusy(true)
     try {
       if (yourName.trim() !== savedName) await setDisplayName(yourName)
-      const id = await joinChallenge(
-        code,
-        yourName.trim(),
-        challenge.exerciseName,
-        challenge.unit,
-      )
+      const id = await joinChallenge(code, yourName.trim(), challenge)
       toast({ message: t.join.youreIn(challenge.name) })
       if (!session?.user.email) {
         toast({
@@ -167,7 +163,7 @@ export function JoinPage() {
               {challenge.isMember ? t.join.updateName : t.join.joinTitle}
             </h1>
             <p className="text-[13px] leading-relaxed text-muted">
-              {t.join.everySetCounts(challenge.exerciseName)}
+              {t.join.everySetCounts(challengeExerciseName(challenge, t))}
             </p>
 
             <TextField

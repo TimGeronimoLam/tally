@@ -1,4 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
+import { useMemo } from 'react'
+import { useT } from '../i18n/index.ts'
+import { exerciseName } from './builtins.ts'
 import { db } from './db.ts'
 import { entriesForDay } from './entries.ts'
 import { getMeta } from './meta.ts'
@@ -9,18 +12,38 @@ import {
   type UnlockedAchievement,
 } from './types.ts'
 
+/**
+ * Exercises as the UI shows them: `name` is the display name, so built-ins
+ * read in the app language and change with it.
+ */
+function useNamed(rows: Exercise[] | undefined): Exercise[] | undefined {
+  const t = useT()
+  return useMemo(
+    () => rows?.map((e) => ({ ...e, name: exerciseName(e, t) })),
+    [rows, t],
+  )
+}
+
 /** Live (non-archived) exercises in creation order. `undefined` while loading. */
 export function useExercises(): Exercise[] | undefined {
-  return useLiveQuery(
-    () => db.exercises.filter((e) => e.deletedAt == null).sortBy('createdAt'),
-    [],
+  return useNamed(
+    useLiveQuery(
+      () => db.exercises.filter((e) => e.deletedAt == null).sortBy('createdAt'),
+      [],
+    ),
   )
 }
 
 export function useArchivedExercises(): Exercise[] | undefined {
-  return useLiveQuery(
-    () => db.exercises.filter((e) => e.deletedAt != null).sortBy('name'),
-    [],
+  const named = useNamed(
+    useLiveQuery(
+      () => db.exercises.filter((e) => e.deletedAt != null).toArray(),
+      [],
+    ),
+  )
+  return useMemo(
+    () => named && [...named].sort((a, b) => a.name.localeCompare(b.name)),
+    [named],
   )
 }
 

@@ -57,7 +57,7 @@ export const en = {
     kg: 'kg',
   } as Record<string, string>,
 
-  /** Exercises created on first launch. */
+  /** Built-in exercise names (src/db/builtins.ts); they follow the language. */
   defaultExercises: {
     pushups: 'Pushups',
     squats: 'Squats',
