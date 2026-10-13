@@ -392,6 +392,8 @@ export const nl: Messages = {
   errors: {
     needServer: 'Challenges hebben de Tally-server nodig',
     couldNotSignIn: 'Inloggen mislukt',
+    captchaFailed:
+      'Kon niet bevestigen dat je een mens bent. Probeer het opnieuw.',
     localDataNotReady:
       'De lokale gegevens waren niet op tijd klaar. Probeer het opnieuw.',
     couldNotCreateChallenge: 'Challenge aanmaken mislukt',

@@ -389,6 +389,8 @@ export const pt: Messages = {
   errors: {
     needServer: 'Os desafios precisam do servidor Tally',
     couldNotSignIn: 'Não foi possível iniciar sessão',
+    captchaFailed:
+      'Não foi possível confirmar que és uma pessoa. Tenta outra vez.',
     localDataNotReady:
       'Os dados locais não ficaram prontos a tempo. Tenta outra vez.',
     couldNotCreateChallenge: 'Não foi possível criar o desafio',

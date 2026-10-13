@@ -390,6 +390,8 @@ export const it: Messages = {
   errors: {
     needServer: 'Le sfide richiedono il server Tally',
     couldNotSignIn: 'Impossibile accedere',
+    captchaFailed:
+      'Impossibile confermare che sei una persona. Riprova.',
     localDataNotReady: 'I dati locali non erano pronti in tempo. Riprova.',
     couldNotCreateChallenge: 'Impossibile creare la sfida',
     codeCollision: 'Impossibile creare la sfida: collisione di codice',

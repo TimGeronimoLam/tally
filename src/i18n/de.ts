@@ -393,6 +393,8 @@ export const de: Messages = {
   errors: {
     needServer: 'Challenges brauchen den Tally-Server',
     couldNotSignIn: 'Anmeldung nicht möglich',
+    captchaFailed:
+      'Die Prüfung, ob du ein Mensch bist, ist fehlgeschlagen. Bitte versuch es noch einmal.',
     localDataNotReady:
       'Die lokalen Daten waren nicht rechtzeitig bereit. Bitte versuch es noch einmal.',
     couldNotCreateChallenge: 'Challenge konnte nicht erstellt werden',

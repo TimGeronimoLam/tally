@@ -73,8 +73,8 @@ Optional. Without it the app is fully local.
    `20261013000002_builtin_exercises.sql` and (for reminders, see below)
    `20261014000000_push_reminders.sql`, in the dashboard SQL Editor (or `supabase link` + `supabase db push` with the CLI).
 3. Authentication → Sign In / Providers → enable **Anonymous sign-ins**.
-   Optionally enable the Turnstile captcha under Attack Protection to keep
-   junk anonymous users out.
+   To keep junk anonymous users out, turn on the Turnstile captcha, see
+   "Captcha" below.
 4. Copy `.env.example` to `.env.local` and paste the Project URL and anon key
    from Project Settings → API. Restart `npm run dev`.
 
@@ -124,8 +124,9 @@ Either host works for the app; push to `main` and let it build.
   connect the repo, keep build command `npm run build` and deploy command
   `npx wrangler deploy`. `wrangler.jsonc` serves `dist/` as static assets with
   SPA fallback, so deep links like `/join/CODE` work. Under Advanced settings →
-  Build variables add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (the
-  build bakes them in). `.node-version` pins the build to Node 24.
+  Build variables add `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`,
+  `VITE_VAPID_PUBLIC_KEY` and `VITE_TURNSTILE_SITE_KEY` (the build bakes
+  them in). `.node-version` pins the build to Node 24.
 - **Vercel**: Import the repo (framework preset Vite), add the same env vars.
   `vercel.json` holds the SPA rewrite. No cron there, so no daily reminders.
 
@@ -136,6 +137,40 @@ Invite links (`/join/CODE`) have the iOS limit described above: on an
 iPhone they open in Safari, not in the installed app. The join page then
 shows the code with a Copy button and tells the user to enter it in the
 app's Challenges tab, where the code field already lives.
+
+## Captcha
+
+Cloudflare Turnstile guards the Auth calls that mint accounts or send
+email: the silent anonymous sign-in (joining or creating a challenge,
+turning the reminder on) and the sign-in code. Supabase verifies the
+token itself; the app only ever sees the public site key.
+
+1. In the Cloudflare dashboard create a Turnstile widget (Managed mode)
+   with the domains the app is served from. Add `localhost` to a separate
+   dev widget, or use the always-passing test pair below.
+2. Supabase → Authentication → Attack Protection → **Enable Captcha
+   protection**, provider **Turnstile**, paste the widget's **secret key**.
+3. Set `VITE_TURNSTILE_SITE_KEY` to the widget's site key in `.env.local`
+   and as a build variable on Cloudflare (Workers → tally → Settings →
+   Build → Variables and secrets, next to `VITE_SUPABASE_URL`), then push
+   or redeploy so the build bakes it in.
+
+Order matters: once step 2 is on, every build without a site key fails to
+sign in ("Could not confirm you are human"). Without step 2, a site key is
+harmless.
+
+The widget stays invisible while Cloudflare is satisfied and only pops up
+above the tab bar when it wants a tap (`src/lib/captcha.ts`). Each
+sign-in fetches a fresh token; the token is single use. Signing in with a
+code (`verifyOtp`) and attaching an email to an anonymous user
+(`updateUser`) are not behind the captcha, so a join followed by an email
+sign-in asks at most twice.
+
+Local development: Cloudflare's test site key `1x00000000000000000000AA`
+always passes and its test secret `1x0000000000000000000000000000000AA`
+goes into Supabase; swap both for the real pair before going live. Cloudflare
+refuses a real widget on a domain it does not know (error 110200 in the
+console).
 
 ## Daily reminder (push)
 

@@ -1,6 +1,7 @@
 import type { Session } from '@supabase/supabase-js'
 import { useSyncExternalStore } from 'react'
 import { messages } from '../i18n/index.ts'
+import { captchaToken, isCaptchaError } from '../lib/captcha.ts'
 import { recordError } from '../lib/diagnostics.ts'
 import { supabase } from '../lib/supabase.ts'
 import { disableReminder, reconcileReminder } from '../reminders/index.ts'
@@ -56,8 +57,15 @@ function requireClient() {
 
 /** Create a silent account tied to this device. */
 export async function signInAnonymously(): Promise<void> {
-  const { error } = await requireClient().auth.signInAnonymously()
-  if (error) throw error
+  const token = await captchaToken('anonymous')
+  const { error } = await requireClient().auth.signInAnonymously({
+    options: { captchaToken: token },
+  })
+  if (error) throw isCaptchaError(error) ? captchaFailed() : error
+}
+
+function captchaFailed(): Error {
+  return new Error(messages().errors.captchaFailed)
 }
 
 /** Which one-time code the sign-in email carries; needed to verify it. */
@@ -86,11 +94,15 @@ export async function signInWithEmail(email: string): Promise<EmailCodeType> {
     if (!/already|registered|exists/i.test(error.message)) throw error
     // Fall through: the email has an account; sign into that one instead.
   }
+  // Only this path sends mail to an address nobody has verified yet, so
+  // only this path is behind the captcha; attaching to the anonymous
+  // user above is not.
+  const token = await captchaToken('email')
   const { error } = await client.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: window.location.origin },
+    options: { emailRedirectTo: window.location.origin, captchaToken: token },
   })
-  if (error) throw error
+  if (error) throw isCaptchaError(error) ? captchaFailed() : error
   return 'email'
 }
 

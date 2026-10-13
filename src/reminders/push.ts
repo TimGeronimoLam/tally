@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { deleteMeta, getMeta, setMeta } from '../db/meta.ts'
 import { META_KEYS, type ReminderMeta } from '../db/types.ts'
 import { messages } from '../i18n/index.ts'
+import { captchaToken, isCaptchaError } from '../lib/captcha.ts'
 import { recordError } from '../lib/diagnostics.ts'
 import { isIOS, isStandalone } from '../lib/install.ts'
 import { supabase } from '../lib/supabase.ts'
@@ -86,11 +87,18 @@ function readyRegistration(): Promise<ServiceWorkerRegistration> {
  * challenge: the account card keeps saying "Local only", and an email
  * sign-in later upgrades this same user, so the row stays valid.
  */
+function captchaFailed(): Error {
+  return new Error(messages().errors.captchaFailed)
+}
+
 async function ensureUserId(client: SupabaseClient): Promise<string> {
   const { data } = await client.auth.getSession()
   if (data.session) return data.session.user.id
-  const { data: signedIn, error } = await client.auth.signInAnonymously()
-  if (error) throw error
+  const captcha = await captchaToken('reminder')
+  const { data: signedIn, error } = await client.auth.signInAnonymously({
+    options: { captchaToken: captcha },
+  })
+  if (error) throw isCaptchaError(error) ? captchaFailed() : error
   if (!signedIn.user) throw new Error(messages().errors.couldNotSignIn)
   return signedIn.user.id
 }
@@ -240,8 +248,12 @@ export function reconcileReminder(): Promise<void> {
     })
     if (action === null) return
     if (action === 'sign-in') {
-      const { error } = await client.auth.signInAnonymously()
-      if (error) throw error
+      // Unattended: nobody is looking at this widget, so do not wait on it.
+      const captcha = await captchaToken('reminder', { timeoutMs: 30_000 })
+      const { error } = await client.auth.signInAnonymously({
+        options: { captchaToken: captcha },
+      })
+      if (error) throw isCaptchaError(error) ? captchaFailed() : error
       return
     }
     if (action === 'disable' || action === 'unsubscribe') {

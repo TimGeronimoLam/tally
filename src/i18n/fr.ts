@@ -388,6 +388,8 @@ export const fr: Messages = {
   errors: {
     needServer: 'Les défis ont besoin du serveur Tally',
     couldNotSignIn: 'Connexion impossible',
+    captchaFailed:
+      "Impossible de confirmer que tu n'es pas un robot. Réessaie.",
     localDataNotReady:
       "Les données locales n'étaient pas prêtes à temps. Réessaie.",
     couldNotCreateChallenge: 'Impossible de créer le défi',

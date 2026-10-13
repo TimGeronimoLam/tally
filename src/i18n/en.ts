@@ -417,6 +417,7 @@ export const en = {
   errors: {
     needServer: 'Challenges need the Tally server',
     couldNotSignIn: 'Could not sign in',
+    captchaFailed: 'Could not confirm you are human. Please try again.',
     localDataNotReady:
       'Local data did not get ready in time. Please try again.',
     couldNotCreateChallenge: 'Could not create challenge',

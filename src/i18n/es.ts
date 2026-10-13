@@ -386,6 +386,8 @@ export const es: Messages = {
   errors: {
     needServer: 'Los retos necesitan el servidor de Tally',
     couldNotSignIn: 'No se pudo iniciar sesión',
+    captchaFailed:
+      'No se pudo confirmar que eres una persona. Inténtalo de nuevo.',
     localDataNotReady:
       'Los datos locales no estuvieron listos a tiempo. Inténtalo de nuevo.',
     couldNotCreateChallenge: 'No se pudo crear el reto',
