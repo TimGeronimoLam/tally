@@ -357,6 +357,20 @@ export const de: Messages = {
     saving: 'Wird gespeichert…',
   },
 
+  reminders: {
+    title: 'Erinnerungen',
+    daily: 'Tägliche Erinnerung',
+    time: 'Uhrzeit',
+    installFirst: 'Erst Tally installieren',
+    unsupported: 'Hier nicht unterstützt',
+    denied: 'In den Systemeinstellungen blockiert',
+    notAllowed: 'Erlaube Mitteilungen, um erinnert zu werden',
+    enabled: (time) => `Erinnerung um ${time}`,
+    disabled: 'Erinnerung aus',
+    pushTitle: 'Zeit für einen Satz',
+    pushBody: 'Heute noch nichts geloggt. Ein kurzer Satz zählt schon.',
+  },
+
   install: {
     title: 'Tally zum Homescreen hinzufügen',
     iosBefore: 'Tippe auf',

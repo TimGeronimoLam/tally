@@ -10,3 +10,7 @@ export async function getMeta<T = unknown>(
 export async function setMeta(key: string, value: unknown): Promise<void> {
   await db.meta.put({ key, value })
 }
+
+export async function deleteMeta(key: string): Promise<void> {
+  await db.meta.delete(key)
+}

@@ -21,6 +21,11 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
+      // Our own service worker (src/sw.ts): the generated one, plus the
+      // handlers for the daily reminder push.
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'logo.svg', 'apple-touch-icon.png'],
       manifest: {
@@ -86,11 +91,9 @@ export default defineConfig({
           },
         ],
       },
-      workbox: {
+      injectManifest: {
         // Precache the whole app shell so it works fully offline.
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
-        // SPA fallback: unknown routes (e.g. /stats, /join/CODE) serve index.html.
-        navigateFallback: '/index.html',
       },
       devOptions: {
         enabled: false,

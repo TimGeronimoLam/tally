@@ -9,6 +9,7 @@ import {
   META_KEYS,
   type Entry,
   type Exercise,
+  type ReminderMeta,
   type UnlockedAchievement,
 } from './types.ts'
 
@@ -85,6 +86,14 @@ export function useAllEntries(): Entry[] | undefined {
 export function useDisplayName(): string | undefined {
   return useLiveQuery(
     async () => (await getMeta<string>(META_KEYS.displayName)) ?? '',
+    [],
+  )
+}
+
+/** This device's daily reminder, or null while off. `undefined` while loading. */
+export function useReminder(): ReminderMeta | null | undefined {
+  return useLiveQuery(
+    async () => (await getMeta<ReminderMeta>(META_KEYS.reminder)) ?? null,
     [],
   )
 }

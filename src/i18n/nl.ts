@@ -356,6 +356,20 @@ export const nl: Messages = {
     saving: 'Opslaan…',
   },
 
+  reminders: {
+    title: 'Herinneringen',
+    daily: 'Dagelijkse herinnering',
+    time: 'Tijd',
+    installFirst: 'Installeer Tally eerst',
+    unsupported: 'Hier niet ondersteund',
+    denied: 'Geblokkeerd in systeeminstellingen',
+    notAllowed: 'Sta meldingen toe om een herinnering te krijgen',
+    enabled: (time) => `Herinnering om ${time}`,
+    disabled: 'Herinnering uit',
+    pushTitle: 'Tijd voor een set',
+    pushBody: 'Vandaag nog niets gelogd. Eén snelle set telt al.',
+  },
+
   install: {
     title: 'Zet Tally op je beginscherm',
     iosBefore: 'Tik op',

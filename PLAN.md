@@ -161,6 +161,10 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
   - Vitest: `computeStats`, achievement checks, sync merge logic
   - Playwright: one smoke flow (optional)
 
+## Phase 7 – Daily reminder
+
+- [x] Web Push "log your reps" reminder, one per device per day at a chosen time, skipped when the day has an entry (`20261014000000_push_reminders.sql`, Worker cron in `worker/`, `src/sw.ts`, Account → Reminders)
+
 ---
 
 ## Key decisions (for reference)

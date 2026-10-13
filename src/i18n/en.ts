@@ -5,7 +5,7 @@
  * word order inside them.
  */
 export const en = {
-  /** BCP 47 primary subtag; also the key in src/i18n/locale.ts. */
+  /** BCP 47 primary subtag; also the key in src/i18n/messages.ts. */
   locale: 'en',
   /** The language's own name, for the picker. */
   name: 'English',
@@ -376,6 +376,22 @@ export const en = {
     codeWrong: 'That code is wrong or has expired. Ask for a new one.',
     signedInAs: (email: string) => `Signed in as ${email}`,
     saving: 'Saving…',
+  },
+
+  reminders: {
+    title: 'Reminders',
+    daily: 'Daily reminder',
+    time: 'Time',
+    /** iOS in a Safari tab: web push needs the Home Screen app. */
+    installFirst: 'Install Tally first',
+    unsupported: 'Not supported here',
+    denied: 'Blocked in system settings',
+    notAllowed: 'Allow notifications to get a reminder',
+    enabled: (time: string) => `Reminder set for ${time}`,
+    disabled: 'Reminder off',
+    /** The notification itself, sent by the server in the device's language. */
+    pushTitle: 'Time for a set',
+    pushBody: 'Nothing logged today yet. One quick set counts.',
   },
 
   install: {

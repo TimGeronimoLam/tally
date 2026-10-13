@@ -25,3 +25,7 @@ dist-ssr
 
 # vite-plugin-pwa dev output
 dev-dist
+
+# Worker secrets for `wrangler dev`
+.dev.vars
+.wrangler

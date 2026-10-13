@@ -40,6 +40,10 @@ stretched UI. Fixed overlays (toast, sheet) share the same cap.
 | `src/db/`             | Dexie schema, types, mutations, live-query hooks, import/export           |
 | `src/lib/`            | Pure helpers: `cn`, `format`, `date`, `theme`, `toast` hook               |
 | `src/i18n/`           | Languages. `en.ts` is the typed source; every other locale must match it  |
+| `src/sync/`           | Supabase auth and sync                                                    |
+| `src/reminders/`      | Daily push reminder: subscribe, save the row, repair it on launch         |
+| `src/sw.ts`           | Service worker: offline precache plus the reminder's push handlers        |
+| `worker/`             | Cloudflare Worker: serves `dist/`, sends the reminders from a cron        |
 
 Rule of thumb: if a component needs `db`, it belongs in `app` or `routes`, never `ui`.
 
@@ -64,8 +68,10 @@ Optional. Without it the app is fully local.
 2. Run `supabase/migrations/20261012000000_init.sql`, then `20261012000001_grants.sql`,
    `20261012000002_challenges.sql`, `20261012000004_challenge_host_actions.sql`,
    `20261012000005_my_challenges_server_now.sql`,
-   `20261013000000_leave_and_edit_challenge.sql` and
-   `20261013000001_lock_challenge_members.sql`, in the dashboard SQL Editor (or `supabase link` + `supabase db push` with the CLI).
+   `20261013000000_leave_and_edit_challenge.sql`,
+   `20261013000001_lock_challenge_members.sql`,
+   `20261013000002_builtin_exercises.sql` and (for reminders, see below)
+   `20261014000000_push_reminders.sql`, in the dashboard SQL Editor (or `supabase link` + `supabase db push` with the CLI).
 3. Authentication → Sign In / Providers → enable **Anonymous sign-ins**.
    Optionally enable the Turnstile captcha under Attack Protection to keep
    junk anonymous users out.
@@ -111,8 +117,8 @@ the project's dashboard home.
 
 ## Deploy
 
-Static build, no server of its own. Either host works; push to `main` and let
-it build.
+Static build; the only server code is the Cloudflare Worker's reminder cron.
+Either host works for the app; push to `main` and let it build.
 
 - **Cloudflare Workers** (what the dashboard's "Create an app" flow sets up):
   connect the repo, keep build command `npm run build` and deploy command
@@ -121,7 +127,7 @@ it build.
   Build variables add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (the
   build bakes them in). `.node-version` pins the build to Node 24.
 - **Vercel**: Import the repo (framework preset Vite), add the same env vars.
-  `vercel.json` holds the SPA rewrite.
+  `vercel.json` holds the SPA rewrite. No cron there, so no daily reminders.
 
 After the first deploy: put the site URL into Supabase → Authentication →
 URL Configuration (Site URL + Redirect URLs).
@@ -131,8 +137,50 @@ iPhone they open in Safari, not in the installed app. The join page then
 shows the code with a Copy button and tells the user to enter it in the
 app's Challenges tab, where the code field already lives.
 
+## Daily reminder (push)
+
+Account → Reminders → Daily reminder sends one notification a day at the
+chosen time, skipped when that day already has a synced entry. It is per
+device: each phone has its own switch and time. Works on Android and
+desktop Chrome/Edge/Firefox, and on iOS 16.4+ only from the Home Screen app
+(in a Safari tab the row says "Install Tally first").
+
+How it works: the app subscribes to Web Push and stores the subscription in
+`push_subscriptions` (the push service's endpoint URL and keys, time, time
+zone, language, app origin). With no session, turning it on silently creates
+an anonymous user, as joining a challenge does; the account card still says
+"Local only". Every 15 minutes the Worker's cron (`worker/index.ts`) calls
+`due_reminders()`, which picks and claims the due rows in each one's own
+time zone (2-hour grace window, never twice a day), sends each an encrypted
+push with VAPID, and deletes rows the push service reports gone (404/410).
+`src/sw.ts` shows the notification; a tap opens the app.
+
+Setup, once (needs the Cloudflare Workers deployment):
+
+1. `node scripts/gen-vapid.mjs` prints a public and a private key.
+2. Public key → `VITE_VAPID_PUBLIC_KEY` in `.env.local` and in Cloudflare →
+   Build variables. Without it the row says "Not supported here".
+3. Cloudflare → Workers → tally → Settings → Variables and Secrets, as
+   secrets: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`,
+   `VAPID_SUBJECT` (`mailto:you@example.com`), `SUPABASE_URL` and
+   `SUPABASE_SERVICE_ROLE_KEY` (Supabase → Project Settings → API keys → the
+   secret key; never in the repo or a `VITE_` variable).
+4. Run `supabase/migrations/20261014000000_push_reminders.sql` in the SQL
+   Editor.
+5. Push `main`. The cron shows under the Worker's Settings → Triggers; Logs
+   show one `reminders: due …, sent …` line per run that had work.
+
+Try the cron locally: put the five secrets in `.dev.vars` (git-ignored), run
+`npx wrangler dev --test-scheduled`, then
+`curl "http://localhost:8787/__scheduled?cron=*/15+*+*+*+*"`.
+
+Limits: entries logged but not yet synced (phone offline) do not count, so
+the reminder still comes. Delivery is best effort; battery savers can delay
+it. A permission denied in the prompt can only be undone in system settings.
+Signing out or deleting all data turns the reminder off.
+
 ## PWA notes
 
 - Service worker is only generated on `build`; test install with `npm run preview`.
-- Manifest and Workbox config live in `vite.config.ts`.
+- Manifest and precache config live in `vite.config.ts`; the service worker itself is `src/sw.ts` (injectManifest).
 - Icons are rendered from the logo in the design canvas by `npm run icons` (`scripts/gen-icons.mjs`); `public/logo.svg` is the mark for in-app use.

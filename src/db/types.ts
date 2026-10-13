@@ -55,4 +55,23 @@ export const META_KEYS = {
   /** Newest `updated_at` pulled per table (ISO string). */
   lastPullExercises: 'lastPull.exercises',
   lastPullEntries: 'lastPull.entries',
+  /** This device's daily reminder (`ReminderMeta`); absent while off. */
+  reminder: 'reminder',
 } as const
+
+/**
+ * The daily reminder as this device last saved it to Supabase. The row lives
+ * under the push subscription's endpoint; src/reminders/push.ts compares
+ * this with the browser and the session to repair it.
+ */
+export interface ReminderMeta {
+  endpoint: string
+  /** Supabase user the row belongs to (RLS: only they can change it). */
+  userId: string
+  /** "HH:MM", local wall-clock time. */
+  time: string
+  /** IANA zone the time is meant in. */
+  tz: string
+  /** App language the notification is worded in. */
+  lang: string
+}

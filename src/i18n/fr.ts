@@ -352,6 +352,20 @@ export const fr: Messages = {
     saving: 'Enregistrement…',
   },
 
+  reminders: {
+    title: 'Rappels',
+    daily: 'Rappel quotidien',
+    time: 'Heure',
+    installFirst: "Installe d'abord Tally",
+    unsupported: 'Non pris en charge ici',
+    denied: 'Bloqué dans les réglages',
+    notAllowed: 'Autorise les notifications pour recevoir un rappel',
+    enabled: (time) => `Rappel à ${time}`,
+    disabled: 'Rappel désactivé',
+    pushTitle: "C'est l'heure d'une série",
+    pushBody: "Rien d'enregistré aujourd'hui. Une petite série suffit.",
+  },
+
   install: {
     title: "Ajouter Tally à l'écran d'accueil",
     iosBefore: 'Touche',

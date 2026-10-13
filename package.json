@@ -16,6 +16,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@block65/webcrypto-web-push": "^2.0.0",
     "@supabase/supabase-js": "^2.117.3",
     "@tailwindcss/vite": "^4.3.3",
     "dexie": "^4.4.6",
@@ -26,6 +27,7 @@
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261013.1",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
@@ -36,6 +38,9 @@
     "vite": "^8.3.0",
     "vite-plugin-pwa": "^2.0.0",
     "vitest": "^5.0.4",
+    "workbox-core": "^7.4.1",
+    "workbox-precaching": "^7.4.1",
+    "workbox-routing": "^7.4.1",
     "wrangler": "^4.149.0"
   }
 }

@@ -353,6 +353,20 @@ export const pt: Messages = {
     saving: 'A guardar…',
   },
 
+  reminders: {
+    title: 'Lembretes',
+    daily: 'Lembrete diário',
+    time: 'Hora',
+    installFirst: 'Instala o Tally primeiro',
+    unsupported: 'Não suportado aqui',
+    denied: 'Bloqueado nas definições',
+    notAllowed: 'Permite as notificações para receberes um lembrete',
+    enabled: (time) => `Lembrete às ${time}`,
+    disabled: 'Lembrete desligado',
+    pushTitle: 'Hora de uma série',
+    pushBody: 'Ainda não registaste nada hoje. Uma série rápida conta.',
+  },
+
   install: {
     title: 'Adiciona o Tally ao ecrã principal',
     iosBefore: 'Toca em',

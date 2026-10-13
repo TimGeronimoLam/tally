@@ -2,6 +2,7 @@ import { useRef, useState, type ChangeEvent } from 'react'
 import {
   ExerciseSheet,
   LanguageSheet,
+  ReminderSection,
   SyncCard,
 } from '../components/app/index.ts'
 import {
@@ -111,6 +112,11 @@ export function AccountPage() {
 
       <Gutter className="pt-4">
         <SyncCard />
+      </Gutter>
+
+      <Gutter>
+        <SectionLabel>{t.reminders.title}</SectionLabel>
+        <ReminderSection />
       </Gutter>
 
       <Gutter>

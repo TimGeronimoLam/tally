@@ -1,7 +1,9 @@
 import type { Session } from '@supabase/supabase-js'
 import { useSyncExternalStore } from 'react'
 import { messages } from '../i18n/index.ts'
+import { recordError } from '../lib/diagnostics.ts'
 import { supabase } from '../lib/supabase.ts'
+import { disableReminder, reconcileReminder } from '../reminders/index.ts'
 import { reconcileDisplayName } from './profile.ts'
 import { syncNow } from './sync.ts'
 
@@ -38,7 +40,11 @@ export function initAuth(): void {
       window.setTimeout(() => {
         void reconcileDisplayName(session)
         void syncNow()
+        void reconcileReminder()
       }, 0)
+    } else if (!session && event === 'INITIAL_SESSION') {
+      // A reminder outlives a lost session: it signs in again silently.
+      window.setTimeout(() => void reconcileReminder(), 0)
     }
   })
 }
@@ -114,8 +120,14 @@ export async function verifyEmailCode(
   }
 }
 
-/** Ends the session. Local data stays on the device. */
+/**
+ * Ends the session. Local data stays on the device. The daily reminder
+ * goes off first, while the session can still delete its row: signing out
+ * should not leave a server identity pinging this phone.
+ */
 export async function signOut(): Promise<void> {
-  const { error } = await requireClient().auth.signOut()
+  const client = requireClient()
+  await disableReminder().catch((err) => recordError('reminder', err))
+  const { error } = await client.auth.signOut()
   if (error) throw error
 }

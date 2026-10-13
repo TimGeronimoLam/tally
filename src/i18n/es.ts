@@ -350,6 +350,20 @@ export const es: Messages = {
     saving: 'Guardando…',
   },
 
+  reminders: {
+    title: 'Recordatorios',
+    daily: 'Recordatorio diario',
+    time: 'Hora',
+    installFirst: 'Instala Tally primero',
+    unsupported: 'No compatible aquí',
+    denied: 'Bloqueado en los ajustes',
+    notAllowed: 'Permite las notificaciones para recibir un recordatorio',
+    enabled: (time) => `Recordatorio a las ${time}`,
+    disabled: 'Recordatorio desactivado',
+    pushTitle: 'Hora de una serie',
+    pushBody: 'Hoy aún no has registrado nada. Una serie rápida cuenta.',
+  },
+
   install: {
     title: 'Añade Tally a la pantalla de inicio',
     iosBefore: 'Toca',

@@ -1,26 +1,10 @@
 import { useSyncExternalStore } from 'react'
-import { de } from './de.ts'
 import { en, type Messages } from './en.ts'
-import { es } from './es.ts'
-import { fr } from './fr.ts'
-import { it } from './it.ts'
-import { nl } from './nl.ts'
-import { pt } from './pt.ts'
+import { isLocale, MESSAGES, type Locale } from './messages.ts'
 
-export const LOCALES = ['en', 'de', 'fr', 'es', 'it', 'nl', 'pt'] as const
-export type Locale = (typeof LOCALES)[number]
+export { LOCALES, MESSAGES, type Locale } from './messages.ts'
 /** 'system' follows the device language, falling back to English. */
 export type LocalePreference = 'system' | Locale
-
-export const MESSAGES: Record<Locale, Messages> = {
-  en,
-  de,
-  fr,
-  es,
-  it,
-  nl,
-  pt,
-}
 
 const STORAGE_KEY = 'tally.locale'
 
@@ -29,10 +13,6 @@ interface Resolved {
   /** Full BCP 47 tag for Intl (keeps the region: en-GB dates, de-CH numbers). */
   tag: string
   messages: Messages
-}
-
-function isLocale(v: unknown): v is Locale {
-  return typeof v === 'string' && (LOCALES as readonly string[]).includes(v)
 }
 
 export function readLocalePreference(): LocalePreference {

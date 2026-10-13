@@ -354,6 +354,20 @@ export const it: Messages = {
     saving: 'Salvataggio…',
   },
 
+  reminders: {
+    title: 'Promemoria',
+    daily: 'Promemoria giornaliero',
+    time: 'Ora',
+    installFirst: 'Prima installa Tally',
+    unsupported: 'Non supportato qui',
+    denied: 'Bloccato nelle impostazioni',
+    notAllowed: 'Consenti le notifiche per ricevere un promemoria',
+    enabled: (time) => `Promemoria alle ${time}`,
+    disabled: 'Promemoria disattivato',
+    pushTitle: "È l'ora di una serie",
+    pushBody: 'Oggi non hai ancora registrato nulla. Basta una serie veloce.',
+  },
+
   install: {
     title: 'Aggiungi Tally alla schermata Home',
     iosBefore: 'Tocca',
