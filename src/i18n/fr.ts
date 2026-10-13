@@ -200,6 +200,14 @@ export const fr: Messages = {
     deleting: 'Suppression…',
     deletedToast: 'Défi supprimé',
     couldNotDelete: 'Suppression impossible',
+    editChallenge: 'Modifier le défi',
+    leaveChallenge: 'Quitter le défi',
+    leaveTitle: 'Quitter le défi ?',
+    leaveMessage: (name, code) =>
+      `Tu disparais du classement de « ${name} ». Tes réps enregistrées restent à toi. Pour revenir, rejoins-le avec le code ${code}.`,
+    leaving: 'Départ…',
+    leftToast: 'Tu as quitté le défi',
+    couldNotLeave: 'Impossible de quitter',
     inviteCode: "Code d'invitation",
     copy: 'Copier',
     shareLink: 'Partager le lien',
@@ -238,6 +246,18 @@ export const fr: Messages = {
     couldNotCreate: 'Création impossible',
     keepChallengesHint:
       'Ajoute un e-mail dans Compte pour garder tes défis si tu changes de téléphone',
+  },
+
+  editChallenge: {
+    title: 'Modifier le défi',
+    backLabel: 'Retour au défi',
+    appliesToEveryone: "Les changements s'appliquent à tous",
+    save: 'Enregistrer',
+    saving: 'Enregistrement…',
+    savedToast: 'Défi mis à jour',
+    couldNotSave: "Impossible d'enregistrer",
+    notEditable:
+      "Seul l'hôte peut modifier un défi, et seulement avant qu'il se termine.",
   },
 
   join: {
@@ -361,6 +381,8 @@ export const fr: Messages = {
     couldNotJoin: 'Impossible de rejoindre',
     couldNotEnd: 'Impossible de terminer le défi',
     couldNotDelete: 'Impossible de supprimer le défi',
+    couldNotLeave: 'Impossible de quitter le défi',
+    couldNotUpdate: 'Impossible de mettre à jour le défi',
     couldNotLoadChallenges: 'Impossible de charger les défis',
     couldNotLoadLeaderboard: 'Impossible de charger le classement',
     syncNotConfigured: "La synchro n'est pas configurée dans cette version",

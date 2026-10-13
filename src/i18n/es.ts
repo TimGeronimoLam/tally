@@ -197,6 +197,14 @@ export const es: Messages = {
     deleting: 'Eliminando…',
     deletedToast: 'Reto eliminado',
     couldNotDelete: 'No se pudo eliminar',
+    editChallenge: 'Editar reto',
+    leaveChallenge: 'Salir del reto',
+    leaveTitle: '¿Salir del reto?',
+    leaveMessage: (name, code) =>
+      `Desapareces de la clasificación de «${name}». Tus reps registradas siguen siendo tuyas. Para volver, únete de nuevo con el código ${code}.`,
+    leaving: 'Saliendo…',
+    leftToast: 'Has salido del reto',
+    couldNotLeave: 'No se pudo salir',
     inviteCode: 'Código de invitación',
     copy: 'Copiar',
     shareLink: 'Compartir enlace',
@@ -235,6 +243,18 @@ export const es: Messages = {
     couldNotCreate: 'No se pudo crear',
     keepChallengesHint:
       'Añade un correo en Cuenta para conservar tus retos si cambias de móvil',
+  },
+
+  editChallenge: {
+    title: 'Editar reto',
+    backLabel: 'Volver al reto',
+    appliesToEveryone: 'Los cambios se aplican a todos',
+    save: 'Guardar cambios',
+    saving: 'Guardando…',
+    savedToast: 'Reto actualizado',
+    couldNotSave: 'No se pudo guardar',
+    notEditable:
+      'Solo el anfitrión puede editar un reto, y solo antes de que termine.',
   },
 
   join: {
@@ -359,6 +379,8 @@ export const es: Messages = {
     couldNotJoin: 'No se pudo unir',
     couldNotEnd: 'No se pudo terminar el reto',
     couldNotDelete: 'No se pudo eliminar el reto',
+    couldNotLeave: 'No se pudo salir del reto',
+    couldNotUpdate: 'No se pudo actualizar el reto',
     couldNotLoadChallenges: 'No se pudieron cargar los retos',
     couldNotLoadLeaderboard: 'No se pudo cargar la clasificación',
     syncNotConfigured: 'La sincronización no está configurada en esta versión',

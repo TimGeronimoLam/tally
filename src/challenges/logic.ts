@@ -114,6 +114,45 @@ export function challengeWindow(
   return { startsAt, endsAt }
 }
 
+/** The date fields for an existing challenge: its first and last local day. */
+export function dateRangeOf(
+  c: Pick<Challenge, 'startsAt' | 'endsAt'>,
+): DateRangeInput {
+  return {
+    startKey: dayKey(new Date(c.startsAt)),
+    endKey: dayKey(new Date(c.endsAt)),
+  }
+}
+
+/**
+ * The window after the host edits the date fields. A day left as it was
+ * keeps its exact timestamp, so saving only a new name never moves the
+ * window. A changed day snaps to local midnight (start) or the last moment
+ * of the day (end), like a new custom range. Null when the range is
+ * unusable; it must still end in the future, as the server checks.
+ */
+export function editedWindow(
+  c: Pick<Challenge, 'startsAt' | 'endsAt'>,
+  range: DateRangeInput,
+  now: number = serverNow(),
+): { startsAt: Date; endsAt: Date } | null {
+  if (!isDayKey(range.startKey) || !isDayKey(range.endKey)) return null
+  const before = dateRangeOf(c)
+  const startsAt =
+    range.startKey === before.startKey
+      ? new Date(c.startsAt)
+      : parseDayKey(range.startKey)
+  const endsAt =
+    range.endKey === before.endKey
+      ? new Date(c.endsAt)
+      : endOfDayIn(0, parseDayKey(range.endKey))
+  if (Number.isNaN(startsAt.getTime()) || Number.isNaN(endsAt.getTime()))
+    return null
+  if (endsAt <= startsAt) return null
+  if (endsAt.getTime() <= now) return null
+  return { startsAt, endsAt }
+}
+
 function isDayKey(s: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(s)
 }

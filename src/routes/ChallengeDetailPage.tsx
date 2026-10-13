@@ -8,12 +8,14 @@ import {
   endChallenge,
   gapToFirst,
   inviteUrl,
+  leaveChallenge,
   useChallengeSummary,
   useLeaderboard,
 } from '../challenges/index.ts'
 import { InviteCodeCard, LeaderboardList } from '../components/app/index.ts'
 import {
   Button,
+  ButtonLink,
   ConfirmSheet,
   Gutter,
   IconButton,
@@ -42,7 +44,9 @@ export function ChallengeDetailPage() {
   const toast = useToast()
   const { data: c, missing, loading, userId, refresh } = useChallengeSummary(id)
   const board = useLeaderboard(c?.id)
-  const [confirm, setConfirm] = useState<'end' | 'delete' | null>(null)
+  const [confirm, setConfirm] = useState<'end' | 'delete' | 'leave' | null>(
+    null,
+  )
   const [busy, setBusy] = useState(false)
 
   if (missing) {
@@ -132,6 +136,25 @@ export function ChallengeDetailPage() {
     }
   }
 
+  async function leave() {
+    if (busy) return
+    setBusy(true)
+    try {
+      await leaveChallenge(c!.id)
+      await refresh()
+      setConfirm(null)
+      toast({ message: t.challengeDetail.leftToast })
+      nav.pop('/challenges', { replace: true })
+    } catch (err) {
+      toast({
+        message:
+          err instanceof Error ? err.message : t.challengeDetail.couldNotLeave,
+      })
+    } finally {
+      setBusy(false)
+    }
+  }
+
   return (
     <Screen>
       <ScreenNav
@@ -212,7 +235,16 @@ export function ChallengeDetailPage() {
       {isHost && (
         <Gutter className="pt-5">
           <SectionLabel>{t.challengeDetail.host}</SectionLabel>
-          <div className="flex flex-col gap-1 pt-1">
+          <div className="flex flex-col gap-2 pt-1">
+            {status !== 'ended' && (
+              <ButtonLink
+                to={`/challenges/${c.id}/edit`}
+                variant="outline"
+                fullWidth
+              >
+                {t.challengeDetail.editChallenge}
+              </ButtonLink>
+            )}
             {status === 'active' && (
               <Button
                 variant="outline"
@@ -230,6 +262,18 @@ export function ChallengeDetailPage() {
               {t.challengeDetail.deleteChallenge}
             </Button>
           </div>
+        </Gutter>
+      )}
+
+      {userId !== null && !isHost && (
+        <Gutter className="pt-5">
+          <Button
+            variant="danger"
+            fullWidth
+            onClick={() => setConfirm('leave')}
+          >
+            {t.challengeDetail.leaveChallenge}
+          </Button>
         </Gutter>
       )}
 
@@ -262,6 +306,17 @@ export function ChallengeDetailPage() {
         }
         destructive
         onConfirm={remove}
+        onClose={() => !busy && setConfirm(null)}
+      />
+      <ConfirmSheet
+        open={confirm === 'leave'}
+        title={t.challengeDetail.leaveTitle}
+        message={t.challengeDetail.leaveMessage(c.name, c.inviteCode)}
+        confirmLabel={
+          busy ? t.challengeDetail.leaving : t.challengeDetail.leaveChallenge
+        }
+        destructive
+        onConfirm={leave}
         onClose={() => !busy && setConfirm(null)}
       />
     </Screen>

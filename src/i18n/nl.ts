@@ -203,6 +203,14 @@ export const nl: Messages = {
     deleting: 'Verwijderen…',
     deletedToast: 'Challenge verwijderd',
     couldNotDelete: 'Verwijderen mislukt',
+    editChallenge: 'Challenge bewerken',
+    leaveChallenge: 'Challenge verlaten',
+    leaveTitle: 'Challenge verlaten?',
+    leaveMessage: (name, code) =>
+      `Je verdwijnt van de ranglijst van "${name}". Je gelogde reps blijven van jou. Terugkomen kan met de code ${code}.`,
+    leaving: 'Verlaten…',
+    leftToast: 'Je hebt de challenge verlaten',
+    couldNotLeave: 'Verlaten mislukt',
     inviteCode: 'Uitnodigingscode',
     copy: 'Kopiëren',
     shareLink: 'Link delen',
@@ -241,6 +249,18 @@ export const nl: Messages = {
     couldNotCreate: 'Aanmaken mislukt',
     keepChallengesHint:
       'Voeg bij Account een e-mailadres toe om je challenges te bewaren als je van telefoon wisselt',
+  },
+
+  editChallenge: {
+    title: 'Challenge bewerken',
+    backLabel: 'Terug naar challenge',
+    appliesToEveryone: 'Wijzigingen gelden voor iedereen',
+    save: 'Wijzigingen opslaan',
+    saving: 'Opslaan…',
+    savedToast: 'Challenge bijgewerkt',
+    couldNotSave: 'Opslaan mislukt',
+    notEditable:
+      'Alleen de host kan een challenge bewerken, en alleen voordat die afloopt.',
   },
 
   join: {
@@ -365,6 +385,8 @@ export const nl: Messages = {
     couldNotJoin: 'Meedoen mislukt',
     couldNotEnd: 'Challenge beëindigen mislukt',
     couldNotDelete: 'Challenge verwijderen mislukt',
+    couldNotLeave: 'Challenge verlaten mislukt',
+    couldNotUpdate: 'Challenge bijwerken mislukt',
     couldNotLoadChallenges: 'Challenges laden mislukt',
     couldNotLoadLeaderboard: 'Ranglijst laden mislukt',
     syncNotConfigured: 'Synchronisatie is in deze build niet ingesteld',

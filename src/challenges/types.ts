@@ -60,3 +60,12 @@ export interface NewChallengeInput {
   endsAt: Date
   displayName: string
 }
+
+/** What the host can change after creating. The exercise stays fixed. */
+export interface ChallengeEdit {
+  name: string
+  goalType: GoalType
+  goalValue: number | null
+  startsAt: Date
+  endsAt: Date
+}

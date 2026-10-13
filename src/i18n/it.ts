@@ -200,6 +200,14 @@ export const it: Messages = {
     deleting: 'Eliminazione…',
     deletedToast: 'Sfida eliminata',
     couldNotDelete: 'Impossibile eliminare',
+    editChallenge: 'Modifica sfida',
+    leaveChallenge: 'Lascia la sfida',
+    leaveTitle: 'Lasciare la sfida?',
+    leaveMessage: (name, code) =>
+      `Esci dalla classifica di «${name}». Le tue rip. registrate restano tue. Per tornare, unisciti di nuovo con il codice ${code}.`,
+    leaving: 'Uscita…',
+    leftToast: 'Hai lasciato la sfida',
+    couldNotLeave: 'Impossibile uscire',
     inviteCode: 'Codice invito',
     copy: 'Copia',
     shareLink: 'Condividi link',
@@ -238,6 +246,18 @@ export const it: Messages = {
     couldNotCreate: 'Impossibile creare',
     keepChallengesHint:
       "Aggiungi un'email in Account per conservare le sfide se cambi telefono",
+  },
+
+  editChallenge: {
+    title: 'Modifica sfida',
+    backLabel: 'Torna alla sfida',
+    appliesToEveryone: 'Le modifiche valgono per tutti',
+    save: 'Salva modifiche',
+    saving: 'Salvataggio…',
+    savedToast: 'Sfida aggiornata',
+    couldNotSave: 'Impossibile salvare',
+    notEditable:
+      "Solo l'organizzatore può modificare una sfida, e solo prima che finisca.",
   },
 
   join: {
@@ -362,6 +382,8 @@ export const it: Messages = {
     couldNotJoin: 'Impossibile unirsi',
     couldNotEnd: 'Impossibile terminare la sfida',
     couldNotDelete: 'Impossibile eliminare la sfida',
+    couldNotLeave: 'Impossibile lasciare la sfida',
+    couldNotUpdate: 'Impossibile aggiornare la sfida',
     couldNotLoadChallenges: 'Impossibile caricare le sfide',
     couldNotLoadLeaderboard: 'Impossibile caricare la classifica',
     syncNotConfigured:

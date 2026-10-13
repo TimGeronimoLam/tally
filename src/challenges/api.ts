@@ -7,6 +7,7 @@ import { generateInviteCode } from './codes.ts'
 import { resolveLocalExercise } from './localExercise.ts'
 import type {
   Challenge,
+  ChallengeEdit,
   ChallengePreview,
   ChallengeSummary,
   GoalType,
@@ -200,6 +201,31 @@ export async function endChallenge(challengeId: string): Promise<Challenge> {
   // available, so the challenge shows as ended at once.
   calibrate(ended.endsAt)
   return ended
+}
+
+/** Host only: change name, goal and window. Returns the updated challenge. */
+export async function updateChallenge(
+  challengeId: string,
+  edit: ChallengeEdit,
+): Promise<Challenge> {
+  const { data, error } = await client().rpc('update_challenge', {
+    p_challenge_id: challengeId,
+    p_name: edit.name,
+    p_goal_type: edit.goalType,
+    p_goal_value: edit.goalValue,
+    p_starts_at: edit.startsAt.toISOString(),
+    p_ends_at: edit.endsAt.toISOString(),
+  })
+  if (error) fail(messages().errors.couldNotUpdate, error)
+  return toChallenge((Array.isArray(data) ? data[0] : data) as Raw)
+}
+
+/** Members only (not the host): drop off the leaderboard. */
+export async function leaveChallenge(challengeId: string): Promise<void> {
+  const { error } = await client().rpc('leave_challenge', {
+    p_challenge_id: challengeId,
+  })
+  if (error) fail(messages().errors.couldNotLeave, error)
 }
 
 /** Host only: remove the challenge for everyone. */

@@ -203,6 +203,14 @@ export const de: Messages = {
     deleting: 'Wird gelöscht…',
     deletedToast: 'Challenge gelöscht',
     couldNotDelete: 'Löschen nicht möglich',
+    editChallenge: 'Challenge bearbeiten',
+    leaveChallenge: 'Challenge verlassen',
+    leaveTitle: 'Challenge verlassen?',
+    leaveMessage: (name, code) =>
+      `Du verschwindest aus der Rangliste von „${name}“. Deine geloggten Wdh. bleiben dir. Zurück kommst du mit dem Code ${code}.`,
+    leaving: 'Wird verlassen…',
+    leftToast: 'Du hast die Challenge verlassen',
+    couldNotLeave: 'Verlassen nicht möglich',
     inviteCode: 'Einladungscode',
     copy: 'Kopieren',
     shareLink: 'Link teilen',
@@ -241,6 +249,18 @@ export const de: Messages = {
     couldNotCreate: 'Erstellen nicht möglich',
     keepChallengesHint:
       'Hinterlege unter Konto eine E-Mail, damit deine Challenges beim Handywechsel erhalten bleiben',
+  },
+
+  editChallenge: {
+    title: 'Challenge bearbeiten',
+    backLabel: 'Zurück zur Challenge',
+    appliesToEveryone: 'Änderungen gelten für alle',
+    save: 'Änderungen speichern',
+    saving: 'Wird gespeichert…',
+    savedToast: 'Challenge aktualisiert',
+    couldNotSave: 'Speichern nicht möglich',
+    notEditable:
+      'Nur der Gastgeber kann eine Challenge bearbeiten, und nur bevor sie endet.',
   },
 
   join: {
@@ -366,6 +386,8 @@ export const de: Messages = {
     couldNotJoin: 'Beitreten nicht möglich',
     couldNotEnd: 'Challenge konnte nicht beendet werden',
     couldNotDelete: 'Challenge konnte nicht gelöscht werden',
+    couldNotLeave: 'Challenge konnte nicht verlassen werden',
+    couldNotUpdate: 'Challenge konnte nicht aktualisiert werden',
     couldNotLoadChallenges: 'Challenges konnten nicht geladen werden',
     couldNotLoadLeaderboard: 'Rangliste konnte nicht geladen werden',
     syncNotConfigured: 'Sync ist in diesem Build nicht eingerichtet',

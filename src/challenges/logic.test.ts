@@ -8,9 +8,11 @@ import {
   challengeStatus,
   challengeSubtitle,
   challengeWindow,
+  dateRangeOf,
   daysLeft,
   daysUntilStart,
   defaultDateRange,
+  editedWindow,
   endOfDayIn,
   gapToFirst,
   isWon,
@@ -113,6 +115,57 @@ describe('challenge window', () => {
     expect(custom('2026-10-01', '2026-10-11')).toBeNull()
     expect(custom('', '2026-10-19')).toBeNull()
     expect(custom('2026-10-12', 'soon')).toBeNull()
+  })
+})
+
+describe('editing a window', () => {
+  const now = new Date(2026, 9, 12, 12).getTime()
+  const c = {
+    startsAt: new Date(2026, 9, 10).toISOString(),
+    endsAt: new Date(2026, 9, 20, 23, 59, 59, 999).toISOString(),
+  }
+
+  it('reads the first and last local day', () => {
+    expect(dateRangeOf(c)).toEqual({
+      startKey: '2026-10-10',
+      endKey: '2026-10-20',
+    })
+  })
+
+  it('keeps exact timestamps for days left unchanged', () => {
+    // Set in another timezone: the end is mid-day here, not end of day.
+    const odd = { ...c, endsAt: new Date(2026, 9, 20, 15, 30).toISOString() }
+    const w = editedWindow(odd, dateRangeOf(odd), now)!
+    expect(w.startsAt.toISOString()).toBe(odd.startsAt)
+    expect(w.endsAt.toISOString()).toBe(odd.endsAt)
+  })
+
+  it('snaps changed days to the start and end of the day', () => {
+    const w = editedWindow(
+      c,
+      { startKey: '2026-10-11', endKey: '2026-10-25' },
+      now,
+    )!
+    expect(w.startsAt).toEqual(new Date(2026, 9, 11))
+    expect(w.endsAt).toEqual(new Date(2026, 9, 25, 23, 59, 59, 999))
+  })
+
+  it('moves one end and leaves the other alone', () => {
+    const w = editedWindow(
+      c,
+      { startKey: '2026-10-10', endKey: '2026-10-13' },
+      now,
+    )!
+    expect(w.startsAt.toISOString()).toBe(c.startsAt)
+    expect(w.endsAt).toEqual(new Date(2026, 9, 13, 23, 59, 59, 999))
+  })
+
+  it('rejects reversed, past or malformed ranges', () => {
+    const edit = (startKey: string, endKey: string) =>
+      editedWindow(c, { startKey, endKey }, now)
+    expect(edit('2026-10-21', '2026-10-20')).toBeNull()
+    expect(edit('2026-10-01', '2026-10-11')).toBeNull()
+    expect(edit('2026-10-10', '')).toBeNull()
   })
 })
 

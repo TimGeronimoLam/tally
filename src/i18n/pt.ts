@@ -200,6 +200,14 @@ export const pt: Messages = {
     deleting: 'A eliminar…',
     deletedToast: 'Desafio eliminado',
     couldNotDelete: 'Não foi possível eliminar',
+    editChallenge: 'Editar desafio',
+    leaveChallenge: 'Sair do desafio',
+    leaveTitle: 'Sair do desafio?',
+    leaveMessage: (name, code) =>
+      `Sais da classificação de «${name}». As tuas reps registadas continuam tuas. Para voltar, entra outra vez com o código ${code}.`,
+    leaving: 'A sair…',
+    leftToast: 'Saíste do desafio',
+    couldNotLeave: 'Não foi possível sair',
     inviteCode: 'Código de convite',
     copy: 'Copiar',
     shareLink: 'Partilhar ligação',
@@ -238,6 +246,18 @@ export const pt: Messages = {
     couldNotCreate: 'Não foi possível criar',
     keepChallengesHint:
       'Adiciona um e-mail em Conta para manteres os desafios se mudares de telemóvel',
+  },
+
+  editChallenge: {
+    title: 'Editar desafio',
+    backLabel: 'Voltar ao desafio',
+    appliesToEveryone: 'As alterações aplicam-se a todos',
+    save: 'Guardar alterações',
+    saving: 'A guardar…',
+    savedToast: 'Desafio atualizado',
+    couldNotSave: 'Não foi possível guardar',
+    notEditable:
+      'Só o anfitrião pode editar um desafio, e só antes de terminar.',
   },
 
   join: {
@@ -362,6 +382,8 @@ export const pt: Messages = {
     couldNotJoin: 'Não foi possível entrar',
     couldNotEnd: 'Não foi possível terminar o desafio',
     couldNotDelete: 'Não foi possível eliminar o desafio',
+    couldNotLeave: 'Não foi possível sair do desafio',
+    couldNotUpdate: 'Não foi possível atualizar o desafio',
     couldNotLoadChallenges: 'Não foi possível carregar os desafios',
     couldNotLoadLeaderboard: 'Não foi possível carregar a classificação',
     syncNotConfigured: 'A sincronização não está configurada nesta versão',

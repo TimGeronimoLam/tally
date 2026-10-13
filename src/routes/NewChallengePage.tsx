@@ -8,9 +8,10 @@ import {
   type DurationValue,
   type GoalType,
 } from '../challenges/index.ts'
-import { ExercisePicker } from '../components/app/index.ts'
+import { DateRangeFields, ExercisePicker } from '../components/app/index.ts'
 import {
   Button,
+  Field,
   Screen,
   ScreenNav,
   SegmentedControl,
@@ -160,35 +161,15 @@ export function NewChallengePage() {
         </Field>
 
         {duration === 'custom' && (
-          <div className="flex flex-col gap-2">
-            <div className="flex gap-3">
-              <TextField
-                label={t.newChallenge.starts}
-                type="date"
-                value={range.startKey}
-                max={range.endKey}
-                onChange={(e) =>
-                  setRange((r) => ({ ...r, startKey: e.target.value }))
-                }
-                className="min-w-0 flex-1"
-              />
-              <TextField
-                label={t.newChallenge.ends}
-                type="date"
-                value={range.endKey}
-                min={range.startKey}
-                onChange={(e) =>
-                  setRange((r) => ({ ...r, endKey: e.target.value }))
-                }
-                className="min-w-0 flex-1"
-              />
-            </div>
-            <p className="text-[13px] text-muted">
-              {timeWindow
+          <DateRangeFields
+            range={range}
+            onChange={setRange}
+            hint={
+              timeWindow
                 ? t.newChallenge.customHint
-                : t.newChallenge.customInvalid}
-            </p>
-          </div>
+                : t.newChallenge.customInvalid
+            }
+          />
         )}
 
         <TextField
@@ -205,20 +186,5 @@ export function NewChallengePage() {
         </Button>
       </form>
     </Screen>
-  )
-}
-
-function Field({
-  label,
-  children,
-}: {
-  label: string
-  children: React.ReactNode
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <span className="text-[13px] font-medium">{label}</span>
-      {children}
-    </div>
   )
 }

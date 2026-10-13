@@ -226,6 +226,14 @@ export const en = {
     deleting: 'Deleting…',
     deletedToast: 'Challenge deleted',
     couldNotDelete: 'Could not delete',
+    editChallenge: 'Edit challenge',
+    leaveChallenge: 'Leave challenge',
+    leaveTitle: 'Leave challenge?',
+    leaveMessage: (name: string, code: string) =>
+      `You drop off the "${name}" leaderboard. Your logged reps stay yours. To come back, join again with the code ${code}.`,
+    leaving: 'Leaving…',
+    leftToast: 'You left the challenge',
+    couldNotLeave: 'Could not leave',
     inviteCode: 'Invite code',
     copy: 'Copy',
     shareLink: 'Share link',
@@ -265,6 +273,17 @@ export const en = {
     couldNotCreate: 'Could not create',
     keepChallengesHint:
       'Add an email in Account to keep your challenges if you switch phones',
+  },
+
+  editChallenge: {
+    title: 'Edit challenge',
+    backLabel: 'Back to challenge',
+    appliesToEveryone: 'Changes apply to everyone',
+    save: 'Save changes',
+    saving: 'Saving…',
+    savedToast: 'Challenge updated',
+    couldNotSave: 'Could not save',
+    notEditable: 'Only the host can edit a challenge, and only before it ends.',
   },
 
   join: {
@@ -389,6 +408,8 @@ export const en = {
     couldNotJoin: 'Could not join',
     couldNotEnd: 'Could not end challenge',
     couldNotDelete: 'Could not delete challenge',
+    couldNotLeave: 'Could not leave challenge',
+    couldNotUpdate: 'Could not update challenge',
     couldNotLoadChallenges: 'Could not load challenges',
     couldNotLoadLeaderboard: 'Could not load leaderboard',
     syncNotConfigured: 'Sync is not configured in this build',
