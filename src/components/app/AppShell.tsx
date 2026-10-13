@@ -56,7 +56,9 @@ export function AppShell({ tabs = true }: { tabs?: boolean }) {
           // transparent. Positioned so absolutely placed descendants (e.g.
           // sr-only text) stay inside the scroll clip instead of stretching
           // the document.
-          'relative min-h-0 flex-1 overflow-y-auto bg-bg [view-transition-name:main]',
+          // overscroll-contain: a scroll past the top or bottom stays in
+          // this element; it never reaches the document (and pull-to-refresh).
+          'relative min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg [view-transition-name:main]',
           tabs
             ? 'pb-[calc(var(--tab-bar-height)_+_env(safe-area-inset-bottom))]'
             : 'pb-[env(safe-area-inset-bottom)]',

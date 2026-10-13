@@ -151,14 +151,27 @@
     height: 100%;
   }
 
+  /*
+   * The document never scrolls; <main> in AppShell does. Pin the body so
+   * iOS cannot rubber-band the whole app, and refuse overscroll on both
+   * root and body so Chrome's pull-to-refresh never fires: reloading is
+   * the app's business, not the browser's.
+   */
+  html {
+    overscroll-behavior: none;
+  }
+
   body {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
     margin: 0;
     background: var(--bg);
     color: var(--fg);
     font-family: var(--font-sans);
     font-variant-numeric: tabular-nums;
     -webkit-font-smoothing: antialiased;
-    overscroll-behavior-y: none;
+    overscroll-behavior: none;
     -webkit-tap-highlight-color: transparent;
   }
 
