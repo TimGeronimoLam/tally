@@ -30,6 +30,11 @@ export interface KeypadProps {
 /** 3×4 numeric keypad. */
 export function Keypad({ onKey, disabled, className }: KeypadProps) {
   const t = useT()
+  function press(key: KeypadKey) {
+    if (disabled) return
+    haptic('tap')
+    onKey(key)
+  }
   return (
     <div className={cn('grid grid-cols-3 gap-1.5', className)}>
       {LAYOUT.map((key, i) =>
@@ -41,10 +46,18 @@ export function Keypad({ onKey, disabled, className }: KeypadProps) {
             type="button"
             disabled={disabled}
             aria-label={key === 'delete' ? t.log.keypadDelete : undefined}
-            onClick={() => {
-              haptic('tap')
-              onKey(key)
+            // Act on finger-down like a native keypad. Android Chrome turns
+            // a long press into a context-menu gesture and never sends the
+            // click, so a held key would otherwise be lost. Keyboard
+            // activation (Enter/Space) arrives as a click with detail 0.
+            onPointerDown={(e) => {
+              if (e.button !== 0) return
+              press(key)
             }}
+            onClick={(e) => {
+              if (e.detail === 0) press(key)
+            }}
+            onContextMenu={(e) => e.preventDefault()}
             className="pressable flex h-[54px] items-center justify-center rounded-control bg-surface text-[26px] text-fg active:bg-surface-2 disabled:opacity-40"
           >
             {key === 'delete' ? (
