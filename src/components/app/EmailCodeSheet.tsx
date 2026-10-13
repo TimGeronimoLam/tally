@@ -1,4 +1,3 @@
-import { isIOS, isStandalone } from '../../lib/install.ts'
 import {
   normalizeEmailCode,
   verifyEmailCode,
@@ -15,10 +14,10 @@ export interface EmailCodeSheetProps {
 }
 
 /**
- * Second step of email sign-in: the one-time code from the email. The
- * email's link signs in too, but on an iPhone it opens Safari rather than
- * the installed app, and the two do not share a session, so inside the
- * app the code is the only way in. Mount with a changing `key` per send.
+ * Second step of email sign-in: the one-time code from the email. The email
+ * carries only the code (no link: on an iPhone a link opens Safari rather
+ * than the installed app, and the two do not share a session). Mount with
+ * a changing `key` per send.
  */
 export function EmailCodeSheet({
   open,
@@ -26,13 +25,8 @@ export function EmailCodeSheet({
   onSignedIn,
   onClose,
 }: EmailCodeSheetProps) {
-  const inApp = isStandalone()
   const description = pending
-    ? `We sent a code to ${pending.email}. Enter it here${
-        inApp && isIOS()
-          ? '. The link in the email opens Safari, not this app, so use the code.'
-          : ', or tap the link in the email.'
-      }`
+    ? `We sent a code to ${pending.email}. Enter it here.`
     : ''
 
   return (

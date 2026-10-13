@@ -157,7 +157,7 @@ export function SyncCard() {
         key={`email-${sheet}`}
         open={sheet === 'email'}
         title="Sign in"
-        description="We'll email you a code and a link. No password needed; your account is created the first time."
+        description="We'll email you a one-time code. No password needed; your account is created the first time."
         submitLabel="Send code"
         busyLabel="Sending…"
         onSubmit={async (addr) => {

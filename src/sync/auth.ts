@@ -57,18 +57,18 @@ export async function signInAnonymously(): Promise<void> {
 export type EmailCodeType = 'email' | 'email_change'
 
 /**
- * Start an email sign-in. The email carries a link and a one-time code
- * (when the Supabase templates include `{{ .Token }}`, see README): on an
- * iPhone the link opens Safari rather than the installed app, whose
- * storage is separate, so the code is the only way to sign in inside it.
- * Returns the code type `verifyEmailCode` needs.
+ * Start an email sign-in. The email carries a one-time code (the Supabase
+ * templates render `{{ .Token }}` and no link, see README): on an iPhone a
+ * link would open Safari rather than the installed app, whose storage is
+ * separate, so the code is the only way to sign in inside it. Returns the
+ * code type `verifyEmailCode` needs.
  *
  * The user never sees anonymous accounts, so:
  * - with an anonymous session (created silently by a challenge join), the
  *   email is attached to that same user via updateUser, keeping its id and
- *   memberships; Supabase emails a confirmation link and code;
+ *   memberships; Supabase emails a confirmation code;
  * - otherwise, or if that email already belongs to another account, a
- *   magic link is sent (creating the account on first use).
+ *   sign-in code is sent (creating the account on first use).
  */
 export async function signInWithEmail(email: string): Promise<EmailCodeType> {
   const client = requireClient()
@@ -93,8 +93,8 @@ export function normalizeEmailCode(input: string): string {
 }
 
 /**
- * Finish an email sign-in with the code from the email, as an alternative
- * to tapping its link. Works inside an installed app on any platform.
+ * Finish an email sign-in with the code from the email. Works inside an
+ * installed app on any platform.
  */
 export async function verifyEmailCode(
   email: string,
