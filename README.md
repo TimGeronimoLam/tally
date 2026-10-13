@@ -117,18 +117,16 @@ the project's dashboard home.
 
 ## Deploy
 
-Static build; the only server code is the Cloudflare Worker's reminder cron.
-Either host works for the app; push to `main` and let it build.
+Hosted on Cloudflare Workers; push to `main` and let it build. Static build;
+the only server code is the Worker's reminder cron.
 
-- **Cloudflare Workers** (what the dashboard's "Create an app" flow sets up):
-  connect the repo, keep build command `npm run build` and deploy command
-  `npx wrangler deploy`. `wrangler.jsonc` serves `dist/` as static assets with
-  SPA fallback, so deep links like `/join/CODE` work. Under Advanced settings →
-  Build variables add `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`,
-  `VITE_VAPID_PUBLIC_KEY` and `VITE_TURNSTILE_SITE_KEY` (the build bakes
-  them in). `.node-version` pins the build to Node 24.
-- **Vercel**: Import the repo (framework preset Vite), add the same env vars.
-  `vercel.json` holds the SPA rewrite. No cron there, so no daily reminders.
+Setup (what the dashboard's "Create an app" flow sets up): connect the repo,
+keep build command `npm run build` and deploy command `npx wrangler deploy`.
+`wrangler.jsonc` serves `dist/` as static assets with SPA fallback, so deep
+links like `/join/CODE` work. Under Advanced settings → Build variables add
+`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_VAPID_PUBLIC_KEY` and
+`VITE_TURNSTILE_SITE_KEY` (the build bakes them in). `.node-version` pins the
+build to Node 24.
 
 After the first deploy: put the site URL into Supabase → Authentication →
 URL Configuration (Site URL + Redirect URLs).

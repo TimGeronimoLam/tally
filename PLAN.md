@@ -4,7 +4,7 @@ Tally is a minimal workout-stats PWA for Android and iOS. Logging a set takes on
 
 **Design:** https://claude.ai/artifact/6T6fTGkoBAK7KiVJiwqGN9 (canvas with all core screens, light + dark)
 
-**Stack:** Vite + React + TypeScript · Dexie (IndexedDB) · vite-plugin-pwa · Supabase (Postgres, Auth, Realtime) · Cloudflare Pages or Vercel
+**Stack:** Vite + React + TypeScript · Dexie (IndexedDB) · vite-plugin-pwa · Supabase (Postgres, Auth, Realtime) · Cloudflare Workers
 
 Each phase ends with something usable on a phone.
 
@@ -17,8 +17,8 @@ Each phase ends with something usable on a phone.
 - [x] Add `vite-plugin-pwa`
   - Manifest: name, icons, `display: standalone`, theme color
   - Workbox precaching of the app shell
-- [ ] Verify "Add to Home Screen" on Android Chrome and iOS Safari
-- [ ] Deploy from `main` to Cloudflare Pages or Vercel so every push is live (configs and README steps ready; needs your account)
+- [x] Verify "Add to Home Screen" on Android Chrome and iOS Safari (install and Home Screen launch both work)
+- [x] Deploy from `main` to Cloudflare Workers so every push is live (`npm run build`, then `npx wrangler deploy` with `wrangler.jsonc`)
 - [x] Routing: bottom tab bar with Log / Stats / Challenges / Achievements, plus a Settings route
 
 ---
