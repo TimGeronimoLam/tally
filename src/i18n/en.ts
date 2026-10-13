@@ -35,6 +35,7 @@ export const en = {
     delete: 'Delete',
     edit: 'Edit',
     loading: 'Loading…',
+    refreshing: 'Refreshing…',
     somethingWentWrong: 'Something went wrong',
     you: 'You',
     newButton: 'New',

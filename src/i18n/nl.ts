@@ -15,6 +15,7 @@ export const nl: Messages = {
     delete: 'Verwijderen',
     edit: 'Bewerken',
     loading: 'Laden…',
+    refreshing: 'Vernieuwen…',
     somethingWentWrong: 'Er ging iets mis',
     you: 'Jij',
     newButton: 'Nieuw',

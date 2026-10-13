@@ -49,10 +49,13 @@ export function ChallengeDetailPage() {
     null,
   )
   const [busy, setBusy] = useState(false)
+  const pullRefresh = userId
+    ? () => Promise.all([refresh(), board.refresh()])
+    : undefined
 
   if (missing) {
     return (
-      <Screen>
+      <Screen onRefresh={pullRefresh}>
         <ScreenNav
           title={t.challengeDetail.title}
           backLabel={t.challengeDetail.backLabel}
@@ -66,7 +69,7 @@ export function ChallengeDetailPage() {
   }
   if (!c) {
     return (
-      <Screen>
+      <Screen onRefresh={pullRefresh}>
         <ScreenNav
           title={t.challengeDetail.title}
           backLabel={t.challengeDetail.backLabel}
@@ -157,7 +160,7 @@ export function ChallengeDetailPage() {
   }
 
   return (
-    <Screen>
+    <Screen onRefresh={pullRefresh}>
       <ScreenNav
         backLabel={t.challengeDetail.backLabel}
         onBack={() => nav.pop('/challenges')}

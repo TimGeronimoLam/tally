@@ -15,6 +15,7 @@ export const it: Messages = {
     delete: 'Elimina',
     edit: 'Modifica',
     loading: 'Caricamento…',
+    refreshing: 'Aggiornamento…',
     somethingWentWrong: 'Qualcosa è andato storto',
     you: 'Tu',
     newButton: 'Nuova',

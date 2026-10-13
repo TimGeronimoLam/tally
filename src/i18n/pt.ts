@@ -15,6 +15,7 @@ export const pt: Messages = {
     delete: 'Eliminar',
     edit: 'Editar',
     loading: 'A carregar…',
+    refreshing: 'A atualizar…',
     somethingWentWrong: 'Algo correu mal',
     you: 'Tu',
     newButton: 'Novo',

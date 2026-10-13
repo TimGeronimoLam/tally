@@ -27,7 +27,7 @@ export function ChallengesPage() {
   const t = useT()
   const nav = useNav()
   const toast = useToast()
-  const { data, error, loading, userId } = useMyChallenges()
+  const { data, error, loading, userId, refresh } = useMyChallenges()
   const [code, setCode] = useState('')
 
   // Keep the social achievements fed, and celebrate new ones here.
@@ -55,7 +55,7 @@ export function ChallengesPage() {
   const past = (data ?? []).filter((c) => challengeStatus(c) === 'ended')
 
   return (
-    <Screen>
+    <Screen onRefresh={userId ? refresh : undefined}>
       <ScreenHeader
         title={t.challenges.title}
         action={
