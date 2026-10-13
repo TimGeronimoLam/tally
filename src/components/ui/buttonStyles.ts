@@ -18,7 +18,7 @@ export interface ButtonStyleProps {
 }
 
 const base =
-  'inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap select-none transition-colors disabled:cursor-default'
+  'pressable inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap select-none disabled:cursor-default'
 
 const variants: Record<ButtonVariant, string> = {
   primary: 'bg-accent text-accent-fg disabled:bg-surface-2 disabled:text-faint',

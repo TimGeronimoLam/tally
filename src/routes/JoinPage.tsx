@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import {
   challengeSubtitle,
   joinChallenge,
@@ -20,6 +20,7 @@ import { isIOS, isStandalone } from '../lib/install.ts'
 import { copyText } from '../lib/share.ts'
 import { useToast } from '../lib/toast.ts'
 import { setDisplayName, useSession } from '../sync/index.ts'
+import { useNav } from '../lib/nav.ts'
 
 type Preview =
   | { state: 'loading' }
@@ -34,7 +35,7 @@ type Preview =
  */
 export function JoinPage() {
   const code = normalizeInviteCode(useParams().code ?? '')
-  const navigate = useNavigate()
+  const nav = useNav()
   const toast = useToast()
   const savedName = useDisplayName()
   const { session } = useSession()
@@ -91,7 +92,7 @@ export function JoinPage() {
           duration: 6000,
         })
       }
-      navigate(`/challenges/${id}`, { replace: true })
+      nav.push(`/challenges/${id}`, { replace: true })
     } catch (err) {
       toast({ message: err instanceof Error ? err.message : 'Could not join' })
     } finally {
@@ -113,7 +114,7 @@ export function JoinPage() {
             <p className="text-[15px] text-muted">
               Nothing matches the code {code}. Check it with whoever shared it.
             </p>
-            <ButtonLink to="/challenges" variant="ghost">
+            <ButtonLink to="/challenges" direction="pop" variant="ghost">
               Back to challenges
             </ButtonLink>
           </>
@@ -206,7 +207,7 @@ export function JoinPage() {
               </Card>
             )}
 
-            <ButtonLink to="/challenges" variant="ghost">
+            <ButtonLink to="/challenges" direction="pop" variant="ghost">
               Not now
             </ButtonLink>
           </form>

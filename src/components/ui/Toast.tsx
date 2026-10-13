@@ -47,7 +47,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         <div
           role="status"
           aria-live="polite"
-          className="pointer-events-none fixed inset-x-0 bottom-[calc(76px_+_env(safe-area-inset-bottom))] z-30 mx-auto w-full max-w-app px-5"
+          className="pointer-events-none fixed inset-x-0 bottom-[calc(62px_+_env(safe-area-inset-bottom))] z-30 mx-auto w-full max-w-app px-5"
         >
           <Toast key={current.id} toast={current} onDismiss={dismiss} />
         </div>

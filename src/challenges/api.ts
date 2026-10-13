@@ -42,7 +42,11 @@ export async function ensureSession(): Promise<string> {
   return session.user.id
 }
 
-function withTimeout<T>(p: Promise<T>, ms: number, message: string): Promise<T> {
+function withTimeout<T>(
+  p: Promise<T>,
+  ms: number,
+  message: string,
+): Promise<T> {
   return new Promise((resolve, reject) => {
     const timer = window.setTimeout(() => reject(new Error(message)), ms)
     p.then(resolve, reject).finally(() => window.clearTimeout(timer))

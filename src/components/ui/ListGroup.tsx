@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import { cn } from '../../lib/cn.ts'
+import { markNav } from '../../lib/nav.ts'
 
 /** Outlined group of rows (settings-style list). */
 export function ListGroup({
@@ -37,7 +38,7 @@ export interface ListRowProps {
 }
 
 const rowClass =
-  'flex h-[52px] w-full items-center gap-2 border-b border-surface-2 bg-bg px-4 text-left text-[15px] last:border-b-0 disabled:opacity-40'
+  'flex h-[52px] w-full items-center gap-2 border-b border-surface-2 bg-bg px-4 text-left text-[15px] last:border-b-0 disabled:opacity-40 transition-colors duration-100 active:bg-surface active:duration-0'
 
 const tones = {
   default: 'text-fg',
@@ -66,7 +67,12 @@ export function ListRow({
   )
   if (to) {
     return (
-      <Link to={to} className={cn(rowClass, 'no-underline')}>
+      <Link
+        to={to}
+        viewTransition
+        onClick={() => markNav('push')}
+        className={cn(rowClass, 'no-underline')}
+      >
         {body}
       </Link>
     )

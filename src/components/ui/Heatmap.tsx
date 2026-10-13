@@ -14,7 +14,7 @@ export interface HeatmapProps {
   className?: string
 }
 
-const ROW_LABELS = ['Mon', '', 'Wed', '', 'Fri', '', '']
+const ROW_LABELS = ['Mon', '', 'Wed', '', 'Fri', '', 'Sun']
 const ROW_LABEL_WIDTH = 28
 
 const levelClass: Record<HeatLevel, string> = {

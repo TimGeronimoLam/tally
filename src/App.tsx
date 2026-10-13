@@ -1,4 +1,9 @@
-import { Navigate, Route, Routes } from 'react-router'
+import {
+  Navigate,
+  Route,
+  createBrowserRouter,
+  createRoutesFromElements,
+} from 'react-router'
 import { AppShell } from './components/app/index.ts'
 import { AccountPage } from './routes/AccountPage.tsx'
 import { AchievementsPage } from './routes/AchievementsPage.tsx'
@@ -9,9 +14,14 @@ import { LogPage } from './routes/LogPage.tsx'
 import { NewChallengePage } from './routes/NewChallengePage.tsx'
 import { StatsPage } from './routes/StatsPage.tsx'
 
-function App() {
-  return (
-    <Routes>
+/**
+ * A data router rather than `<BrowserRouter>`: only the data router runs
+ * view transitions (the slide between screens, see src/lib/nav.ts), and it
+ * replays them on browser back and forward.
+ */
+export const router = createBrowserRouter(
+  createRoutesFromElements(
+    <>
       <Route element={<AppShell />}>
         <Route index element={<LogPage />} />
         <Route path="stats" element={<StatsPage />} />
@@ -27,8 +37,6 @@ function App() {
         <Route path="join/:code" element={<JoinPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  )
-}
-
-export default App
+    </>,
+  ),
+)

@@ -1,5 +1,4 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router'
 import { evaluateAchievements } from '../achievements/index.ts'
 import {
   challengeStatus,
@@ -21,9 +20,10 @@ import {
 } from '../components/ui/index.ts'
 import { isSyncConfigured } from '../lib/supabase.ts'
 import { useToast } from '../lib/toast.ts'
+import { useNav } from '../lib/nav.ts'
 
 export function ChallengesPage() {
-  const navigate = useNavigate()
+  const nav = useNav()
   const toast = useToast()
   const { data, error, loading, userId } = useMyChallenges()
   const [code, setCode] = useState('')
@@ -46,7 +46,7 @@ export function ChallengesPage() {
       toast({ message: 'Codes are 6 letters or digits' })
       return
     }
-    navigate(`/join/${normalized}`)
+    nav.push(`/join/${normalized}`)
   }
 
   const active = (data ?? []).filter((c) => challengeStatus(c) !== 'ended')

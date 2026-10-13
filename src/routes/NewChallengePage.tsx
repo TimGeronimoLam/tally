@@ -1,5 +1,4 @@
 import { useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router'
 import {
   DURATION_OPTIONS,
   GOAL_TYPES,
@@ -12,10 +11,8 @@ import {
 import { ExercisePicker } from '../components/app/index.ts'
 import {
   Button,
-  ChevronLeftIcon,
-  Gutter,
-  IconButton,
   Screen,
+  ScreenNav,
   SegmentedControl,
   TextField,
 } from '../components/ui/index.ts'
@@ -26,9 +23,10 @@ import {
 } from '../db/index.ts'
 import { useToast } from '../lib/toast.ts'
 import { setDisplayName, useSession } from '../sync/index.ts'
+import { useNav } from '../lib/nav.ts'
 
 export function NewChallengePage() {
-  const navigate = useNavigate()
+  const nav = useNav()
   const toast = useToast()
   const exercises = useExercises()
   const defaultExercise = useSelectedExercise(exercises)
@@ -86,7 +84,7 @@ export function NewChallengePage() {
           duration: 6000,
         })
       }
-      navigate(`/challenges/${created.id}`, { replace: true })
+      nav.push(`/challenges/${created.id}`, { replace: true })
     } catch (err) {
       toast({
         message: err instanceof Error ? err.message : 'Could not create',
@@ -98,16 +96,7 @@ export function NewChallengePage() {
 
   return (
     <Screen>
-      <div className="flex items-center px-3 pt-[calc(env(safe-area-inset-top)_+_8px)]">
-        <IconButton aria-label="Back" onClick={() => navigate(-1)}>
-          <ChevronLeftIcon />
-        </IconButton>
-      </div>
-      <Gutter className="pt-2">
-        <h1 className="text-[28px] font-semibold tracking-[-0.02em]">
-          New challenge
-        </h1>
-      </Gutter>
+      <ScreenNav title="New challenge" onBack={() => nav.pop('/challenges')} />
 
       <form onSubmit={submit} className="flex flex-col gap-5 px-5 pt-5 pb-8">
         <Field label="Exercise">

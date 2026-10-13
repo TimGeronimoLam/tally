@@ -1,6 +1,7 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import { Link } from 'react-router'
 import { cn } from '../../lib/cn.ts'
+import { markNav } from '../../lib/nav.ts'
 
 export type CardVariant = 'filled' | 'outline' | 'dashed'
 
@@ -17,7 +18,8 @@ const variants: Record<CardVariant, string> = {
   dashed: 'border-[1.5px] border-dashed border-border-strong',
 }
 
-/** Rounded content container. Pass `to` to make the whole card a link. */
+/** Rounded content container. Pass `to` to make the whole card a link
+ *  that pushes the next screen. */
 export function Card({
   variant = 'filled',
   to,
@@ -32,7 +34,12 @@ export function Card({
   )
   if (to) {
     return (
-      <Link to={to} className={cn(classes, 'no-underline')}>
+      <Link
+        to={to}
+        viewTransition
+        onClick={() => markNav('push')}
+        className={cn(classes, 'pressable no-underline')}
+      >
         {children}
       </Link>
     )

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import {
   challengeStatus,
   daysLeft,
@@ -14,11 +14,11 @@ import {
 import { InviteCodeCard, LeaderboardList } from '../components/app/index.ts'
 import {
   Button,
-  ChevronLeftIcon,
   ConfirmSheet,
   Gutter,
   IconButton,
   Screen,
+  ScreenNav,
   SectionLabel,
   ShareIcon,
   Tile,
@@ -28,6 +28,7 @@ import { META_KEYS, setMeta } from '../db/index.ts'
 import { formatNumber } from '../lib/format.ts'
 import { shareLink } from '../lib/share.ts'
 import { useToast } from '../lib/toast.ts'
+import { useNav } from '../lib/nav.ts'
 
 function windowLabel(startsAt: string, endsAt: string): string {
   const fmt = (s: string) =>
@@ -40,7 +41,7 @@ function windowLabel(startsAt: string, endsAt: string): string {
 
 export function ChallengeDetailPage() {
   const { id } = useParams()
-  const navigate = useNavigate()
+  const nav = useNav()
   const toast = useToast()
   const { data: c, missing, loading, userId, refresh } = useChallengeSummary(id)
   const board = useLeaderboard(c?.id)
@@ -50,7 +51,11 @@ export function ChallengeDetailPage() {
   if (missing) {
     return (
       <Screen>
-        <Header onBack={() => navigate('/challenges')} />
+        <ScreenNav
+          title="Challenge"
+          backLabel="Back to challenges"
+          onBack={() => nav.pop('/challenges')}
+        />
         <Gutter className="pt-4 text-[15px] text-muted">
           This challenge is not on your list.
         </Gutter>
@@ -60,7 +65,11 @@ export function ChallengeDetailPage() {
   if (!c) {
     return (
       <Screen>
-        <Header onBack={() => navigate('/challenges')} />
+        <ScreenNav
+          title="Challenge"
+          backLabel="Back to challenges"
+          onBack={() => nav.pop('/challenges')}
+        />
         {loading && (
           <Gutter className="pt-4 text-[15px] text-muted">Loading…</Gutter>
         )}
@@ -84,7 +93,7 @@ export function ChallengeDetailPage() {
 
   async function logThis() {
     await setMeta(META_KEYS.lastExerciseId, c!.myExerciseId)
-    navigate('/')
+    nav.pop('/')
   }
 
   async function endNow() {
@@ -110,7 +119,7 @@ export function ChallengeDetailPage() {
       await refresh()
       setConfirm(null)
       toast({ message: 'Challenge deleted' })
-      navigate('/challenges', { replace: true })
+      nav.pop('/challenges', { replace: true })
     } catch (err) {
       toast({
         message: err instanceof Error ? err.message : 'Could not delete',
@@ -122,19 +131,16 @@ export function ChallengeDetailPage() {
 
   return (
     <Screen>
-      <Header
-        onBack={() => navigate('/challenges')}
+      <ScreenNav
+        backLabel="Back to challenges"
+        onBack={() => nav.pop('/challenges')}
         action={
           <IconButton aria-label="Share challenge" onClick={share}>
             <ShareIcon />
           </IconButton>
         }
-      />
-
-      <Gutter className="flex flex-col gap-1 pt-2">
-        <h1 className="text-[28px] font-semibold tracking-[-0.02em]">
-          {c.name}
-        </h1>
+        title={c.name}
+      >
         <span className="text-sm text-muted">
           {c.exerciseName} ·{' '}
           {c.goalType === 'first_to'
@@ -142,7 +148,7 @@ export function ChallengeDetailPage() {
             : 'Most reps wins'}{' '}
           · {windowLabel(c.startsAt, c.endsAt)}
         </span>
-      </Gutter>
+      </ScreenNav>
 
       <Gutter className="pt-5">
         <TileGrid>
@@ -240,22 +246,5 @@ export function ChallengeDetailPage() {
         onClose={() => !busy && setConfirm(null)}
       />
     </Screen>
-  )
-}
-
-function Header({
-  onBack,
-  action,
-}: {
-  onBack: () => void
-  action?: React.ReactNode
-}) {
-  return (
-    <div className="flex items-center justify-between px-3 pt-[calc(env(safe-area-inset-top)_+_8px)]">
-      <IconButton aria-label="Back to challenges" onClick={onBack}>
-        <ChevronLeftIcon />
-      </IconButton>
-      {action ?? <span className="size-11" />}
-    </div>
   )
 }

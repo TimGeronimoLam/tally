@@ -28,6 +28,7 @@ import {
   type Exercise,
 } from '../db/index.ts'
 import { formatHeaderDate, formatNumber, unitLabel } from '../lib/format.ts'
+import { haptic } from '../lib/haptics.ts'
 import { useToast } from '../lib/toast.ts'
 
 type SheetState =
@@ -54,6 +55,7 @@ export function LogPage() {
   async function log() {
     if (!selected || keypad.number <= 0) return
     const n = keypad.number
+    haptic('confirm')
     const entry = await logEntry(selected.id, n)
     keypad.clear()
     toast({

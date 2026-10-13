@@ -1,4 +1,5 @@
 import { cn } from '../../lib/cn.ts'
+import { haptic } from '../../lib/haptics.ts'
 import { BackspaceIcon } from './icons.tsx'
 
 export type KeypadKey =
@@ -38,10 +39,17 @@ export function Keypad({ onKey, disabled, className }: KeypadProps) {
             type="button"
             disabled={disabled}
             aria-label={key === 'delete' ? 'Delete' : undefined}
-            onClick={() => onKey(key)}
-            className="flex h-[54px] items-center justify-center rounded-control bg-surface text-[26px] text-fg active:bg-surface-2 disabled:opacity-40"
+            onClick={() => {
+              haptic('tap')
+              onKey(key)
+            }}
+            className="pressable flex h-[54px] items-center justify-center rounded-control bg-surface text-[26px] text-fg active:bg-surface-2 disabled:opacity-40"
           >
-            {key === 'delete' ? <BackspaceIcon size={26} /> : key}
+            {key === 'delete' ? (
+              <BackspaceIcon size={30} strokeWidth={1.8} />
+            ) : (
+              key
+            )}
           </button>
         ),
       )}

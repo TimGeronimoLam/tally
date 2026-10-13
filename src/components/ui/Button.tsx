@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { Link, type LinkProps } from 'react-router'
 import { cn } from '../../lib/cn.ts'
+import { markNav, type NavDirection } from '../../lib/nav.ts'
 import { buttonClassName, type ButtonStyleProps } from './buttonStyles.ts'
 
 export interface ButtonProps
@@ -26,20 +27,29 @@ export function Button({
 }
 
 export interface ButtonLinkProps extends LinkProps, ButtonStyleProps {
+  /** How the screen change animates; see src/lib/nav.ts. */
+  direction?: NavDirection
   children: ReactNode
 }
 
-/** A router link styled as a button. */
+/** A router link styled as a button. Pushes the next screen by default. */
 export function ButtonLink({
   variant,
   size,
   fullWidth,
   className,
+  direction = 'push',
+  onClick,
   ...rest
 }: ButtonLinkProps) {
   return (
     <Link
+      viewTransition
       className={buttonClassName({ variant, size, fullWidth, className })}
+      onClick={(e) => {
+        markNav(direction)
+        onClick?.(e)
+      }}
       {...rest}
     />
   )
@@ -63,7 +73,7 @@ export function IconButton({
     <button
       type={type}
       className={cn(
-        'inline-flex size-11 shrink-0 items-center justify-center rounded-full text-fg',
+        'pressable inline-flex size-11 shrink-0 items-center justify-center rounded-full text-fg',
         variant === 'outline' && 'border-[1.5px] border-border-strong bg-bg',
         className,
       )}

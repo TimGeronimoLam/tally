@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router'
 import { cn } from '../../lib/cn.ts'
+import { markNav } from '../../lib/nav.ts'
 import {
   FlagIcon,
   LogIcon,
@@ -23,21 +24,30 @@ const TABS: Tab[] = [
   { to: '/account', label: 'Account', icon: UserIcon },
 ]
 
-/** Bottom navigation. Five equal tabs, padded for the home indicator. */
+/** Height of the tab row (px), excluding the home-indicator inset. */
+export const TAB_BAR_HEIGHT = 50
+
+/**
+ * Bottom navigation. Five equal tabs, padded for the home indicator. Floats
+ * over the content with a translucent blur, like a native tab bar. Named
+ * for view transitions so it stays put while screens slide underneath.
+ */
 export function TabBar() {
   return (
     <nav
       aria-label="Main"
-      className="grid grid-cols-5 border-t border-border bg-bg pb-[env(safe-area-inset-bottom)]"
+      className="absolute inset-x-0 bottom-0 z-10 grid grid-cols-5 border-t border-border/60 bg-bg/80 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl [view-transition-name:tabbar]"
     >
       {TABS.map(({ to, label, icon: Icon }) => (
         <NavLink
           key={to}
           to={to}
           end={to === '/'}
+          viewTransition
+          onClick={() => markNav('tab')}
           className={({ isActive }) =>
             cn(
-              'flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium no-underline',
+              'pressable-dim flex h-[var(--tab-bar-height)] flex-col items-center justify-center gap-0.5 text-[11px] font-medium no-underline',
               isActive ? 'text-fg' : 'text-faint',
             )
           }

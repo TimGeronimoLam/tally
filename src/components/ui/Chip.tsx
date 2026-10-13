@@ -1,5 +1,6 @@
 import type { ButtonHTMLAttributes } from 'react'
 import { cn } from '../../lib/cn.ts'
+import { haptic } from '../../lib/haptics.ts'
 
 export interface ChipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   selected?: boolean
@@ -12,14 +13,19 @@ export function Chip({
   size = 'md',
   className,
   type = 'button',
+  onClick,
   ...rest
 }: ChipProps) {
   return (
     <button
       type={type}
       aria-pressed={selected}
+      onClick={(e) => {
+        haptic('tap')
+        onClick?.(e)
+      }}
       className={cn(
-        'shrink-0 rounded-full font-medium whitespace-nowrap transition-colors',
+        'pressable shrink-0 rounded-full font-medium whitespace-nowrap',
         size === 'md' ? 'h-11 px-[18px] text-[15px]' : 'h-9 px-3.5 text-sm',
         selected ? 'bg-inverse text-inverse-fg' : 'bg-surface text-fg',
         className,

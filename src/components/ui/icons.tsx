@@ -39,10 +39,11 @@ function createIcon(paths: ReactNode, defaultStrokeWidth = 1.75) {
 
 export const PlusIcon = createIcon(<path d="M12 5v14M5 12h14" />, 2)
 
+/** Keycap with rounded corners; the cross sits in the body's centre. */
 export const BackspaceIcon = createIcon(
   <>
-    <path d="M21 5H9l-6 7 6 7h12V5z" />
-    <path d="M18 9l-6 6M12 9l6 6" />
+    <path d="M9 5.5h10a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5.6-6.1a1.3 1.3 0 0 1 0-1.8z" />
+    <path d="M11.5 9.5l5 5M16.5 9.5l-5 5" />
   </>,
 )
 

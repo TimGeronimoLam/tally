@@ -47,7 +47,7 @@
   --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.12);
   --shadow-toast: 0 8px 24px rgba(0, 0, 0, 0.18);
   --shadow-sheet: 0 -12px 40px rgba(0, 0, 0, 0.18);
-  --scrim: rgba(0, 0, 0, 0.18);
+  --scrim: rgba(0, 0, 0, 0.35);
 }
 
 :root[data-theme='dark'] {
@@ -92,7 +92,9 @@
 
 /* Expose the tokens to Tailwind utilities (bg-surface, text-muted, ...). */
 @theme inline {
-  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  /* The platform's own UI font: SF on Apple, Roboto on Android, Segoe on Windows. */
+  --font-sans:
+    system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
 
   --color-bg: var(--bg);
   --color-fg: var(--fg);
@@ -186,6 +188,19 @@
     cursor: pointer;
   }
 
+  /* Like a native app: nothing selects on long press or drag, no link
+     preview sheet, no copy callout. Text fields keep selection. */
+  body {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  input,
+  textarea {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
   button:disabled {
     cursor: default;
   }
@@ -205,6 +220,82 @@
       animation-iteration-count: 1 !important;
       scroll-behavior: auto !important;
     }
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
+    }
+  }
+}
+
+/*
+ * Screen changes. The scrolling <main> is the only element that moves; the
+ * tab bar is named so it stays put. Direction comes from `data-nav` on
+ * <html> (src/lib/nav.ts). Tabs and anything unmarked cross-fade.
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 150ms;
+}
+::view-transition-old(main),
+::view-transition-new(main) {
+  animation-duration: 150ms;
+}
+/* The snapshots slide inside the phone column, not across the viewport,
+   and stack as opaque layers rather than the default additive cross-fade. */
+::view-transition-image-pair(main) {
+  overflow: clip;
+}
+::view-transition-old(main),
+::view-transition-new(main) {
+  mix-blend-mode: normal;
+}
+html[data-nav='push']::view-transition-old(main) {
+  animation: 280ms cubic-bezier(0.32, 0.72, 0, 1) both screen-out-left;
+}
+html[data-nav='push']::view-transition-new(main) {
+  animation: 280ms cubic-bezier(0.32, 0.72, 0, 1) both screen-in-right;
+}
+html[data-nav='pop']::view-transition-old(main) {
+  animation: 280ms cubic-bezier(0.32, 0.72, 0, 1) both screen-out-right;
+  z-index: 1;
+}
+html[data-nav='pop']::view-transition-new(main) {
+  animation: 280ms cubic-bezier(0.32, 0.72, 0, 1) both screen-in-left;
+}
+@keyframes screen-in-right {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes screen-out-left {
+  to {
+    transform: translateX(-30%);
+    opacity: 0.6;
+  }
+}
+@keyframes screen-out-right {
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes screen-in-left {
+  from {
+    transform: translateX(-30%);
+    opacity: 0.6;
+  }
+}
+
+/* Bottom sheet: slides up on open, scrim fades in; closing is a transition
+   in Sheet.tsx so it can start from wherever a drag left off. */
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes scrim-in {
+  from {
+    opacity: 0;
   }
 }
 
@@ -217,6 +308,30 @@
     --fg-placeholder: var(--fg-muted);
     --border: var(--border-strong);
     --border-strong: var(--fg);
+  }
+}
+
+@utility pressable {
+  /* Finger-down feedback for anything tappable: shrinks and dims a touch. */
+  transition:
+    transform 80ms ease-out,
+    opacity 80ms ease-out,
+    background-color 80ms ease-out,
+    color 80ms ease-out;
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+    opacity: 0.8;
+  }
+}
+
+@utility pressable-dim {
+  /* Same feedback without the scale, for rows and tabs. */
+  transition:
+    opacity 80ms ease-out,
+    background-color 80ms ease-out,
+    color 80ms ease-out;
+  &:active:not(:disabled) {
+    opacity: 0.6;
   }
 }
 

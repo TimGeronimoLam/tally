@@ -34,7 +34,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
         <p className="text-[15px] text-muted">
           Your data is still on this phone. Reloading usually fixes it.
         </p>
-        <pre className="overflow-x-auto rounded-xl bg-surface p-3 text-xs break-words whitespace-pre-wrap text-faint">
+        <pre className="overflow-x-auto rounded-xl bg-surface p-3 text-xs break-words whitespace-pre-wrap text-faint select-text">
           {error.name}: {error.message}
         </pre>
         <Button size="lg" fullWidth onClick={() => window.location.reload()}>

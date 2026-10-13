@@ -1,19 +1,21 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router'
+import { RouterProvider } from 'react-router/dom'
 import { registerSW } from 'virtual:pwa-register'
 import './index.css'
-import App from './App.tsx'
+import { router } from './App.tsx'
 import { ErrorBoundary } from './components/app/ErrorBoundary.tsx'
 import { ToastProvider } from './components/ui/index.ts'
 import { seedIfNeeded } from './db/index.ts'
 import { installErrorCapture, recordError } from './lib/diagnostics.ts'
+import { initNavDirection } from './lib/nav.ts'
 import { initTheme } from './lib/theme.ts'
 import { initAuth, startSyncTriggers } from './sync/index.ts'
 
 installErrorCapture()
 registerSW({ immediate: true })
 initTheme()
+initNavDirection()
 
 const root = createRoot(document.getElementById('root')!)
 let started = false
@@ -29,11 +31,9 @@ function start() {
   root.render(
     <StrictMode>
       <ErrorBoundary>
-        <BrowserRouter>
-          <ToastProvider>
-            <App />
-          </ToastProvider>
-        </BrowserRouter>
+        <ToastProvider>
+          <RouterProvider router={router} />
+        </ToastProvider>
       </ErrorBoundary>
     </StrictMode>,
   )
