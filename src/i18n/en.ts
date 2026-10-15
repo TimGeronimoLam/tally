@@ -347,7 +347,12 @@ export const en = {
     waitingFirst: 'Waiting for first sync',
     syncNow: 'Sync now',
     signOut: 'Sign out',
-    signedOut: 'Signed out. Your data stays on this phone.',
+    signedOut: 'Signed out',
+    signOutTitle: 'Sign out?',
+    signOutMessage:
+      'Your sets stay in your account and leave this phone. Sign in again to get them back.',
+    signOutUnsynced:
+      'Your latest sets are not backed up yet. Check your connection, then try again.',
     localOnly: 'Local only',
     localOnlyBody:
       'Your data lives on this device. Sign in to back it up and sync across phones.',
@@ -417,6 +422,8 @@ export const en = {
   errors: {
     needServer: 'Challenges need the Tally server',
     couldNotSignIn: 'Could not sign in',
+    otherAccountData:
+      'This phone holds sets from another account. Sign in with that email, or delete all data in Account.',
     captchaFailed: 'Could not confirm you are human. Please try again.',
     localDataNotReady:
       'Local data did not get ready in time. Please try again.',

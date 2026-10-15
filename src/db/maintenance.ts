@@ -3,7 +3,12 @@ import { recordError } from '../lib/diagnostics.ts'
 import { disableReminder } from '../reminders/index.ts'
 import { db } from './db.ts'
 import { seedIfNeeded } from './seed.ts'
-import type { Entry, Exercise, UnlockedAchievement } from './types.ts'
+import {
+  META_KEYS,
+  type Entry,
+  type Exercise,
+  type UnlockedAchievement,
+} from './types.ts'
 
 export interface Snapshot {
   app: 'tally'
@@ -80,6 +85,39 @@ export async function importSnapshot(
     },
   )
   return { exercises: parsed.exercises.length, entries: parsed.entries.length }
+}
+
+/**
+ * Sign-out: everything that belongs to the account leaves the device and
+ * the defaults come back, so the next sign-in starts from a clean slate
+ * instead of pushing copies of rows the account already holds. The device
+ * id and the display name stay.
+ */
+export async function clearAccountData(): Promise<void> {
+  await db.transaction(
+    'rw',
+    db.exercises,
+    db.entries,
+    db.meta,
+    db.achievements,
+    async () => {
+      await Promise.all([
+        db.exercises.clear(),
+        db.entries.clear(),
+        db.achievements.clear(),
+        db.meta.bulkDelete([
+          META_KEYS.seededAt,
+          META_KEYS.lastExerciseId,
+          META_KEYS.socialStats,
+          META_KEYS.syncUserId,
+          META_KEYS.syncUserAnonymous,
+          META_KEYS.lastPullExercises,
+          META_KEYS.lastPullEntries,
+        ]),
+      ])
+    },
+  )
+  await seedIfNeeded()
 }
 
 /** Wipe everything and re-seed defaults. Irreversible. */

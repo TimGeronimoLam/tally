@@ -325,7 +325,12 @@ export const de: Messages = {
     waitingFirst: 'Warte auf ersten Sync',
     syncNow: 'Jetzt synchronisieren',
     signOut: 'Abmelden',
-    signedOut: 'Abgemeldet. Deine Daten bleiben auf diesem Handy.',
+    signedOut: 'Abgemeldet',
+    signOutTitle: 'Abmelden?',
+    signOutMessage:
+      'Deine Sätze bleiben in deinem Konto und verschwinden von diesem Handy. Melde dich wieder an, um sie zurückzubekommen.',
+    signOutUnsynced:
+      'Deine neuesten Sätze sind noch nicht gesichert. Prüf deine Verbindung und versuch es noch einmal.',
     localOnly: 'Nur lokal',
     localOnlyBody:
       'Deine Daten liegen auf diesem Gerät. Melde dich an, um sie zu sichern und zwischen Handys zu synchronisieren.',
@@ -393,6 +398,8 @@ export const de: Messages = {
   errors: {
     needServer: 'Challenges brauchen den Tally-Server',
     couldNotSignIn: 'Anmeldung nicht möglich',
+    otherAccountData:
+      'Auf diesem Handy liegen Sätze eines anderen Kontos. Melde dich mit dieser E-Mail an oder lösche unter Konto alle Daten.',
     captchaFailed:
       'Die Prüfung, ob du ein Mensch bist, ist fehlgeschlagen. Bitte versuch es noch einmal.',
     localDataNotReady:

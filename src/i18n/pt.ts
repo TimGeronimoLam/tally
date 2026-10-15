@@ -322,7 +322,12 @@ export const pt: Messages = {
     waitingFirst: 'À espera da primeira sincronização',
     syncNow: 'Sincronizar agora',
     signOut: 'Terminar sessão',
-    signedOut: 'Sessão terminada. Os teus dados ficam neste telemóvel.',
+    signedOut: 'Sessão terminada',
+    signOutTitle: 'Terminar sessão?',
+    signOutMessage:
+      'As tuas séries ficam na tua conta e saem deste telemóvel. Inicia sessão outra vez para as recuperar.',
+    signOutUnsynced:
+      'As tuas últimas séries ainda não estão guardadas. Verifica a ligação e tenta outra vez.',
     localOnly: 'Só local',
     localOnlyBody:
       'Os teus dados estão neste dispositivo. Inicia sessão para fazer cópia e sincronizar entre telemóveis.',
@@ -389,6 +394,8 @@ export const pt: Messages = {
   errors: {
     needServer: 'Os desafios precisam do servidor Tally',
     couldNotSignIn: 'Não foi possível iniciar sessão',
+    otherAccountData:
+      'Este telemóvel tem séries de outra conta. Inicia sessão com esse email ou apaga todos os dados em Conta.',
     captchaFailed:
       'Não foi possível confirmar que és uma pessoa. Tenta outra vez.',
     localDataNotReady:

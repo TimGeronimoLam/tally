@@ -322,7 +322,12 @@ export const it: Messages = {
     waitingFirst: 'In attesa della prima sincronizzazione',
     syncNow: 'Sincronizza ora',
     signOut: 'Esci',
-    signedOut: 'Disconnesso. I tuoi dati restano su questo telefono.',
+    signedOut: 'Disconnesso',
+    signOutTitle: 'Uscire?',
+    signOutMessage:
+      'Le tue serie restano nel tuo account e spariscono da questo telefono. Accedi di nuovo per riaverle.',
+    signOutUnsynced:
+      'Le tue ultime serie non sono ancora salvate. Controlla la connessione e riprova.',
     localOnly: 'Solo locale',
     localOnlyBody:
       'I tuoi dati sono su questo dispositivo. Accedi per salvarli e sincronizzarli tra telefoni.',
@@ -390,8 +395,9 @@ export const it: Messages = {
   errors: {
     needServer: 'Le sfide richiedono il server Tally',
     couldNotSignIn: 'Impossibile accedere',
-    captchaFailed:
-      'Impossibile confermare che sei una persona. Riprova.',
+    otherAccountData:
+      'Questo telefono contiene serie di un altro account. Accedi con quella email o elimina tutti i dati in Account.',
+    captchaFailed: 'Impossibile confermare che sei una persona. Riprova.',
     localDataNotReady: 'I dati locali non erano pronti in tempo. Riprova.',
     couldNotCreateChallenge: 'Impossibile creare la sfida',
     codeCollision: 'Impossibile creare la sfida: collisione di codice',

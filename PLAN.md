@@ -105,7 +105,7 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
 
 - [x] "Sign in with email": on an anonymous session, `supabase.auth.updateUser({ email })` upgrades it in place; otherwise a magic link. The UI never mentions anonymous accounts
   - Never call a fresh `signInWithOAuth` here; that creates a second user and orphans the anonymous one
-- [x] Sign out keeps local data (different user signing in later resets sync markers)
+- [x] Sign out syncs, then clears the account's rows from the device; the next sign-in pulls afresh. Local rows belong to one account (`src/sync/owner.ts`): never-synced rows are adopted, an anonymous account's rows move to the email account that replaces it, another email account's rows are refused instead of copied
 
 ### Notes
 

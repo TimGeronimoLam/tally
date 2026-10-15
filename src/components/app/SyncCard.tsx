@@ -14,11 +14,11 @@ import {
   useSyncStatus,
   type EmailCodeType,
 } from '../../sync/index.ts'
-import { Avatar, Button, Card, InputSheet } from '../ui/index.ts'
+import { Avatar, Button, Card, ConfirmSheet, InputSheet } from '../ui/index.ts'
 import { EmailCodeSheet } from './EmailCodeSheet.tsx'
 import { EmailSheet } from './EmailSheet.tsx'
 
-type SheetMode = 'closed' | 'name' | 'email' | 'code'
+type SheetMode = 'closed' | 'name' | 'email' | 'code' | 'signOut'
 
 /** The sign-in email just sent; the code sheet verifies against it. */
 interface PendingSignIn {
@@ -99,7 +99,7 @@ export function SyncCard() {
                   variant="ghost"
                   className="flex-1"
                   disabled={busy}
-                  onClick={() => act(signOut, t.sync.signedOut)}
+                  onClick={() => setSheet('signOut')}
                 >
                   {t.sync.signOut}
                 </Button>
@@ -153,6 +153,17 @@ export function SyncCard() {
           autoComplete: 'nickname',
           maxLength: DISPLAY_NAME_MAX,
         }}
+      />
+      <ConfirmSheet
+        open={sheet === 'signOut'}
+        title={t.sync.signOutTitle}
+        message={t.sync.signOutMessage}
+        confirmLabel={t.sync.signOut}
+        onConfirm={() => {
+          setSheet('closed')
+          void act(signOut, t.sync.signedOut)
+        }}
+        onClose={() => setSheet('closed')}
       />
       <EmailSheet
         key={`email-${sheet}`}

@@ -319,7 +319,12 @@ export const es: Messages = {
     waitingFirst: 'Esperando la primera sincronización',
     syncNow: 'Sincronizar ahora',
     signOut: 'Cerrar sesión',
-    signedOut: 'Sesión cerrada. Tus datos siguen en este móvil.',
+    signedOut: 'Sesión cerrada',
+    signOutTitle: '¿Cerrar sesión?',
+    signOutMessage:
+      'Tus series siguen en tu cuenta y desaparecen de este móvil. Vuelve a iniciar sesión para recuperarlas.',
+    signOutUnsynced:
+      'Tus últimas series aún no están guardadas. Comprueba tu conexión e inténtalo de nuevo.',
     localOnly: 'Solo local',
     localOnlyBody:
       'Tus datos están en este dispositivo. Inicia sesión para hacer copia y sincronizar entre móviles.',
@@ -386,6 +391,8 @@ export const es: Messages = {
   errors: {
     needServer: 'Los retos necesitan el servidor de Tally',
     couldNotSignIn: 'No se pudo iniciar sesión',
+    otherAccountData:
+      'Este móvil tiene series de otra cuenta. Inicia sesión con ese correo o borra todos los datos en Cuenta.',
     captchaFailed:
       'No se pudo confirmar que eres una persona. Inténtalo de nuevo.',
     localDataNotReady:

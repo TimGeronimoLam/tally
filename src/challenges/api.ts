@@ -3,7 +3,7 @@ import { messages } from '../i18n/index.ts'
 import { calibrate } from '../lib/clock.ts'
 import { supabase } from '../lib/supabase.ts'
 import { signInAnonymously } from '../sync/auth.ts'
-import { ensureSyncOwner, syncNow } from '../sync/sync.ts'
+import { ensureSyncOwner, sessionUser, syncNow } from '../sync/sync.ts'
 import { generateInviteCode } from './codes.ts'
 import {
   resolveLocalExercise,
@@ -39,9 +39,11 @@ export async function ensureSession(): Promise<string> {
   // Local rows may be re-keyed when the account changes, so the local
   // exercise id a challenge points at is only resolved after this. A full
   // sync (pull + push) is not needed here and would hold the UI hostage on
-  // a slow connection; it is kicked off after the RPC instead.
+  // a slow connection; it is kicked off after the RPC instead. Rows that
+  // belong to another email account are refused (the error says to sign
+  // in with it): a silent session must not copy them.
   await withTimeout(
-    ensureSyncOwner(session.user.id),
+    ensureSyncOwner(sessionUser(session)),
     15_000,
     messages().errors.localDataNotReady,
   )

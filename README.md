@@ -91,8 +91,15 @@ Optional. Without it the app is fully local.
    ```html
    <h2>Your Tally sign-in code</h2>
    <p>Enter this code in the app to sign in:</p>
-   <p style="font-size: 32px; font-weight: 700; letter-spacing: 6px; font-family: monospace;">{{ .Token }}</p>
-   <p>The code expires shortly and can only be used once. If you did not request it, ignore this email.</p>
+   <p
+     style="font-size: 32px; font-weight: 700; letter-spacing: 6px; font-family: monospace;"
+   >
+     {{ .Token }}
+   </p>
+   <p>
+     The code expires shortly and can only be used once. If you did not request
+     it, ignore this email.
+   </p>
    ```
 
    The app asks for this code after sending the email and never mentions a
@@ -109,8 +116,16 @@ with an emailed one-time code (the email carries no link; see step 7 above),
 or not at all. Joining a challenge without an
 account silently creates an anonymous Supabase user; the UI never calls it
 that, and a later email sign-in upgrades that same user in place so nothing is
-orphaned. Sign out keeps local data; signing in as a different user resets the
-sync markers so everything is pushed to the new account.
+orphaned.
+
+Local rows belong to at most one account (`src/sync/owner.ts`): rows that
+were never synced are adopted by the first account that signs in; an
+anonymous account's rows move (re-keyed) to the email account that replaces
+it; rows of another email account are refused rather than copied. Sign out
+pushes pending changes (and is refused if that fails), then clears the
+account's rows from the device and re-seeds the defaults, so the next
+sign-in pulls everything afresh. "Sign out" is per device; other phones stay
+signed in.
 
 Free-tier projects pause after a week of inactivity; the Restore button is on
 the project's dashboard home.

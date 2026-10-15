@@ -321,7 +321,12 @@ export const fr: Messages = {
     waitingFirst: 'En attente de la première synchro',
     syncNow: 'Synchroniser',
     signOut: 'Se déconnecter',
-    signedOut: 'Déconnecté. Tes données restent sur ce téléphone.',
+    signedOut: 'Déconnecté',
+    signOutTitle: 'Se déconnecter ?',
+    signOutMessage:
+      'Tes séries restent dans ton compte et quittent ce téléphone. Reconnecte-toi pour les retrouver.',
+    signOutUnsynced:
+      'Tes dernières séries ne sont pas encore sauvegardées. Vérifie ta connexion, puis réessaie.',
     localOnly: 'Local uniquement',
     localOnlyBody:
       'Tes données restent sur cet appareil. Connecte-toi pour les sauvegarder et les synchroniser entre téléphones.',
@@ -388,6 +393,8 @@ export const fr: Messages = {
   errors: {
     needServer: 'Les défis ont besoin du serveur Tally',
     couldNotSignIn: 'Connexion impossible',
+    otherAccountData:
+      "Ce téléphone contient des séries d'un autre compte. Connecte-toi avec cet e-mail, ou supprime toutes les données dans Compte.",
     captchaFailed:
       "Impossible de confirmer que tu n'es pas un robot. Réessaie.",
     localDataNotReady:

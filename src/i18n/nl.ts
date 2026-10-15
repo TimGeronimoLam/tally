@@ -324,7 +324,12 @@ export const nl: Messages = {
     waitingFirst: 'Wacht op eerste synchronisatie',
     syncNow: 'Nu synchroniseren',
     signOut: 'Uitloggen',
-    signedOut: 'Uitgelogd. Je gegevens blijven op deze telefoon.',
+    signedOut: 'Uitgelogd',
+    signOutTitle: 'Uitloggen?',
+    signOutMessage:
+      'Je sets blijven in je account en verdwijnen van deze telefoon. Log opnieuw in om ze terug te krijgen.',
+    signOutUnsynced:
+      'Je laatste sets zijn nog niet opgeslagen. Controleer je verbinding en probeer het opnieuw.',
     localOnly: 'Alleen lokaal',
     localOnlyBody:
       'Je gegevens staan op dit apparaat. Log in om een back-up te maken en tussen telefoons te synchroniseren.',
@@ -392,6 +397,8 @@ export const nl: Messages = {
   errors: {
     needServer: 'Challenges hebben de Tally-server nodig',
     couldNotSignIn: 'Inloggen mislukt',
+    otherAccountData:
+      'Deze telefoon bevat sets van een ander account. Log in met dat e-mailadres of verwijder alle gegevens onder Account.',
     captchaFailed:
       'Kon niet bevestigen dat je een mens bent. Probeer het opnieuw.',
     localDataNotReady:

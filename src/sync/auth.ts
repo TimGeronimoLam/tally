@@ -5,8 +5,10 @@ import { captchaToken, isCaptchaError } from '../lib/captcha.ts'
 import { recordError } from '../lib/diagnostics.ts'
 import { supabase } from '../lib/supabase.ts'
 import { disableReminder, reconcileReminder } from '../reminders/index.ts'
+import { clearAccountData } from '../db/maintenance.ts'
 import { reconcileDisplayName } from './profile.ts'
-import { syncNow } from './sync.ts'
+import { setSyncStatus } from './status.ts'
+import { cancelScheduledSync, hasUnsyncedRows, syncNow } from './sync.ts'
 
 export interface AuthState {
   session: Session | null
@@ -133,13 +135,24 @@ export async function verifyEmailCode(
 }
 
 /**
- * Ends the session. Local data stays on the device. The daily reminder
- * goes off first, while the session can still delete its row: signing out
- * should not leave a server identity pinging this phone.
+ * Ends the session on this device and clears the account's rows from it;
+ * the next sign-in pulls them again instead of pushing copies (owner.ts).
+ * Pending local changes are pushed first: if that fails they would be
+ * lost, so the sign-out is refused. The daily reminder goes off while the
+ * session can still delete its row: signing out should not leave a server
+ * identity pinging this phone.
  */
 export async function signOut(): Promise<void> {
   const client = requireClient()
+  const result = await syncNow()
+  if (!result.ok && result.reason === 'failed' && (await hasUnsyncedRows())) {
+    throw new Error(messages().sync.signOutUnsynced)
+  }
+  cancelScheduledSync()
   await disableReminder().catch((err) => recordError('reminder', err))
-  const { error } = await client.auth.signOut()
+  // This device only: other phones keep their sessions.
+  const { error } = await client.auth.signOut({ scope: 'local' })
   if (error) throw error
+  await clearAccountData()
+  setSyncStatus({ state: 'idle', lastSyncAt: null, error: null })
 }

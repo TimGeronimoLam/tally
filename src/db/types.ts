@@ -50,8 +50,10 @@ export const META_KEYS = {
   displayName: 'displayName',
   /** Cached {joined, hosted, won} counts for social achievements. */
   socialStats: 'socialStats',
-  /** Supabase user id the sync markers belong to. */
+  /** Supabase user id the sync markers belong to (see sync/owner.ts). */
   syncUserId: 'syncUserId',
+  /** Whether that user is anonymous; absent on devices from before the flag. */
+  syncUserAnonymous: 'syncUserAnonymous',
   /** Newest `updated_at` pulled per table (ISO string). */
   lastPullExercises: 'lastPull.exercises',
   lastPullEntries: 'lastPull.entries',
