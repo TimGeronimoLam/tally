@@ -94,7 +94,7 @@ export const en = {
 
   stats: {
     title: 'Stats',
-    meta: 'Last 3 months',
+    since: (month: string) => `Since ${month}`,
     exercise: 'Exercise',
     all: 'All',
     total: 'total',
@@ -108,10 +108,15 @@ export const en = {
     bestDay: 'Best day',
     dailyAvg: 'Daily avg',
     perDay: 'Per day',
+    perMonth: 'Per month',
     range: 'Range',
     rangeDays: (n: number) => `${n}d`,
-    perDayChart: (unit: string, days: number) =>
-      `${unit} per day, last ${days} days`,
+    rangeYear: '1y',
+    earlier: 'Earlier',
+    later: 'Later',
+    perDayChart: (unit: string, period: string) => `${unit} per day, ${period}`,
+    perMonthChart: (unit: string, period: string) =>
+      `${unit} per month, ${period}`,
     cellLabel: (date: string, total: string, unit: string) =>
       `${date}: ${total} ${unit}`,
     heatmapHint: 'Tap a day to see its total',

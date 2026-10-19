@@ -1,6 +1,7 @@
 import { currentLocale } from '../i18n/index.ts'
 import {
   dayKey,
+  diffDays,
   parseDayKey,
   shiftDayKey,
   startOfWeekKey,
@@ -30,9 +31,15 @@ export interface HeatmapData {
 }
 
 export interface HeatmapOptions {
+  /** Minimum number of weeks shown. */
   weeks?: number
+  /** Reach back to the week containing this day when it is further back than `weeks`. */
+  since?: string | null
   today?: string
 }
+
+/** A month label needs this many columns before the next one to fit. */
+const MIN_LABEL_COLUMNS = 3
 
 /**
  * Quartile cut points of the non-zero totals, so intensity is relative to the
@@ -53,14 +60,23 @@ export function levelFor(total: number, thresholds: number[]): HeatLevel {
   return Math.min(4, level) as HeatLevel
 }
 
-/** Lay out `weeks` columns of Monday-first weeks ending with the week containing `today`. */
+/**
+ * Lay out Monday-first week columns ending with the week containing `today`:
+ * `weeks` of them, or back to `since` if that is further. Month labels
+ * carry the year once the grid spans more than the current year.
+ */
 export function buildHeatmap(
   dailyTotals: ReadonlyMap<string, number>,
-  { weeks = 13, today = dayKey() }: HeatmapOptions = {},
+  { weeks = 13, since, today = dayKey() }: HeatmapOptions = {},
 ): HeatmapData {
   const thresholds = quantileThresholds(dailyTotals.values())
   const lastMonday = startOfWeekKey(today)
+  if (since && since < today) {
+    const back = diffDays(startOfWeekKey(since), lastMonday) / 7
+    weeks = Math.max(weeks, back + 1)
+  }
   const columns: HeatmapColumn[] = []
+  const monthStarts: number[] = []
   let prevMonth = -1
 
   for (let w = weeks - 1; w >= 0; w--) {
@@ -76,17 +92,26 @@ export function buildHeatmap(
         future: day > today,
       })
     }
-    const mondayDate = parseDayKey(monday)
-    const month = mondayDate.getMonth()
-    const column: HeatmapColumn = { cells }
+    const month = parseDayKey(monday).getMonth()
     if (month !== prevMonth) {
-      column.monthLabel = mondayDate.toLocaleDateString(currentLocale(), {
-        month: 'short',
-      })
+      monthStarts.push(columns.length)
       prevMonth = month
     }
-    columns.push(column)
+    columns.push({ cells })
   }
+
+  // The first column is often a month's last week: no room for its label.
+  if (monthStarts[1] < MIN_LABEL_COLUMNS) monthStarts.shift()
+  const firstYear = parseDayKey(columns[0].cells[0].day).getFullYear()
+  const showYear = firstYear !== parseDayKey(today).getFullYear()
+  monthStarts.forEach((col, i) => {
+    const monday = parseDayKey(columns[col].cells[0].day)
+    const withYear = showYear && (i === 0 || monday.getMonth() === 0)
+    columns[col].monthLabel = monday.toLocaleDateString(currentLocale(), {
+      month: 'short',
+      year: withYear ? 'numeric' : undefined,
+    })
+  })
 
   return { columns, thresholds }
 }

@@ -20,6 +20,8 @@ export interface Stats {
   longestStreak: number
   /** Days with at least one entry. */
   activeDays: number
+  /** Earliest day with an entry, or null with none. */
+  firstDay: string | null
   /** All-time total divided by active days. */
   dailyAverage: number
   /** Day key → total. Only days with entries appear. */
@@ -85,6 +87,7 @@ export function computeStats(
     currentStreak,
     longestStreak,
     activeDays: days.length,
+    firstDay: days[0] ?? null,
     dailyAverage: days.length ? allTime / days.length : 0,
     dailyTotals,
   }

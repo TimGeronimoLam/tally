@@ -1,11 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import {
   BarChart,
   Card,
+  ChevronLeftIcon,
+  ChevronRightIcon,
   Chip,
   ChipRow,
   Gutter,
   Heatmap,
+  IconButton,
   Screen,
   ScreenHeader,
   SegmentedControl,
@@ -14,8 +17,18 @@ import {
 } from '../components/ui/index.ts'
 import { useAllEntries, useExercises } from '../db/index.ts'
 import { useLocale, useT } from '../i18n/index.ts'
-import { dayKey, diffDays, parseDayKey } from '../lib/date.ts'
 import {
+  dayKey,
+  diffDays,
+  parseDayKey,
+  weekdayMondayFirst,
+} from '../lib/date.ts'
+import { haptic } from '../lib/haptics.ts'
+import {
+  formatDayRange,
+  formatMonthRange,
+  formatMonthShort,
+  formatMonthYear,
   formatNumber,
   formatShortDate,
   unitLabel,
@@ -24,14 +37,38 @@ import {
 } from '../lib/format.ts'
 import {
   buildHeatmap,
+  CHART_RANGES,
+  chartPeriod,
   computeStats,
-  recentDays,
+  maxChartOffset,
+  type ChartRange,
   type ExerciseFilter,
 } from '../stats/index.ts'
 
+/** Shortest heatmap; it grows back to the first entry beyond this. */
 const HEATMAP_WEEKS = 13
-const RANGES = [7, 30] as const
-type Range = `${(typeof RANGES)[number]}`
+/** Horizontal travel, in px, that turns a touch on the chart into a page turn. */
+const SWIPE_MIN = 40
+/** The chart's last range (7d / 30d / 1y), kept across visits on this device. */
+const RANGE_KEY = 'tally.statsRange'
+
+function readRange(): ChartRange {
+  try {
+    const v = localStorage.getItem(RANGE_KEY)
+    if (CHART_RANGES.includes(v as ChartRange)) return v as ChartRange
+  } catch {
+    // storage unavailable (private mode etc.)
+  }
+  return '7d'
+}
+
+function saveRange(range: ChartRange) {
+  try {
+    localStorage.setItem(RANGE_KEY, range)
+  } catch {
+    // ignore
+  }
+}
 
 export function StatsPage() {
   const t = useT()
@@ -39,9 +76,11 @@ export function StatsPage() {
   const exercises = useExercises() ?? []
   const entries = useAllEntries()
   const [filter, setFilter] = useState<ExerciseFilter>('all')
-  const [range, setRange] = useState<Range>('7')
+  const [range, setRange] = useState(readRange)
+  const [offset, setOffset] = useState(0)
   const today = dayKey()
   const [selectedDay, setSelectedDay] = useState(today)
+  const swipeStart = useRef<{ x: number; y: number } | null>(null)
 
   const stats = useMemo(
     () => computeStats(entries ?? [], { exerciseId: filter, today }),
@@ -49,25 +88,50 @@ export function StatsPage() {
   )
   // `locale` is not read here, but the month labels inside follow it.
   const heatmap = useMemo(
-    () => buildHeatmap(stats.dailyTotals, { weeks: HEATMAP_WEEKS, today }),
+    () =>
+      buildHeatmap(stats.dailyTotals, {
+        weeks: HEATMAP_WEEKS,
+        since: stats.firstDay,
+        today,
+      }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [stats, today, locale],
   )
+
+  // Switching exercise can leave fewer pages than the one being viewed.
+  const maxOffset = maxChartOffset(stats.firstDay, range, today)
+  const page = Math.min(offset, maxOffset)
+  const period = useMemo(
+    () => chartPeriod(stats.dailyTotals, range, page, today),
+    [stats, range, page, today],
+  )
   const bars = useMemo(() => {
     const initials = weekdayNames('narrow')
-    const days = recentDays(stats.dailyTotals, Number(range), today)
-    return days.map((d, i) => ({
-      value: d.total,
-      highlight: i === days.length - 1,
+    const last = period.buckets.length - 1
+    return period.buckets.map((b, i) => ({
+      value: b.total,
+      highlight: page === 0 && i === last,
       label:
-        range === '7'
-          ? initials[(parseDayKey(d.day).getDay() + 6) % 7]
-          : i % 5 === 4
-            ? String(parseDayKey(d.day).getDate())
-            : '',
+        range === '7d'
+          ? initials[weekdayMondayFirst(b.day)]
+          : range === '1y'
+            ? formatMonthShort(parseDayKey(b.day))
+            : i % 5 === 4
+              ? String(parseDayKey(b.day).getDate())
+              : '',
     }))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stats, range, today, locale])
+  }, [period, page, range, locale])
+  const periodLabel =
+    range === '1y'
+      ? formatMonthRange(parseDayKey(period.start), parseDayKey(period.end))
+      : formatDayRange(parseDayKey(period.start), parseDayKey(period.end))
+
+  function turnPage(to: number) {
+    if (to < 0 || to > maxOffset || to === page) return
+    haptic('tap')
+    setOffset(to)
+  }
 
   function relativeDayLabel(day: string): string {
     const back = diffDays(day, today)
@@ -88,16 +152,22 @@ export function StatsPage() {
     { value: 'all', label: t.stats.all },
     ...exercises.map((e) => ({ value: e.id, label: e.name })),
   ]
-  const rangeOptions = RANGES.map((n) => ({
-    value: String(n) as Range,
-    label: t.stats.rangeDays(n),
+  const rangeOptions = CHART_RANGES.map((r) => ({
+    value: r,
+    label: r === '1y' ? t.stats.rangeYear : t.stats.rangeDays(parseInt(r)),
   }))
 
   if (!entries) return null
 
   return (
     <Screen>
-      <ScreenHeader title={t.stats.title} meta={t.stats.meta} />
+      <ScreenHeader
+        title={t.stats.title}
+        meta={
+          stats.firstDay &&
+          t.stats.since(formatMonthYear(parseDayKey(stats.firstDay)))
+        }
+      />
 
       <Gutter className="pt-4">
         {filterOptions.length <= 4 ? (
@@ -180,19 +250,77 @@ export function StatsPage() {
 
       <Gutter className="flex flex-col gap-2.5 pt-4 pb-6">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-semibold">{t.stats.perDay}</span>
+          <span className="text-sm font-semibold">
+            {range === '1y' ? t.stats.perMonth : t.stats.perDay}
+          </span>
           <SegmentedControl
             aria-label={t.stats.range}
             size="sm"
             options={rangeOptions}
             value={range}
-            onChange={setRange}
+            onChange={(r) => {
+              setRange(r)
+              setOffset(0)
+              saveRange(r)
+            }}
           />
         </div>
-        <BarChart
-          bars={bars}
-          aria-label={t.stats.perDayChart(unit, Number(range))}
-        />
+        <div className="flex items-center justify-between">
+          <div className="flex min-w-0 flex-col">
+            <span className="text-[13px] text-muted">{periodLabel}</span>
+            <span className="text-[20px] font-semibold tracking-[-0.02em]">
+              {formatNumber(period.total)}
+              <span className="ml-1 text-[13px] font-medium text-muted">
+                {unit}
+              </span>
+            </span>
+          </div>
+          <div className="-mr-2.5 flex shrink-0">
+            <IconButton
+              aria-label={t.stats.earlier}
+              disabled={page >= maxOffset}
+              onClick={() => turnPage(page + 1)}
+              className="disabled:text-disabled"
+            >
+              <ChevronLeftIcon size={20} />
+            </IconButton>
+            <IconButton
+              aria-label={t.stats.later}
+              disabled={page === 0}
+              onClick={() => turnPage(page - 1)}
+              className="disabled:text-disabled"
+            >
+              <ChevronRightIcon size={20} />
+            </IconButton>
+          </div>
+        </div>
+        {/* Swipe right for earlier, left for later, like the heatmap scrolls. */}
+        <div
+          onTouchStart={(e) => {
+            const p = e.touches[0]
+            swipeStart.current = { x: p.clientX, y: p.clientY }
+          }}
+          onTouchEnd={(e) => {
+            const start = swipeStart.current
+            swipeStart.current = null
+            if (!start) return
+            const p = e.changedTouches[0]
+            const dx = p.clientX - start.x
+            const dy = p.clientY - start.y
+            if (Math.abs(dx) < SWIPE_MIN || Math.abs(dx) < 2 * Math.abs(dy))
+              return
+            turnPage(dx > 0 ? page + 1 : page - 1)
+          }}
+        >
+          <BarChart
+            bars={bars}
+            aria-label={
+              range === '1y'
+                ? t.stats.perMonthChart(unit, periodLabel)
+                : t.stats.perDayChart(unit, periodLabel)
+            }
+          />
+        </div>
       </Gutter>
     </Screen>
   )

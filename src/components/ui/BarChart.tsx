@@ -15,7 +15,11 @@ export interface BarChartProps {
   className?: string
 }
 
-/** Plain-div bar chart. Heights are relative to the largest value. */
+/**
+ * Plain-div bar chart. Heights are relative to the largest value. Every
+ * bar gets the same width: a label wider than its bar spills over its
+ * neighbours' gaps, centered, instead of widening its column.
+ */
 export function BarChart({
   bars,
   height = 60,
@@ -34,7 +38,7 @@ export function BarChart({
       {bars.map((b, i) => (
         <div
           key={i}
-          className="flex h-full flex-1 flex-col items-center justify-end gap-1"
+          className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1"
         >
           <div
             className={cn(
@@ -45,7 +49,7 @@ export function BarChart({
               height: Math.max(2, Math.round((b.value / max) * height)),
             }}
           />
-          <span className="h-[12px] text-[11px] leading-[12px] text-faint">
+          <span className="h-[12px] text-[11px] leading-[12px] whitespace-nowrap text-faint">
             {b.label}
           </span>
         </div>

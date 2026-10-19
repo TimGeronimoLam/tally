@@ -49,6 +49,8 @@ export const BackspaceIcon = createIcon(
 
 export const ChevronLeftIcon = createIcon(<path d="M15 5l-7 7 7 7" />, 2)
 
+export const ChevronRightIcon = createIcon(<path d="M9 5l7 7-7 7" />, 2)
+
 export const ShareIcon = createIcon(
   <>
     <path d="M12 16V4" />

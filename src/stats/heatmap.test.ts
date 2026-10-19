@@ -63,6 +63,42 @@ describe('buildHeatmap', () => {
     expect(labelled).toEqual([0, 4])
   })
 
+  it('drops a first label too close to the next one', () => {
+    // Columns start on Sep 28, Oct 5, Oct 12: "Sep" would collide with "Oct".
+    const { columns } = buildHeatmap(new Map(), { weeks: 3, today: TODAY })
+    expect(columns[0].monthLabel).toBeUndefined()
+    expect(columns[1].monthLabel).toBeDefined()
+  })
+
+  it('reaches back to `since` when that is further than `weeks`', () => {
+    const { columns } = buildHeatmap(new Map(), {
+      weeks: 4,
+      since: '2026-08-05', // a Wednesday
+      today: TODAY,
+    })
+    expect(columns[0].cells[0].day).toBe('2026-08-03')
+    expect(columns.at(-1)!.cells[0].day).toBe('2026-10-12')
+    // A recent `since` keeps the minimum.
+    expect(
+      buildHeatmap(new Map(), { weeks: 4, since: '2026-10-13', today: TODAY })
+        .columns,
+    ).toHaveLength(4)
+  })
+
+  it('adds the year to labels once the grid spans past years', () => {
+    const { columns } = buildHeatmap(new Map(), {
+      since: '2025-11-03',
+      today: TODAY,
+    })
+    const withYear = columns.filter((c) => /\d{4}/.test(c.monthLabel ?? ''))
+    // The first label and January's; the months between stay short.
+    expect(withYear.map((c) => c.cells[0].day.slice(0, 7))).toEqual([
+      '2025-11',
+      '2026-01',
+    ])
+    expect(columns.filter((c) => c.monthLabel).length).toBeGreaterThan(2)
+  })
+
   it('assigns levels from the totals', () => {
     const totals = new Map([
       ['2026-10-12', 10],

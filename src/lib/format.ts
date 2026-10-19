@@ -58,6 +58,35 @@ export function formatMonthYear(d: Date | number): string {
   })
 }
 
+/** "Jan", "Feb"…, without the trailing dot some locales add ("janv."), to fit under a bar. */
+export function formatMonthShort(d: Date | number): string {
+  return new Date(d)
+    .toLocaleDateString(currentLocale(), { month: 'short' })
+    .replace(/\.$/, '')
+}
+
+/**
+ * "13 – 19 Oct", "20 Sep – 19 Oct": a day range in the locale's own style,
+ * with the year when it is not the current one.
+ */
+export function formatDayRange(start: Date, end: Date): string {
+  const year = new Date().getFullYear()
+  const otherYear = start.getFullYear() !== year || end.getFullYear() !== year
+  return new Intl.DateTimeFormat(currentLocale(), {
+    day: 'numeric',
+    month: 'short',
+    year: otherYear ? 'numeric' : undefined,
+  }).formatRange(start, end)
+}
+
+/** "Nov 2025 – Oct 2026" */
+export function formatMonthRange(start: Date, end: Date): string {
+  return new Intl.DateTimeFormat(currentLocale(), {
+    month: 'short',
+    year: 'numeric',
+  }).formatRange(start, end)
+}
+
 /** "October" */
 export function formatMonthName(d: Date | number = Date.now()): string {
   return new Date(d).toLocaleDateString(currentLocale(), { month: 'long' })

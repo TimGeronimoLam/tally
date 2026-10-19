@@ -41,6 +41,7 @@ describe('computeStats', () => {
       currentStreak: 0,
       longestStreak: 0,
       activeDays: 0,
+      firstDay: null,
       dailyAverage: 0,
     })
   })
@@ -60,6 +61,7 @@ describe('computeStats', () => {
     expect(s.allTime).toBe(155)
     expect(s.bestDay).toEqual({ day: '2026-10-11', total: 100 })
     expect(s.activeDays).toBe(3)
+    expect(s.firstDay).toBe('2026-10-01')
     expect(s.dailyAverage).toBeCloseTo(155 / 3)
   })
 
