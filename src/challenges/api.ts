@@ -1,6 +1,7 @@
 import { isBuiltin } from '../db/builtins.ts'
 import { messages } from '../i18n/index.ts'
 import { calibrate } from '../lib/clock.ts'
+import { deviceTimeZone } from '../lib/date.ts'
 import { supabase } from '../lib/supabase.ts'
 import { signInAnonymously } from '../sync/auth.ts'
 import { ensureSyncOwner, sessionUser, syncNow } from '../sync/sync.ts'
@@ -248,7 +249,10 @@ export async function deleteChallenge(challengeId: string): Promise<void> {
 
 export async function fetchMyChallenges(): Promise<ChallengeSummary[]> {
   if (!(await currentUserId())) return []
-  const { data, error } = await client().rpc('my_challenges')
+  // "today" on the server starts at the same local midnight as the stats.
+  const { data, error } = await client().rpc('my_challenges', {
+    p_tz: deviceTimeZone(),
+  })
   if (error) fail(messages().errors.couldNotLoadChallenges, error)
   const rows = (data ?? []) as Raw[]
   // Every row carries the server's clock reading for this request.
@@ -261,6 +265,7 @@ export async function fetchLeaderboard(
 ): Promise<LeaderboardRow[]> {
   const { data, error } = await client().rpc('challenge_leaderboard', {
     p_challenge_id: challengeId,
+    p_tz: deviceTimeZone(),
   })
   if (error) fail(messages().errors.couldNotLoadLeaderboard, error)
   return ((data ?? []) as Raw[]).map(toRow)

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   dayKey,
+  deviceTimeZone,
   diffDays,
   parseDayKey,
   shiftDayKey,
@@ -25,6 +26,13 @@ describe('dayKey', () => {
 
     vi.stubEnv('TZ', 'Pacific/Kiritimati') // UTC+14
     expect(dayKey(ts)).toBe('2026-10-13')
+  })
+})
+
+describe('deviceTimeZone', () => {
+  it('names the zone dayKey uses', () => {
+    vi.stubEnv('TZ', 'America/New_York')
+    expect(deviceTimeZone()).toBe('America/New_York')
   })
 })
 

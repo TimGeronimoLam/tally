@@ -12,6 +12,11 @@ export function dayKey(d: Date | number = Date.now()): string {
   return `${y}-${m}-${day}`
 }
 
+/** The device's IANA time zone, for the server to find the same local day. */
+export function deviceTimeZone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+}
+
 /** Local midnight for a day key. */
 export function parseDayKey(key: string): Date {
   const [y, m, d] = key.split('-').map(Number)

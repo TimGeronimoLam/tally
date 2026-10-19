@@ -3,6 +3,7 @@ import { deleteMeta, getMeta, setMeta } from '../db/meta.ts'
 import { META_KEYS, type ReminderMeta } from '../db/types.ts'
 import { messages } from '../i18n/index.ts'
 import { captchaToken, isCaptchaError } from '../lib/captcha.ts'
+import { deviceTimeZone } from '../lib/date.ts'
 import { recordError } from '../lib/diagnostics.ts'
 import { isIOS, isStandalone } from '../lib/install.ts'
 import { supabase } from '../lib/supabase.ts'
@@ -55,10 +56,6 @@ function serial<T>(fn: () => Promise<T>): Promise<T> {
 function requireClient(): SupabaseClient {
   if (!supabase) throw new Error(messages().errors.syncNotConfigured)
   return supabase
-}
-
-function currentTimeZone(): string {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
 }
 
 function currentLang(): string {
@@ -188,7 +185,7 @@ export function enableReminder(time: string): Promise<void> {
     await resubscribe({
       userId,
       time,
-      tz: currentTimeZone(),
+      tz: deviceTimeZone(),
       lang: currentLang(),
     })
   })
@@ -236,7 +233,7 @@ export function reconcileReminder(): Promise<void> {
     if (!meta && !sub) return
     const { data } = await client.auth.getSession()
     const userId = data.session?.user.id ?? null
-    const tz = currentTimeZone()
+    const tz = deviceTimeZone()
     const lang = currentLang()
     const action = planReconcile({
       meta,
