@@ -17,6 +17,7 @@ import type {
   ChallengeSummary,
   GoalType,
   LeaderboardRow,
+  MemberDay,
   NewChallengeInput,
 } from './types.ts'
 
@@ -269,4 +270,24 @@ export async function fetchLeaderboard(
   })
   if (error) fail(messages().errors.couldNotLoadLeaderboard, error)
   return ((data ?? []) as Raw[]).map(toRow)
+}
+
+/**
+ * One member's day totals for the challenge's exercise inside its window.
+ * Only days with entries come back; days start at the viewer's midnight.
+ */
+export async function fetchMemberDays(
+  challengeId: string,
+  userId: string,
+): Promise<MemberDay[]> {
+  const { data, error } = await client().rpc('challenge_member_days', {
+    p_challenge_id: challengeId,
+    p_user_id: userId,
+    p_tz: deviceTimeZone(),
+  })
+  if (error) fail(messages().errors.couldNotLoadMemberStats, error)
+  return ((data ?? []) as Raw[]).map((r) => ({
+    day: str(r.day),
+    total: num(r.total),
+  }))
 }

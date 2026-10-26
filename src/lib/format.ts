@@ -1,5 +1,6 @@
 import type { Exercise } from '../db/types.ts'
 import { currentLocale, messages, type Messages } from '../i18n/index.ts'
+import { dayKey, diffDays, parseDayKey } from './date.ts'
 
 export function formatNumber(n: number): string {
   return new Intl.NumberFormat(currentLocale()).format(n)
@@ -40,6 +41,18 @@ export function formatShortDate(d: Date | number): string {
     day: 'numeric',
     month: 'short',
   })
+}
+
+/** "Today", "Yesterday", or "Sun, 12 Oct" for a day key. */
+export function formatRelativeDay(
+  day: string,
+  today: string = dayKey(),
+  m: Messages = messages(),
+): string {
+  const back = diffDays(day, today)
+  if (back === 0) return m.stats.today
+  if (back === 1) return m.stats.yesterday
+  return formatShortDate(parseDayKey(day))
 }
 
 /** "12 Oct" */

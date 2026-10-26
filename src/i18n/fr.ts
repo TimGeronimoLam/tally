@@ -221,6 +221,18 @@ export const fr: Messages = {
     couldNotCopy: 'Copie impossible',
   },
 
+  memberStats: {
+    title: 'Membre',
+    backLabel: 'Retour au défi',
+    notInChallenge: 'Cette personne ne participe plus au défi.',
+    total: (unit) => `Total ${unit}`,
+    finalStreak: 'Série finale',
+    activeDays: 'Jours actifs',
+    ofDays: (n) => `sur ${n}`,
+    startsOn: (date) =>
+      `Le défi commence le ${date}. Les stats apparaîtront à ce moment-là.`,
+  },
+
   newChallenge: {
     title: 'Nouveau défi',
     exercise: 'Exercice',
@@ -414,6 +426,7 @@ export const fr: Messages = {
     couldNotUpdate: 'Impossible de mettre à jour le défi',
     couldNotLoadChallenges: 'Impossible de charger les défis',
     couldNotLoadLeaderboard: 'Impossible de charger le classement',
+    couldNotLoadMemberStats: 'Impossible de charger les stats',
     syncNotConfigured: "La synchro n'est pas configurée dans cette version",
     notExportFile: "Ce n'est pas un fichier d'export Tally",
   },

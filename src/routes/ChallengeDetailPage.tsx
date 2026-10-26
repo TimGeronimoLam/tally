@@ -229,7 +229,11 @@ export function ChallengeDetailPage() {
             <span className="text-xs text-danger">{board.error}</span>
           )}
         </div>
-        <LeaderboardList rows={rows} meId={userId} />
+        <LeaderboardList
+          rows={rows}
+          meId={userId}
+          rowHref={(r) => `/challenges/${c.id}/members/${r.userId}`}
+        />
       </Gutter>
 
       <Gutter className="pt-5">

@@ -17,12 +17,7 @@ import {
 } from '../components/ui/index.ts'
 import { useAllEntries, useExercises } from '../db/index.ts'
 import { useLocale, useT } from '../i18n/index.ts'
-import {
-  dayKey,
-  diffDays,
-  parseDayKey,
-  weekdayMondayFirst,
-} from '../lib/date.ts'
+import { dayKey, parseDayKey, weekdayMondayFirst } from '../lib/date.ts'
 import { haptic } from '../lib/haptics.ts'
 import {
   formatDayRange,
@@ -30,6 +25,7 @@ import {
   formatMonthShort,
   formatMonthYear,
   formatNumber,
+  formatRelativeDay,
   formatShortDate,
   unitLabel,
   unitName,
@@ -133,13 +129,6 @@ export function StatsPage() {
     setOffset(to)
   }
 
-  function relativeDayLabel(day: string): string {
-    const back = diffDays(day, today)
-    if (back === 0) return t.stats.today
-    if (back === 1) return t.stats.yesterday
-    return formatShortDate(parseDayKey(day))
-  }
-
   // Unit caption: the exercise's own, or "reps" when every exercise uses reps.
   const selectedExercise = exercises.find((e) => e.id === filter)
   const unit = selectedExercise
@@ -211,7 +200,7 @@ export function StatsPage() {
       <Gutter className="pt-3.5">
         <Card className="flex items-center justify-between px-3.5 py-3">
           <span className="text-sm font-semibold">
-            {relativeDayLabel(selectedDay)}
+            {formatRelativeDay(selectedDay, today, t)}
           </span>
           <span className="text-[20px] font-semibold tracking-[-0.02em]">
             {formatNumber(stats.dailyTotals.get(selectedDay) ?? 0)}

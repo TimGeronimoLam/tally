@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import { usePolling, type Polled } from '../lib/usePolling.ts'
 import { useSession, useSyncStatus } from '../sync/index.ts'
-import { fetchLeaderboard, fetchMyChallenges } from './api.ts'
-import type { ChallengeSummary, LeaderboardRow } from './types.ts'
+import { fetchLeaderboard, fetchMemberDays, fetchMyChallenges } from './api.ts'
+import type { ChallengeSummary, LeaderboardRow, MemberDay } from './types.ts'
 
 /** All challenges the user is in, refreshed every 30 s, on focus and after each sync. */
 export function useMyChallenges(): Polled<ChallengeSummary[]> & {
@@ -39,6 +39,26 @@ export function useLeaderboard(
     {
       enabled: challengeId !== undefined,
       cacheKey: challengeId ? `cache.leaderboard.${challengeId}` : undefined,
+    },
+  )
+}
+
+/** One member's day totals in a challenge, refreshed like the leaderboard. */
+export function useMemberDays(
+  challengeId: string | undefined,
+  userId: string | undefined,
+): Polled<MemberDay[]> {
+  const { lastSyncAt } = useSyncStatus()
+  const enabled = challengeId !== undefined && userId !== undefined
+  return usePolling(
+    () =>
+      enabled ? fetchMemberDays(challengeId, userId) : Promise.resolve([]),
+    [challengeId, userId, lastSyncAt],
+    {
+      enabled,
+      cacheKey: enabled
+        ? `cache.memberDays.${challengeId}.${userId}`
+        : undefined,
     },
   )
 }

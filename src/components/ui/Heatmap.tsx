@@ -99,7 +99,7 @@ export function Heatmap({
                       <button
                         key={cell.day}
                         type="button"
-                        disabled={cell.future}
+                        disabled={cell.outside}
                         aria-label={cellLabel(cell.day, cell.total)}
                         aria-pressed={selected}
                         onClick={() => onSelect?.(cell.day)}
@@ -109,7 +109,7 @@ export function Heatmap({
                         <span
                           className={cn(
                             'block size-full rounded-[4px]',
-                            cell.future
+                            cell.outside
                               ? 'bg-surface-faint'
                               : levelClass[cell.level],
                             selected &&

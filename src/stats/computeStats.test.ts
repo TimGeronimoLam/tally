@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { Entry } from '../db/types.ts'
-import { computeStats, recentDays } from './computeStats.ts'
+import {
+  computeStats,
+  recentDays,
+  statsFromDailyTotals,
+} from './computeStats.ts'
 
 afterEach(() => {
   vi.unstubAllEnvs()
@@ -177,6 +181,27 @@ describe('computeStats', () => {
     expect([...computeStats([e]).dailyTotals.keys()]).toEqual(['2026-10-12'])
     vi.stubEnv('TZ', 'Pacific/Kiritimati')
     expect([...computeStats([e]).dailyTotals.keys()]).toEqual(['2026-10-13'])
+  })
+})
+
+describe('statsFromDailyTotals', () => {
+  it('derives the same numbers from totals summed elsewhere', () => {
+    const totals = new Map([
+      ['2026-10-12', 3],
+      ['2026-10-10', 5],
+      ['2026-10-11', 7],
+      ['2026-10-01', 1],
+    ])
+    expect(statsFromDailyTotals(totals, TODAY)).toMatchObject({
+      today: 3,
+      allTime: 16,
+      bestDay: { day: '2026-10-11', total: 7 },
+      currentStreak: 3,
+      longestStreak: 3,
+      activeDays: 4,
+      firstDay: '2026-10-01',
+      dailyAverage: 4,
+    })
   })
 })
 

@@ -224,6 +224,18 @@ export const nl: Messages = {
     couldNotCopy: 'Kopiëren mislukt',
   },
 
+  memberStats: {
+    title: 'Deelnemer',
+    backLabel: 'Terug naar challenge',
+    notInChallenge: 'Deze deelnemer doet niet meer mee aan de challenge.',
+    total: (unit) => `Totaal ${unit}`,
+    finalStreak: 'Eindreeks',
+    activeDays: 'Actieve dagen',
+    ofDays: (n) => `van ${n}`,
+    startsOn: (date) =>
+      `De challenge begint op ${date}. Daarna verschijnen hier de statistieken.`,
+  },
+
   newChallenge: {
     title: 'Nieuwe challenge',
     exercise: 'Oefening',
@@ -418,6 +430,7 @@ export const nl: Messages = {
     couldNotUpdate: 'Challenge bijwerken mislukt',
     couldNotLoadChallenges: 'Challenges laden mislukt',
     couldNotLoadLeaderboard: 'Ranglijst laden mislukt',
+    couldNotLoadMemberStats: 'Statistieken laden mislukt',
     syncNotConfigured: 'Synchronisatie is in deze build niet ingesteld',
     notExportFile: 'Geen Tally-exportbestand',
   },

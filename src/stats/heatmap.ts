@@ -13,8 +13,8 @@ export interface HeatmapCell {
   day: string
   total: number
   level: HeatLevel
-  /** After today: drawn but not tappable. */
-  future: boolean
+  /** Before `from` or after today: drawn but not tappable. */
+  outside: boolean
 }
 
 export interface HeatmapColumn {
@@ -35,6 +35,8 @@ export interface HeatmapOptions {
   weeks?: number
   /** Reach back to the week containing this day when it is further back than `weeks`. */
   since?: string | null
+  /** Days before this one are drawn like future days, e.g. before a challenge started. */
+  from?: string
   today?: string
 }
 
@@ -67,7 +69,7 @@ export function levelFor(total: number, thresholds: number[]): HeatLevel {
  */
 export function buildHeatmap(
   dailyTotals: ReadonlyMap<string, number>,
-  { weeks = 13, since, today = dayKey() }: HeatmapOptions = {},
+  { weeks = 13, since, from, today = dayKey() }: HeatmapOptions = {},
 ): HeatmapData {
   const thresholds = quantileThresholds(dailyTotals.values())
   const lastMonday = startOfWeekKey(today)
@@ -89,7 +91,7 @@ export function buildHeatmap(
         day,
         total,
         level: levelFor(total, thresholds),
-        future: day > today,
+        outside: day > today || (from !== undefined && day < from),
       })
     }
     const month = parseDayKey(monday).getMonth()

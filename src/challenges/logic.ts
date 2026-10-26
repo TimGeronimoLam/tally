@@ -1,7 +1,13 @@
 import { exerciseName } from '../db/builtins.ts'
 import type { Messages } from '../i18n/index.ts'
 import { serverNow } from '../lib/clock.ts'
-import { dayKey, parseDayKey, shiftDayKey, startOfDay } from '../lib/date.ts'
+import {
+  dayKey,
+  diffDays,
+  parseDayKey,
+  shiftDayKey,
+  startOfDay,
+} from '../lib/date.ts'
 import { formatDayMonth, formatNumber } from '../lib/format.ts'
 import type { Challenge, ChallengeSummary } from './types.ts'
 
@@ -32,6 +38,23 @@ export function daysLeft(
 ): number {
   const ms = Date.parse(c.endsAt) - now
   return ms <= 0 ? 0 : Math.ceil(ms / 86_400_000)
+}
+
+/**
+ * The challenge's days so far as device-local day keys: its first day
+ * through today, or through its last day once it has ended. `count` is
+ * how many days that is, 0 before the start.
+ */
+export function challengeDaysSoFar(
+  c: Pick<Challenge, 'startsAt' | 'endsAt'>,
+  now: number = serverNow(),
+): { first: string; last: string; count: number } {
+  const start = Date.parse(c.startsAt)
+  // ends_at is exclusive: a window ending at midnight does not reach that day.
+  const end = Date.parse(c.endsAt) - 1
+  const first = dayKey(start)
+  const last = dayKey(Math.max(start, Math.min(now, end)))
+  return { first, last, count: now < start ? 0 : diffDays(first, last) + 1 }
 }
 
 /** True when the caller has won: first_to reached, or most_reps ended in 1st. */

@@ -30,6 +30,13 @@ export interface LeaderboardRow {
   rank: number
 }
 
+/** One member's total for one day of a challenge, in the viewer's time zone. */
+export interface MemberDay {
+  /** Day key, `YYYY-MM-DD`. */
+  day: string
+  total: number
+}
+
 /** `my_challenges()` row: a challenge plus how the caller is doing in it. */
 export interface ChallengeSummary extends Challenge {
   /** The caller's local exercise mapped onto this challenge. */

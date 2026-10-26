@@ -221,6 +221,18 @@ export const it: Messages = {
     couldNotCopy: 'Impossibile copiare',
   },
 
+  memberStats: {
+    title: 'Membro',
+    backLabel: 'Torna alla sfida',
+    notInChallenge: 'Questa persona non è più nella sfida.',
+    total: (unit) => `Totale ${unit}`,
+    finalStreak: 'Serie finale',
+    activeDays: 'Giorni attivi',
+    ofDays: (n) => `su ${n}`,
+    startsOn: (date) =>
+      `La sfida inizia il ${date}. Le statistiche compariranno da allora.`,
+  },
+
   newChallenge: {
     title: 'Nuova sfida',
     exercise: 'Esercizio',
@@ -414,6 +426,7 @@ export const it: Messages = {
     couldNotUpdate: 'Impossibile aggiornare la sfida',
     couldNotLoadChallenges: 'Impossibile caricare le sfide',
     couldNotLoadLeaderboard: 'Impossibile caricare la classifica',
+    couldNotLoadMemberStats: 'Impossibile caricare le statistiche',
     syncNotConfigured:
       'La sincronizzazione non è configurata in questa versione',
     notExportFile: 'Non è un file di esportazione Tally',

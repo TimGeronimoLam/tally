@@ -247,6 +247,18 @@ export const en = {
     couldNotCopy: 'Could not copy',
   },
 
+  memberStats: {
+    title: 'Member',
+    backLabel: 'Back to challenge',
+    notInChallenge: 'This member is no longer in the challenge.',
+    total: (unit: string) => `Total ${unit}`,
+    finalStreak: 'Final streak',
+    activeDays: 'Active days',
+    ofDays: (n: number) => `of ${n}`,
+    startsOn: (date: string) =>
+      `The challenge starts ${date}. Stats show up once it does.`,
+  },
+
   newChallenge: {
     title: 'New challenge',
     exercise: 'Exercise',
@@ -442,6 +454,7 @@ export const en = {
     couldNotUpdate: 'Could not update challenge',
     couldNotLoadChallenges: 'Could not load challenges',
     couldNotLoadLeaderboard: 'Could not load leaderboard',
+    couldNotLoadMemberStats: 'Could not load stats',
     syncNotConfigured: 'Sync is not configured in this build',
     notExportFile: 'Not a Tally export file',
   },

@@ -218,6 +218,18 @@ export const es: Messages = {
     couldNotCopy: 'No se pudo copiar',
   },
 
+  memberStats: {
+    title: 'Miembro',
+    backLabel: 'Volver al reto',
+    notInChallenge: 'Esta persona ya no está en el reto.',
+    total: (unit) => `Total de ${unit}`,
+    finalStreak: 'Racha final',
+    activeDays: 'Días activos',
+    ofDays: (n) => `de ${n}`,
+    startsOn: (date) =>
+      `El reto empieza el ${date}. Las estadísticas aparecerán entonces.`,
+  },
+
   newChallenge: {
     title: 'Nuevo reto',
     exercise: 'Ejercicio',
@@ -412,6 +424,7 @@ export const es: Messages = {
     couldNotUpdate: 'No se pudo actualizar el reto',
     couldNotLoadChallenges: 'No se pudieron cargar los retos',
     couldNotLoadLeaderboard: 'No se pudo cargar la clasificación',
+    couldNotLoadMemberStats: 'No se pudieron cargar las estadísticas',
     syncNotConfigured: 'La sincronización no está configurada en esta versión',
     notExportFile: 'No es un archivo de exportación de Tally',
   },

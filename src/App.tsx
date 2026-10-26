@@ -12,6 +12,7 @@ import { ChallengesPage } from './routes/ChallengesPage.tsx'
 import { EditChallengePage } from './routes/EditChallengePage.tsx'
 import { JoinPage } from './routes/JoinPage.tsx'
 import { LogPage } from './routes/LogPage.tsx'
+import { MemberStatsPage } from './routes/MemberStatsPage.tsx'
 import { NewChallengePage } from './routes/NewChallengePage.tsx'
 import { StatsPage } from './routes/StatsPage.tsx'
 
@@ -28,6 +29,10 @@ export const router = createBrowserRouter(
         <Route path="stats" element={<StatsPage />} />
         <Route path="challenges" element={<ChallengesPage />} />
         <Route path="challenges/:id" element={<ChallengeDetailPage />} />
+        <Route
+          path="challenges/:id/members/:userId"
+          element={<MemberStatsPage />}
+        />
         <Route path="achievements" element={<AchievementsPage />} />
         <Route path="account" element={<AccountPage />} />
         <Route path="settings" element={<Navigate to="/account" replace />} />

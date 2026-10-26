@@ -42,7 +42,7 @@ describe('buildHeatmap', () => {
       '2026-10-17',
       '2026-10-18',
     ])
-    expect(last.map((c) => c.future)).toEqual([
+    expect(last.map((c) => c.outside)).toEqual([
       false,
       false,
       false,
@@ -52,6 +52,23 @@ describe('buildHeatmap', () => {
       true,
     ])
     expect(columns[0].cells[0].day).toBe('2026-09-21')
+  })
+
+  it('marks days before `from` like future days', () => {
+    const { columns } = buildHeatmap(new Map(), {
+      weeks: 1,
+      from: '2026-10-13',
+      today: TODAY,
+    })
+    expect(columns[0].cells.map((c) => c.outside)).toEqual([
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+    ])
   })
 
   it('labels the first column of each month', () => {

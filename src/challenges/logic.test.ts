@@ -5,6 +5,7 @@ import {
   normalizeInviteCode,
 } from './codes.ts'
 import {
+  challengeDaysSoFar,
   challengeStatus,
   challengeSubtitle,
   challengeWindow,
@@ -69,6 +70,46 @@ describe('status and timing', () => {
     expect(end.getDate()).toBe(19)
     expect(end.getHours()).toBe(23)
     expect(end.getMinutes()).toBe(59)
+  })
+})
+
+describe('days so far', () => {
+  // A week in local time: Mon 12 Oct through the end of Sun 18 Oct.
+  const c = {
+    startsAt: new Date(2026, 9, 12).toISOString(),
+    endsAt: endOfDayIn(0, new Date(2026, 9, 18)).toISOString(),
+  }
+  const at = (day: number, hour = 12) => new Date(2026, 9, day, hour).getTime()
+
+  it('runs from the first day through today while active', () => {
+    expect(challengeDaysSoFar(c, at(14))).toEqual({
+      first: '2026-10-12',
+      last: '2026-10-14',
+      count: 3,
+    })
+  })
+
+  it('stops at the last day once ended', () => {
+    expect(challengeDaysSoFar(c, at(25))).toEqual({
+      first: '2026-10-12',
+      last: '2026-10-18',
+      count: 7,
+    })
+  })
+
+  it('has no days before the start, even later the same day', () => {
+    expect(challengeDaysSoFar(c, at(10)).count).toBe(0)
+    const tonight = { ...c, startsAt: new Date(2026, 9, 12, 18).toISOString() }
+    expect(challengeDaysSoFar(tonight, at(12))).toEqual({
+      first: '2026-10-12',
+      last: '2026-10-12',
+      count: 0,
+    })
+  })
+
+  it('does not count the day a window ends at midnight', () => {
+    const toMidnight = { ...c, endsAt: new Date(2026, 9, 19).toISOString() }
+    expect(challengeDaysSoFar(toMidnight, at(25)).last).toBe('2026-10-18')
   })
 })
 

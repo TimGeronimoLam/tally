@@ -42,6 +42,14 @@ export function computeStats(
   entries: Iterable<Entry>,
   { exerciseId = 'all', today = dayKey() }: StatsOptions = {},
 ): Stats {
+  return statsFromDailyTotals(dailyTotalsOf(entries, exerciseId), today)
+}
+
+/** Day key → total of the live entries for one exercise, or all of them. */
+export function dailyTotalsOf(
+  entries: Iterable<Entry>,
+  exerciseId: ExerciseFilter = 'all',
+): Map<string, number> {
   const dailyTotals = new Map<string, number>()
   for (const e of entries) {
     if (e.deletedAt != null) continue
@@ -49,7 +57,14 @@ export function computeStats(
     const key = dayKey(e.loggedAt)
     dailyTotals.set(key, (dailyTotals.get(key) ?? 0) + e.amount)
   }
+  return dailyTotals
+}
 
+/** The same numbers from totals already summed per day, e.g. a challenge member's days from the server. */
+export function statsFromDailyTotals(
+  dailyTotals: Map<string, number>,
+  today: string = dayKey(),
+): Stats {
   const days = [...dailyTotals.keys()].sort()
 
   let allTime = 0
