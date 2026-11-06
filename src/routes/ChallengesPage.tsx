@@ -7,8 +7,13 @@ import {
   recordSocialStats,
   socialStatsFrom,
   useMyChallenges,
+  usePublicChallenges,
 } from '../challenges/index.ts'
-import { ChallengeCard, PastChallengeRow } from '../components/app/index.ts'
+import {
+  ChallengeCard,
+  PastChallengeRow,
+  PublicChallengeRow,
+} from '../components/app/index.ts'
 import {
   Button,
   ButtonLink,
@@ -27,7 +32,8 @@ export function ChallengesPage() {
   const t = useT()
   const nav = useNav()
   const toast = useToast()
-  const { data, error, loading, userId, refresh } = useMyChallenges()
+  const { data, loading, userId, refresh } = useMyChallenges()
+  const publicList = usePublicChallenges()
   const [code, setCode] = useState('')
 
   // Keep the social achievements fed, and celebrate new ones here.
@@ -53,9 +59,21 @@ export function ChallengesPage() {
 
   const active = (data ?? []).filter((c) => challengeStatus(c) !== 'ended')
   const past = (data ?? []).filter((c) => challengeStatus(c) === 'ended')
+  // The server leaves out the user's own, but a join may be newer than
+  // its last answer.
+  const mine = new Set((data ?? []).map((c) => c.id))
+  const listed = (publicList.data ?? []).filter(
+    (c) => !mine.has(c.id) && challengeStatus(c) !== 'ended',
+  )
 
   return (
-    <Screen onRefresh={userId ? refresh : undefined}>
+    <Screen
+      onRefresh={
+        isSyncConfigured
+          ? () => Promise.all([refresh(), publicList.refresh()])
+          : undefined
+      }
+    >
       <ScreenHeader
         title={t.challenges.title}
         action={
@@ -92,12 +110,6 @@ export function ChallengesPage() {
         </Gutter>
       )}
 
-      {error && (
-        <Gutter className="pt-4">
-          <p className="text-[13px] text-danger">{error}</p>
-        </Gutter>
-      )}
-
       <Gutter>
         <SectionLabel>{t.challenges.active}</SectionLabel>
         {loading && !data ? (
@@ -114,6 +126,25 @@ export function ChallengesPage() {
           </div>
         )}
       </Gutter>
+
+      {isSyncConfigured && (
+        <Gutter>
+          <SectionLabel>{t.challenges.publicSection}</SectionLabel>
+          {publicList.data === undefined ? (
+            <p className="pt-2 text-[15px] text-muted">{t.common.loading}</p>
+          ) : listed.length === 0 ? (
+            <p className="pt-2 text-[15px] leading-relaxed text-muted">
+              {t.challenges.nonePublic}
+            </p>
+          ) : (
+            <div className="flex flex-col gap-2 pt-1">
+              {listed.map((c) => (
+                <PublicChallengeRow key={c.id} challenge={c} />
+              ))}
+            </div>
+          )}
+        </Gutter>
+      )}
 
       {past.length > 0 && (
         <Gutter className="pb-6">

@@ -11,7 +11,7 @@ import {
   type ChallengeSummary,
   type GoalType,
 } from '../challenges/index.ts'
-import { DateRangeFields } from '../components/app/index.ts'
+import { DateRangeFields, PublicToggle } from '../components/app/index.ts'
 import {
   Button,
   Field,
@@ -82,6 +82,7 @@ function EditForm({
     c.goalValue === null ? '' : String(c.goalValue),
   )
   const [range, setRange] = useState(() => dateRangeOf(c))
+  const [isPublic, setIsPublic] = useState(c.isPublic)
   const [busy, setBusy] = useState(false)
 
   const goal = Number(goalValue)
@@ -96,7 +97,8 @@ function EditForm({
     goalType !== c.goalType ||
     (goalType === 'first_to' && goal !== c.goalValue) ||
     range.startKey !== before.startKey ||
-    range.endKey !== before.endKey
+    range.endKey !== before.endKey ||
+    isPublic !== c.isPublic
 
   const goalOptions = GOAL_TYPES.map((value) => ({
     value,
@@ -114,6 +116,7 @@ function EditForm({
         goalValue: goalType === 'first_to' ? goal : null,
         startsAt: timeWindow.startsAt,
         endsAt: timeWindow.endsAt,
+        isPublic,
       })
       await onSaved()
       toast({ message: t.editChallenge.savedToast })
@@ -179,6 +182,8 @@ function EditForm({
               : t.newChallenge.customInvalid
           }
         />
+
+        <PublicToggle checked={isPublic} onChange={setIsPublic} />
 
         <Button
           type="submit"

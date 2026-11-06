@@ -152,6 +152,9 @@ export const it: Messages = {
     past: 'Passate',
     noneActive:
       'Nessuna sfida in corso. Creane una con Nuova o inserisci sopra il codice di un amico.',
+    publicSection: 'Pubbliche',
+    nonePublic:
+      'Nessuna sfida pubblica al momento. Attiva Pubblica quando ne crei una per mostrarla qui.',
     won: 'Vinta',
     placing: (rank, members) => `${rank} di ${members}`,
     more: (n) => `altri ${n}`,
@@ -262,6 +265,8 @@ export const it: Messages = {
     create: 'Crea sfida',
     createdToast: 'Sfida creata. Condividi il codice!',
     couldNotCreate: 'Impossibile creare',
+    public: 'Pubblica',
+    publicHint: 'Compare in Sfide: chiunque può trovarla e partecipare.',
     keepChallengesHint:
       "Aggiungi un'email in Account per conservare le sfide se cambi telefono",
   },
@@ -301,7 +306,6 @@ export const it: Messages = {
     signInToKeep:
       'Accedi per conservare il tuo posto e sincronizzare le tue rip.',
     signIn: 'Accedi',
-    couldNotLoad: 'Impossibile caricare',
   },
 
   account: {
@@ -425,6 +429,7 @@ export const it: Messages = {
     couldNotLeave: 'Impossibile lasciare la sfida',
     couldNotUpdate: 'Impossibile aggiornare la sfida',
     couldNotLoadChallenges: 'Impossibile caricare le sfide',
+    couldNotLoadPublicChallenges: 'Impossibile caricare le sfide pubbliche',
     couldNotLoadLeaderboard: 'Impossibile caricare la classifica',
     couldNotLoadMemberStats: 'Impossibile caricare le statistiche',
     syncNotConfigured:

@@ -155,6 +155,9 @@ export const nl: Messages = {
     past: 'Afgelopen',
     noneActive:
       'Geen actieve challenges. Start er een met Nieuw of voer hierboven de code van een vriend in.',
+    publicSection: 'Openbaar',
+    nonePublic:
+      'Er zijn nu geen openbare challenges. Zet Openbaar aan als je er een maakt om hem hier te tonen.',
     won: 'Gewonnen',
     placing: (rank, members) => `${rank} van ${members}`,
     more: (n) => `nog ${n}`,
@@ -265,6 +268,9 @@ export const nl: Messages = {
     create: 'Challenge aanmaken',
     createdToast: 'Challenge aangemaakt. Deel de code!',
     couldNotCreate: 'Aanmaken mislukt',
+    public: 'Openbaar',
+    publicHint:
+      'Staat bij Challenges, zodat iedereen hem kan vinden en meedoen.',
     keepChallengesHint:
       'Voeg bij Account een e-mailadres toe om je challenges te bewaren als je van telefoon wisselt',
   },
@@ -303,7 +309,6 @@ export const nl: Messages = {
     switchingPhones: 'Wissel je later van telefoon?',
     signInToKeep: 'Log in om je plek te houden en je reps te synchroniseren.',
     signIn: 'Inloggen',
-    couldNotLoad: 'Laden mislukt',
   },
 
   account: {
@@ -429,6 +434,7 @@ export const nl: Messages = {
     couldNotLeave: 'Challenge verlaten mislukt',
     couldNotUpdate: 'Challenge bijwerken mislukt',
     couldNotLoadChallenges: 'Challenges laden mislukt',
+    couldNotLoadPublicChallenges: 'Openbare challenges laden mislukt',
     couldNotLoadLeaderboard: 'Ranglijst laden mislukt',
     couldNotLoadMemberStats: 'Statistieken laden mislukt',
     syncNotConfigured: 'Synchronisatie is in deze build niet ingesteld',

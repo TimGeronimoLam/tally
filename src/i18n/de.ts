@@ -155,6 +155,9 @@ export const de: Messages = {
     past: 'Vergangen',
     noneActive:
       'Keine aktiven Challenges. Starte eine mit „Neu“ oder gib oben den Code eines Freundes ein.',
+    publicSection: 'Öffentlich',
+    nonePublic:
+      'Gerade keine öffentlichen Challenges. Schalte beim Erstellen „Öffentlich“ ein, um deine hier zu zeigen.',
     won: 'Gewonnen',
     placing: (rank, members) => `${rank} von ${members}`,
     more: (n) => `${n} weitere`,
@@ -265,6 +268,9 @@ export const de: Messages = {
     create: 'Challenge erstellen',
     createdToast: 'Challenge erstellt. Teile den Code!',
     couldNotCreate: 'Erstellen nicht möglich',
+    public: 'Öffentlich',
+    publicHint:
+      'Erscheint unter Challenges, sodass jeder sie finden und beitreten kann.',
     keepChallengesHint:
       'Hinterlege unter Konto eine E-Mail, damit deine Challenges beim Handywechsel erhalten bleiben',
   },
@@ -304,7 +310,6 @@ export const de: Messages = {
     signInToKeep:
       'Melde dich an, um deinen Platz zu behalten und deine Wdh. zu synchronisieren.',
     signIn: 'Anmelden',
-    couldNotLoad: 'Laden nicht möglich',
   },
 
   account: {
@@ -430,6 +435,8 @@ export const de: Messages = {
     couldNotLeave: 'Challenge konnte nicht verlassen werden',
     couldNotUpdate: 'Challenge konnte nicht aktualisiert werden',
     couldNotLoadChallenges: 'Challenges konnten nicht geladen werden',
+    couldNotLoadPublicChallenges:
+      'Öffentliche Challenges konnten nicht geladen werden',
     couldNotLoadLeaderboard: 'Rangliste konnte nicht geladen werden',
     couldNotLoadMemberStats: 'Statistik konnte nicht geladen werden',
     syncNotConfigured: 'Sync ist in diesem Build nicht eingerichtet',

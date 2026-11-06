@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { useParams } from 'react-router'
 import {
   challengeExerciseName,
-  challengeSubtitle,
+  challengeHeadline,
   joinChallenge,
   normalizeInviteCode,
   previewChallenge,
@@ -14,12 +14,16 @@ import {
   Card,
   Gutter,
   Screen,
+  ScreenNav,
+  SectionLabel,
   TextField,
 } from '../components/ui/index.ts'
 import { useDisplayName } from '../db/index.ts'
 import { useT } from '../i18n/index.ts'
 import { isIOS, isStandalone } from '../lib/install.ts'
+import { recordError } from '../lib/diagnostics.ts'
 import { copyText } from '../lib/share.ts'
+import { retryDelay } from '../lib/retry.ts'
 import { useToast } from '../lib/toast.ts'
 import { setDisplayName, useSession } from '../sync/index.ts'
 import { useNav } from '../lib/nav.ts'
@@ -27,7 +31,6 @@ import { useNav } from '../lib/nav.ts'
 type Preview =
   | { state: 'loading' }
   | { state: 'missing' }
-  | { state: 'error'; message: string }
   | { state: 'ready'; challenge: ChallengePreview }
 
 /**
@@ -51,24 +54,33 @@ export function JoinPage() {
   // land the membership on a Safari-only account, so point at the code.
   const [openedOutsideApp] = useState(() => isIOS() && !isStandalone())
 
+  // A failed lookup is not shown: it stays "Looking up…" and tries again,
+  // backing off like the polled lists.
   useEffect(() => {
     let cancelled = false
-    previewChallenge(code)
-      .then((c) => {
-        if (cancelled) return
-        setPreview(c ? { state: 'ready', challenge: c } : { state: 'missing' })
-      })
-      .catch((err: unknown) => {
-        if (!cancelled)
-          setPreview({
-            state: 'error',
-            message: err instanceof Error ? err.message : t.join.couldNotLoad,
-          })
-      })
+    let timer: number | undefined
+    let failures = 0
+    const load = () => {
+      previewChallenge(code)
+        .then((c) => {
+          if (cancelled) return
+          setPreview(
+            c ? { state: 'ready', challenge: c } : { state: 'missing' },
+          )
+        })
+        .catch((err: unknown) => {
+          if (cancelled) return
+          failures += 1
+          if (failures === 1) recordError('join preview', err)
+          timer = window.setTimeout(load, retryDelay(failures, 30_000))
+        })
+    }
+    load()
     return () => {
       cancelled = true
+      window.clearTimeout(timer)
     }
-  }, [code, t])
+  }, [code])
 
   const challenge = preview.state === 'ready' ? preview.challenge : null
   const yourName = nameInput ?? savedName ?? ''
@@ -99,37 +111,41 @@ export function JoinPage() {
     }
   }
 
+  const title =
+    preview.state === 'missing'
+      ? t.join.notFound
+      : (challenge?.name ?? t.challengeDetail.title)
+
   return (
     <Screen>
-      <Gutter className="flex flex-col gap-4 pt-[calc(env(safe-area-inset-top)_+_20px)] pb-8">
+      <ScreenNav
+        title={title}
+        backLabel={t.challengeDetail.backLabel}
+        onBack={() => nav.pop('/challenges')}
+      >
+        {challenge && (
+          <span className="text-sm text-muted">
+            {challengeHeadline(challenge, t)} ·{' '}
+            {t.challenges.subtitle.people(challenge.memberCount)}
+          </span>
+        )}
+      </ScreenNav>
+
+      <Gutter className="flex flex-col gap-4 pt-4 pb-8">
         {preview.state === 'loading' && (
           <p className="text-[15px] text-muted">{t.join.lookingUp(code)}</p>
         )}
         {preview.state === 'missing' && (
           <>
-            <h1 className="text-[22px] font-semibold tracking-[-0.02em]">
-              {t.join.notFound}
-            </h1>
             <p className="text-[15px] text-muted">{t.join.noMatch(code)}</p>
             <ButtonLink to="/challenges" direction="pop" variant="ghost">
               {t.join.backToChallenges}
             </ButtonLink>
           </>
         )}
-        {preview.state === 'error' && (
-          <p className="text-[15px] text-danger">{preview.message}</p>
-        )}
 
         {challenge && savedName !== undefined && (
           <form onSubmit={join} className="flex flex-col gap-4">
-            <Card className="flex flex-col gap-0.5 px-3 py-2.5">
-              <span className="text-sm font-semibold">{challenge.name}</span>
-              <span className="text-xs text-muted">
-                {challengeSubtitle(challenge, t, {
-                  memberCount: challenge.memberCount,
-                })}
-              </span>
-            </Card>
             {openedOutsideApp && (
               <Card
                 variant="outline"
@@ -159,12 +175,14 @@ export function JoinPage() {
                 </Button>
               </Card>
             )}
-            <h1 className="text-[22px] font-semibold tracking-[-0.02em]">
-              {challenge.isMember ? t.join.updateName : t.join.joinTitle}
-            </h1>
-            <p className="text-[13px] leading-relaxed text-muted">
-              {t.join.everySetCounts(challengeExerciseName(challenge, t))}
-            </p>
+            <div className="flex flex-col">
+              <SectionLabel className="pt-2">
+                {challenge.isMember ? t.join.updateName : t.join.joinTitle}
+              </SectionLabel>
+              <p className="text-[13px] leading-relaxed text-muted">
+                {t.join.everySetCounts(challengeExerciseName(challenge, t))}
+              </p>
+            </div>
 
             <TextField
               label={t.join.nameLabel}

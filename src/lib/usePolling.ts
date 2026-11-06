@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { getMeta, setMeta } from '../db/meta.ts'
+import { recordError } from './diagnostics.ts'
+import { retryDelay } from './retry.ts'
 
 export interface Polled<T> {
   data: T | undefined
-  error: string | null
+  /** True until the first successful load (failed loads keep retrying). */
   loading: boolean
   refresh: () => Promise<void>
 }
@@ -26,7 +28,9 @@ const memory = new Map<string, unknown>()
 /**
  * Fetch on mount, every `intervalMs`, when the tab becomes visible, and
  * whenever `deps` change. Good enough for leaderboards; swap for Realtime
- * later if needed.
+ * later if needed. A failed load is never shown: the last good data stays
+ * up and the load is retried soon, backing off up to `intervalMs`. The
+ * first failure in a row goes to the diagnostics log.
  */
 export function usePolling<T>(
   fetcher: () => Promise<T>,
@@ -36,29 +40,39 @@ export function usePolling<T>(
   const [data, setData] = useState<T | undefined>(() =>
     cacheKey ? (memory.get(cacheKey) as T | undefined) : undefined,
   )
-  const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(enabled)
   const latest = useRef(fetcher)
   latest.current = fetcher
   const key = useRef(cacheKey)
   key.current = cacheKey
+  const failures = useRef(0)
+  const retry = useRef<number | undefined>(undefined)
 
   const refresh = useCallback(async () => {
     if (!enabled) return
+    window.clearTimeout(retry.current)
+    retry.current = undefined
     try {
       const result = await latest.current()
+      failures.current = 0
       setData(result)
-      setError(null)
+      setLoading(false)
       if (key.current) {
         memory.set(key.current, result)
         void setMeta(key.current, result)
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err))
-    } finally {
-      setLoading(false)
+      failures.current += 1
+      if (failures.current === 1) recordError('poll', err)
+      // A refresh that started meanwhile may already have queued one.
+      if (retry.current === undefined) {
+        retry.current = window.setTimeout(
+          () => void refresh(),
+          retryDelay(failures.current, intervalMs),
+        )
+      }
     }
-  }, [enabled])
+  }, [enabled, intervalMs])
 
   // Hydrate from cache when the key changes: memory first, then IndexedDB.
   useEffect(() => {
@@ -91,10 +105,13 @@ export function usePolling<T>(
     document.addEventListener('visibilitychange', onVisible)
     return () => {
       window.clearInterval(timer)
+      window.clearTimeout(retry.current)
+      retry.current = undefined
+      failures.current = 0
       document.removeEventListener('visibilitychange', onVisible)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- deps are the caller's
   }, [enabled, intervalMs, refresh, ...deps])
 
-  return { data, error, loading, refresh }
+  return { data, loading, refresh }
 }

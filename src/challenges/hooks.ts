@@ -1,8 +1,19 @@
 import { useMemo } from 'react'
+import { isSyncConfigured } from '../lib/supabase.ts'
 import { usePolling, type Polled } from '../lib/usePolling.ts'
 import { useSession, useSyncStatus } from '../sync/index.ts'
-import { fetchLeaderboard, fetchMemberDays, fetchMyChallenges } from './api.ts'
-import type { ChallengeSummary, LeaderboardRow, MemberDay } from './types.ts'
+import {
+  fetchLeaderboard,
+  fetchMemberDays,
+  fetchMyChallenges,
+  fetchPublicChallenges,
+} from './api.ts'
+import type {
+  ChallengeSummary,
+  LeaderboardRow,
+  MemberDay,
+  PublicChallenge,
+} from './types.ts'
 
 /** All challenges the user is in, refreshed every 30 s, on focus and after each sync. */
 export function useMyChallenges(): Polled<ChallengeSummary[]> & {
@@ -21,6 +32,19 @@ export function useMyChallenges(): Polled<ChallengeSummary[]> & {
     [ready, userId, polled.data],
   )
   return { ...polled, data, loading: !ready || polled.loading, userId }
+}
+
+/**
+ * Public challenges to browse, signed in or not. Refreshed like the
+ * user's own list; ones they are in are left out.
+ */
+export function usePublicChallenges(): Polled<PublicChallenge[]> {
+  const { session, ready } = useSession()
+  const userId = session?.user.id ?? null
+  return usePolling(fetchPublicChallenges, [userId], {
+    enabled: ready && isSyncConfigured,
+    cacheKey: `cache.publicChallenges.${userId ?? 'none'}`,
+  })
 }
 
 export function useChallengeSummary(id: string | undefined) {

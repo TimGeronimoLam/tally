@@ -20,6 +20,8 @@ export interface Challenge {
   endsAt: string
   inviteCode: string
   creatorId: string
+  /** Listed under Challenges for everyone to join. */
+  isPublic: boolean
 }
 
 export interface LeaderboardRow {
@@ -63,6 +65,11 @@ export interface ChallengePreview {
   isMember: boolean
 }
 
+/** `public_challenges()` row: a listed challenge the caller is not in. */
+export interface PublicChallenge extends Omit<ChallengePreview, 'isMember'> {
+  inviteCode: string
+}
+
 export interface NewChallengeInput {
   name: string
   exerciseName: string
@@ -73,6 +80,7 @@ export interface NewChallengeInput {
   startsAt: Date
   endsAt: Date
   displayName: string
+  isPublic: boolean
 }
 
 /** What the host can change after creating. The exercise stays fixed. */
@@ -82,4 +90,5 @@ export interface ChallengeEdit {
   goalValue: number | null
   startsAt: Date
   endsAt: Date
+  isPublic: boolean
 }

@@ -152,6 +152,9 @@ export const fr: Messages = {
     past: 'Terminés',
     noneActive:
       "Aucun défi en cours. Lance-en un avec Nouveau, ou entre le code d'un ami ci-dessus.",
+    publicSection: 'Publics',
+    nonePublic:
+      "Aucun défi public pour l'instant. Active Public en créant le tien pour l'afficher ici.",
     won: 'Gagné',
     placing: (rank, members) => `${rank} sur ${members}`,
     more: (n) => `${n} de plus`,
@@ -262,6 +265,9 @@ export const fr: Messages = {
     create: 'Créer le défi',
     createdToast: 'Défi créé. Partage le code !',
     couldNotCreate: 'Création impossible',
+    public: 'Public',
+    publicHint:
+      'Affiché dans Défis : tout le monde peut le trouver et le rejoindre.',
     keepChallengesHint:
       'Ajoute un e-mail dans Compte pour garder tes défis si tu changes de téléphone',
   },
@@ -300,7 +306,6 @@ export const fr: Messages = {
     switchingPhones: 'Tu changes de téléphone plus tard ?',
     signInToKeep: 'Connecte-toi pour garder ta place et synchroniser tes réps.',
     signIn: 'Se connecter',
-    couldNotLoad: 'Chargement impossible',
   },
 
   account: {
@@ -425,6 +430,7 @@ export const fr: Messages = {
     couldNotLeave: 'Impossible de quitter le défi',
     couldNotUpdate: 'Impossible de mettre à jour le défi',
     couldNotLoadChallenges: 'Impossible de charger les défis',
+    couldNotLoadPublicChallenges: 'Impossible de charger les défis publics',
     couldNotLoadLeaderboard: 'Impossible de charger le classement',
     couldNotLoadMemberStats: 'Impossible de charger les stats',
     syncNotConfigured: "La synchro n'est pas configurée dans cette version",

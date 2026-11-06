@@ -152,6 +152,9 @@ export const pt: Messages = {
     past: 'Passados',
     noneActive:
       'Sem desafios ativos. Cria um com Novo ou escreve acima o código de um amigo.',
+    publicSection: 'Públicos',
+    nonePublic:
+      'Sem desafios públicos de momento. Ativa Público ao criar um para o mostrares aqui.',
     won: 'Ganho',
     placing: (rank, members) => `${rank} de ${members}`,
     more: (n) => `mais ${n}`,
@@ -262,6 +265,9 @@ export const pt: Messages = {
     create: 'Criar desafio',
     createdToast: 'Desafio criado. Partilha o código!',
     couldNotCreate: 'Não foi possível criar',
+    public: 'Público',
+    publicHint:
+      'Aparece em Desafios, para qualquer pessoa o encontrar e participar.',
     keepChallengesHint:
       'Adiciona um e-mail em Conta para manteres os desafios se mudares de telemóvel',
   },
@@ -301,7 +307,6 @@ export const pt: Messages = {
     signInToKeep:
       'Inicia sessão para manteres o teu lugar e sincronizar as tuas reps.',
     signIn: 'Iniciar sessão',
-    couldNotLoad: 'Não foi possível carregar',
   },
 
   account: {
@@ -426,6 +431,8 @@ export const pt: Messages = {
     couldNotLeave: 'Não foi possível sair do desafio',
     couldNotUpdate: 'Não foi possível atualizar o desafio',
     couldNotLoadChallenges: 'Não foi possível carregar os desafios',
+    couldNotLoadPublicChallenges:
+      'Não foi possível carregar os desafios públicos',
     couldNotLoadLeaderboard: 'Não foi possível carregar a classificação',
     couldNotLoadMemberStats: 'Não foi possível carregar as estatísticas',
     syncNotConfigured: 'A sincronização não está configurada nesta versão',

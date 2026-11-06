@@ -19,6 +19,7 @@ import type {
   LeaderboardRow,
   MemberDay,
   NewChallengeInput,
+  PublicChallenge,
 } from './types.ts'
 
 function client() {
@@ -89,6 +90,7 @@ function toChallenge(r: Raw): Challenge {
     endsAt: str(r.ends_at),
     inviteCode: str(r.invite_code),
     creatorId: str(r.creator_id),
+    isPublic: Boolean(r.is_public),
   }
 }
 
@@ -130,6 +132,11 @@ function toPreview(r: Raw): ChallengePreview {
   }
 }
 
+function toPublic(r: Raw): PublicChallenge {
+  const { isMember: _, ...preview } = toPreview(r)
+  return { ...preview, inviteCode: str(r.invite_code) }
+}
+
 function fail(prefix: string, error: { message: string }): never {
   throw new Error(`${prefix}: ${error.message}`)
 }
@@ -156,6 +163,7 @@ export async function createChallenge(
       p_invite_code: generateInviteCode(),
       p_display_name: input.displayName,
       p_exercise_id: exerciseId,
+      p_is_public: input.isPublic,
     })
     if (!error) {
       // Entries logged earlier today should count right away.
@@ -227,6 +235,7 @@ export async function updateChallenge(
     p_goal_value: edit.goalValue,
     p_starts_at: edit.startsAt.toISOString(),
     p_ends_at: edit.endsAt.toISOString(),
+    p_is_public: edit.isPublic,
   })
   if (error) fail(messages().errors.couldNotUpdate, error)
   return toChallenge((Array.isArray(data) ? data[0] : data) as Raw)
@@ -259,6 +268,19 @@ export async function fetchMyChallenges(): Promise<ChallengeSummary[]> {
   // Every row carries the server's clock reading for this request.
   if (rows.length) calibrate(rows[0].server_now as string | undefined)
   return rows.map(toSummary)
+}
+
+/**
+ * Public challenges that have not ended and the caller is not in. Works
+ * signed out too, so anyone can browse before joining.
+ */
+export async function fetchPublicChallenges(): Promise<PublicChallenge[]> {
+  if (!supabase) return []
+  const { data, error } = await supabase.rpc('public_challenges')
+  if (error) fail(messages().errors.couldNotLoadPublicChallenges, error)
+  const rows = (data ?? []) as Raw[]
+  if (rows.length) calibrate(rows[0].server_now as string | undefined)
+  return rows.map(toPublic)
 }
 
 export async function fetchLeaderboard(

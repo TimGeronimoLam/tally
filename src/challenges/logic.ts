@@ -194,6 +194,27 @@ export function challengeExerciseName(
   return exerciseName({ name: c.exerciseName, builtin: c.exerciseBuiltin }, m)
 }
 
+/**
+ * The line under a challenge's name on its own screen (detail and join):
+ * "Pushups · Most reps wins · Nov 1 – Nov 30".
+ */
+export function challengeHeadline(
+  c: Pick<
+    Challenge,
+    'exerciseName' | 'goalType' | 'goalValue' | 'startsAt' | 'endsAt'
+  > &
+    Partial<Pick<Challenge, 'exerciseBuiltin'>>,
+  m: Messages,
+): string {
+  return [
+    challengeExerciseName(c, m),
+    c.goalType === 'first_to'
+      ? m.challengeDetail.firstToWins(formatNumber(c.goalValue ?? 0))
+      : m.challengeDetail.mostRepsWins,
+    `${formatDayMonth(c.startsAt)} – ${formatDayMonth(c.endsAt)}`,
+  ].join(' · ')
+}
+
 /** "Pushups · Most reps · 19 days left", in the language of `m`. */
 export function challengeSubtitle(
   c: Pick<

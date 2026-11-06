@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useParams } from 'react-router'
 import {
   challengeExerciseName,
+  challengeHeadline,
   challengeStatus,
   daysLeft,
   daysUntilStart,
@@ -29,14 +30,10 @@ import {
 } from '../components/ui/index.ts'
 import { META_KEYS, setMeta } from '../db/index.ts'
 import { useT } from '../i18n/index.ts'
-import { formatDayMonth, formatNumber, unitName } from '../lib/format.ts'
+import { formatNumber, unitName } from '../lib/format.ts'
 import { shareLink } from '../lib/share.ts'
 import { useToast } from '../lib/toast.ts'
 import { useNav } from '../lib/nav.ts'
-
-function windowLabel(startsAt: string, endsAt: string): string {
-  return `${formatDayMonth(startsAt)} – ${formatDayMonth(endsAt)}`
-}
 
 export function ChallengeDetailPage() {
   const t = useT()
@@ -172,11 +169,8 @@ export function ChallengeDetailPage() {
         title={c.name}
       >
         <span className="text-sm text-muted">
-          {challengeExerciseName(c, t)} ·{' '}
-          {c.goalType === 'first_to'
-            ? t.challengeDetail.firstToWins(formatNumber(c.goalValue ?? 0))
-            : t.challengeDetail.mostRepsWins}{' '}
-          · {windowLabel(c.startsAt, c.endsAt)}
+          {challengeHeadline(c, t)}
+          {c.isPublic && ` · ${t.newChallenge.public}`}
         </span>
       </ScreenNav>
 
@@ -221,14 +215,9 @@ export function ChallengeDetailPage() {
       </Gutter>
 
       <Gutter>
-        <div className="flex items-center justify-between pt-6 pb-2">
-          <SectionLabel className="pt-0 pb-0">
-            {t.challengeDetail.leaderboard}
-          </SectionLabel>
-          {board.error && (
-            <span className="text-xs text-danger">{board.error}</span>
-          )}
-        </div>
+        <SectionLabel className="pb-2">
+          {t.challengeDetail.leaderboard}
+        </SectionLabel>
         <LeaderboardList
           rows={rows}
           meId={userId}

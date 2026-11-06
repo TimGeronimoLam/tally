@@ -176,6 +176,9 @@ export const en = {
     past: 'Past',
     noneActive:
       "No active challenges. Start one with New, or enter a friend's code above.",
+    publicSection: 'Public',
+    nonePublic:
+      'No public challenges right now. Switch on Public when you create one to list it here.',
     won: 'Won',
     placing: (rank: string, members: number) => `${rank} of ${members}`,
     more: (n: number) => `${n} more`,
@@ -289,6 +292,8 @@ export const en = {
     create: 'Create challenge',
     createdToast: 'Challenge created. Share the code!',
     couldNotCreate: 'Could not create',
+    public: 'Public',
+    publicHint: 'Listed under Challenges, so anyone can find and join it.',
     keepChallengesHint:
       'Add an email in Account to keep your challenges if you switch phones',
   },
@@ -326,7 +331,6 @@ export const en = {
     switchingPhones: 'Switching phones later?',
     signInToKeep: 'Sign in to keep your spot and sync your reps.',
     signIn: 'Sign in',
-    couldNotLoad: 'Could not load',
   },
 
   account: {
@@ -453,6 +457,7 @@ export const en = {
     couldNotLeave: 'Could not leave challenge',
     couldNotUpdate: 'Could not update challenge',
     couldNotLoadChallenges: 'Could not load challenges',
+    couldNotLoadPublicChallenges: 'Could not load public challenges',
     couldNotLoadLeaderboard: 'Could not load leaderboard',
     couldNotLoadMemberStats: 'Could not load stats',
     syncNotConfigured: 'Sync is not configured in this build',

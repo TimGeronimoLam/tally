@@ -8,7 +8,11 @@ import {
   type DurationValue,
   type GoalType,
 } from '../challenges/index.ts'
-import { DateRangeFields, ExercisePicker } from '../components/app/index.ts'
+import {
+  DateRangeFields,
+  ExercisePicker,
+  PublicToggle,
+} from '../components/app/index.ts'
 import {
   Button,
   Field,
@@ -44,6 +48,7 @@ export function NewChallengePage() {
   const [duration, setDuration] = useState<DurationValue>('1w')
   const [range, setRange] = useState(defaultDateRange)
   const [displayName, setDisplayNameInput] = useState<string | null>(null)
+  const [isPublic, setIsPublic] = useState(false)
   const [busy, setBusy] = useState(false)
 
   if (!exercises || savedName === undefined) return null
@@ -87,6 +92,7 @@ export function NewChallengePage() {
         startsAt: timeWindow.startsAt,
         endsAt: timeWindow.endsAt,
         displayName: yourName.trim(),
+        isPublic,
       })
       toast({ message: t.newChallenge.createdToast })
       if (!session?.user.email) {
@@ -172,6 +178,8 @@ export function NewChallengePage() {
             }
           />
         )}
+
+        <PublicToggle checked={isPublic} onChange={setIsPublic} />
 
         <TextField
           label={t.newChallenge.yourName}

@@ -1,5 +1,8 @@
 import { challengeSubtitle, isWon } from '../../challenges/logic.ts'
-import type { ChallengeSummary } from '../../challenges/types.ts'
+import type {
+  ChallengeSummary,
+  PublicChallenge,
+} from '../../challenges/types.ts'
 import { useT } from '../../i18n/index.ts'
 import { cn } from '../../lib/cn.ts'
 import { formatNumber } from '../../lib/format.ts'
@@ -83,6 +86,33 @@ export function PastChallengeRow({ challenge: c }: ChallengeCardProps) {
         {won
           ? t.challenges.won
           : t.challenges.placing(t.ordinal(c.myRank), c.memberCount)}
+      </span>
+    </Card>
+  )
+}
+
+/** Public challenge the user is not in: opens the join page. */
+export function PublicChallengeRow({
+  challenge: c,
+}: {
+  challenge: PublicChallenge
+}) {
+  const t = useT()
+  return (
+    <Card
+      variant="outline"
+      to={`/join/${c.inviteCode}`}
+      className="flex items-center justify-between gap-3 px-4 py-3.5"
+    >
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <span className="truncate text-[15px] font-semibold">{c.name}</span>
+        <span className="text-[13px] text-muted">
+          {challengeSubtitle(c, t)} ·{' '}
+          {t.challenges.subtitle.people(c.memberCount)}
+        </span>
+      </div>
+      <span className="shrink-0 rounded-md bg-inverse px-2.5 py-1 text-xs font-semibold text-inverse-fg">
+        {t.challenges.join}
       </span>
     </Card>
   )

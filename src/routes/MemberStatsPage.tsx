@@ -82,7 +82,7 @@ export function MemberStatsPage() {
         ? t.memberStats.notInChallenge
         : loading || board.loading
           ? t.common.loading
-          : board.error
+          : null
     return (
       <Screen onRefresh={pullRefresh}>
         <ScreenNav
@@ -187,9 +187,6 @@ export function MemberStatsPage() {
                 unit={t.memberStats.ofDays(span.count)}
               />
             </TileGrid>
-            {days.error && (
-              <p className="pt-3 text-xs text-danger">{days.error}</p>
-            )}
           </Gutter>
         </>
       )}

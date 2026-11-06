@@ -149,6 +149,9 @@ export const es: Messages = {
     past: 'Pasados',
     noneActive:
       'No hay retos activos. Crea uno con Nuevo o escribe arriba el código de un amigo.',
+    publicSection: 'Públicos',
+    nonePublic:
+      'Ahora no hay retos públicos. Activa Público al crear uno para mostrarlo aquí.',
     won: 'Ganado',
     placing: (rank, members) => `${rank} de ${members}`,
     more: (n) => `${n} más`,
@@ -259,6 +262,9 @@ export const es: Messages = {
     create: 'Crear reto',
     createdToast: 'Reto creado. ¡Comparte el código!',
     couldNotCreate: 'No se pudo crear',
+    public: 'Público',
+    publicHint:
+      'Aparece en Retos, así que cualquiera puede encontrarlo y unirse.',
     keepChallengesHint:
       'Añade un correo en Cuenta para conservar tus retos si cambias de móvil',
   },
@@ -298,7 +304,6 @@ export const es: Messages = {
     signInToKeep:
       'Inicia sesión para conservar tu puesto y sincronizar tus reps.',
     signIn: 'Iniciar sesión',
-    couldNotLoad: 'No se pudo cargar',
   },
 
   account: {
@@ -423,6 +428,7 @@ export const es: Messages = {
     couldNotLeave: 'No se pudo salir del reto',
     couldNotUpdate: 'No se pudo actualizar el reto',
     couldNotLoadChallenges: 'No se pudieron cargar los retos',
+    couldNotLoadPublicChallenges: 'No se pudieron cargar los retos públicos',
     couldNotLoadLeaderboard: 'No se pudo cargar la clasificación',
     couldNotLoadMemberStats: 'No se pudieron cargar las estadísticas',
     syncNotConfigured: 'La sincronización no está configurada en esta versión',
