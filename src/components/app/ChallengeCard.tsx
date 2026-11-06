@@ -1,11 +1,15 @@
-import { challengeSubtitle, isWon } from '../../challenges/logic.ts'
+import {
+  challengeSubtitle,
+  isWon,
+  teamTotalOf,
+} from '../../challenges/logic.ts'
 import type {
   ChallengeSummary,
   PublicChallenge,
 } from '../../challenges/types.ts'
 import { useT } from '../../i18n/index.ts'
 import { cn } from '../../lib/cn.ts'
-import { formatNumber } from '../../lib/format.ts'
+import { formatNumber, formatPercent } from '../../lib/format.ts'
 import { Card, ProgressBar } from '../ui/index.ts'
 import { LeaderboardList } from './LeaderboardList.tsx'
 
@@ -14,9 +18,13 @@ export interface ChallengeCardProps {
   meId: string | null
 }
 
-/** Active challenge: leaderboard preview (most reps) or goal progress (first to). */
+/**
+ * Active challenge: leaderboard preview (most reps), the caller's progress
+ * (first to) or everyone's progress together (team).
+ */
 export function ChallengeCard({ challenge: c, meId }: ChallengeCardProps) {
   const t = useT()
+  if (c.goalType === 'team') return <TeamChallengeCard challenge={c} />
   const leading = c.myRank === 1
   return (
     <Card to={`/challenges/${c.id}`} className="flex flex-col gap-3">
@@ -61,10 +69,60 @@ export function ChallengeCard({ challenge: c, meId }: ChallengeCardProps) {
   )
 }
 
-/** Past challenge: one line with the final placing. */
+function TeamChallengeCard({ challenge: c }: { challenge: ChallengeSummary }) {
+  const t = useT()
+  const total = teamTotalOf(c)
+  const goal = c.goalValue ?? 0
+  const reached = total >= goal
+  return (
+    <Card to={`/challenges/${c.id}`} className="flex flex-col gap-3">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <span className="truncate text-[17px] font-semibold">{c.name}</span>
+          <span className="text-[13px] text-muted">
+            {challengeSubtitle(c, t, { memberCount: c.memberCount })}
+          </span>
+        </div>
+        <span
+          className={cn(
+            'shrink-0 rounded-md px-2 py-1 text-xs font-semibold tabular-nums',
+            reached ? 'bg-accent text-accent-fg' : 'bg-border text-fg',
+          )}
+        >
+          {formatPercent(total, goal)}
+        </span>
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <div className="flex justify-between text-[13px]">
+          <span className="font-semibold">
+            {t.challenges.team} · {t.challenges.subtitle.people(c.memberCount)}
+          </span>
+          <span>
+            {formatNumber(total)} / {formatNumber(goal)}
+          </span>
+        </div>
+        <ProgressBar
+          value={total}
+          max={goal || 1}
+          aria-label={t.challenges.teamProgress}
+        />
+      </div>
+    </Card>
+  )
+}
+
+/** Past challenge: one line with the final placing, or whether a team goal was met. */
 export function PastChallengeRow({ challenge: c }: ChallengeCardProps) {
   const t = useT()
   const won = isWon(c)
+  const outcome =
+    c.goalType === 'team'
+      ? won
+        ? t.challenges.reached
+        : t.challenges.missed
+      : won
+        ? t.challenges.won
+        : t.challenges.placing(t.ordinal(c.myRank), c.memberCount)
   return (
     <Card
       variant="outline"
@@ -83,9 +141,7 @@ export function PastChallengeRow({ challenge: c }: ChallengeCardProps) {
           won ? 'text-accent-text' : 'text-muted',
         )}
       >
-        {won
-          ? t.challenges.won
-          : t.challenges.placing(t.ordinal(c.myRank), c.memberCount)}
+        {outcome}
       </span>
     </Card>
   )

@@ -1,16 +1,17 @@
 import { useState, type FormEvent } from 'react'
 import {
   DURATION_OPTIONS,
-  GOAL_TYPES,
   challengeWindow,
   createChallenge,
   defaultDateRange,
+  needsGoalValue,
   type DurationValue,
   type GoalType,
 } from '../challenges/index.ts'
 import {
   DateRangeFields,
   ExercisePicker,
+  GoalFields,
   PublicToggle,
 } from '../components/app/index.ts'
 import {
@@ -27,7 +28,7 @@ import {
   useSelectedExercise,
 } from '../db/index.ts'
 import { useT } from '../i18n/index.ts'
-import { formatMonthName, unitName } from '../lib/format.ts'
+import { formatMonthName } from '../lib/format.ts'
 import { useToast } from '../lib/toast.ts'
 import { setDisplayName, useSession } from '../sync/index.ts'
 import { useNav } from '../lib/nav.ts'
@@ -64,13 +65,9 @@ export function NewChallengePage() {
   const valid =
     exercise !== null &&
     yourName.trim().length > 0 &&
-    (goalType === 'most_reps' || goal > 0) &&
+    (!needsGoalValue(goalType) || goal > 0) &&
     timeWindow !== null
 
-  const goalOptions = GOAL_TYPES.map((value) => ({
-    value,
-    label: t.challenges.goalType[value],
-  }))
   const durationOptions = DURATION_OPTIONS.map(({ value }) => ({
     value,
     label: t.newChallenge.durations[value],
@@ -88,7 +85,7 @@ export function NewChallengePage() {
         unit: exercise.unit,
         exerciseBuiltin: exercise.builtin ?? null,
         goalType,
-        goalValue: goalType === 'first_to' ? goal : null,
+        goalValue: needsGoalValue(goalType) ? goal : null,
         startsAt: timeWindow.startsAt,
         endsAt: timeWindow.endsAt,
         displayName: yourName.trim(),
@@ -137,26 +134,13 @@ export function NewChallengePage() {
           autoComplete="off"
         />
 
-        <Field label={t.newChallenge.goal}>
-          <SegmentedControl
-            aria-label={t.newChallenge.goalType}
-            options={goalOptions}
-            value={goalType}
-            onChange={setGoalType}
-          />
-        </Field>
-
-        {goalType === 'first_to' && (
-          <TextField
-            label={t.newChallenge.target(unitName(exercise?.unit ?? 'reps', t))}
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            value={goalValue}
-            onChange={(e) => setGoalValue(e.target.value.replace(/\D/g, ''))}
-            placeholder={t.newChallenge.targetPlaceholder}
-          />
-        )}
+        <GoalFields
+          goalType={goalType}
+          onGoalTypeChange={setGoalType}
+          goalValue={goalValue}
+          onGoalValueChange={setGoalValue}
+          unit={exercise?.unit ?? 'reps'}
+        />
 
         <Field label={t.newChallenge.duration}>
           <SegmentedControl

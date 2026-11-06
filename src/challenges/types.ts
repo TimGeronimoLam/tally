@@ -1,9 +1,13 @@
 import type { BuiltinExercise } from '../db/builtins.ts'
 
-export type GoalType = 'most_reps' | 'first_to'
+/**
+ * most_reps: highest total at the end wins. first_to: first member to reach
+ * goalValue wins. team: all members together reach goalValue in the window.
+ */
+export type GoalType = 'most_reps' | 'first_to' | 'team'
 
 /** Picker order; labels come from `m.challenges.goalType[value]`. */
-export const GOAL_TYPES: GoalType[] = ['most_reps', 'first_to']
+export const GOAL_TYPES: GoalType[] = ['most_reps', 'first_to', 'team']
 
 /** A challenge as the server describes it. Timestamps are ISO strings. */
 export interface Challenge {
@@ -47,6 +51,8 @@ export interface ChallengeSummary extends Challenge {
   myTotal: number
   myRank: number
   leaderTotal: number
+  /** All members' totals summed; what a team goal is measured against. */
+  teamTotal: number
   top: LeaderboardRow[]
 }
 

@@ -183,14 +183,23 @@ export const en = {
     placing: (rank: string, members: number) => `${rank} of ${members}`,
     more: (n: number) => `${n} more`,
     progressToGoal: 'Progress to goal',
+    reached: 'Goal reached',
+    missed: 'Goal missed',
+    team: 'Team',
+    teamProgress: 'Team progress',
     today: (delta: string) => `+${delta} today`,
     youSuffix: '(you)',
     /** Goal types, keyed by GoalType. */
-    goalType: { most_reps: 'Most reps', first_to: 'First to' },
+    goalType: {
+      most_reps: 'Most reps',
+      first_to: 'First to',
+      team: 'Together',
+    },
     /** Subtitle pieces: "Pushups · Most reps · 19 days left" */
     subtitle: {
       mostReps: 'Most reps',
       firstTo: (goal: string) => `First to ${goal}`,
+      team: (goal: string) => `Together to ${goal}`,
       ended: (date: string) => `ended ${date}`,
       starts: (date: string) => `starts ${date}`,
       people: (n: number) => `${n} ${n === 1 ? 'person' : 'people'}`,
@@ -209,6 +218,7 @@ export const en = {
     linkCopied: 'Link copied',
     couldNotShare: 'Could not share',
     firstToWins: (goal: string) => `First to ${goal} wins`,
+    teamGoal: (goal: string) => `Together to ${goal}`,
     mostRepsWins: 'Most reps wins',
     ended: 'Ended',
     startsIn: 'Starts in',
@@ -218,6 +228,9 @@ export const en = {
     lead: 'Lead',
     toFirst: 'To 1st',
     leaderboard: 'Leaderboard',
+    contributions: 'Contributions',
+    teamPerDay: (n: string, unit: string) => `${n} ${unit} a day to make it`,
+    teamReached: 'Goal reached together',
     host: 'Host',
     endNow: 'End challenge now',
     deleteChallenge: 'Delete challenge',
@@ -274,6 +287,8 @@ export const en = {
     goalType: 'Goal type',
     target: (unit: string) => `Target (${unit})`,
     targetPlaceholder: 'e.g. 1000',
+    teamTarget: (unit: string) => `Shared target (${unit})`,
+    teamHint: 'Everything the members log counts towards one total.',
     duration: 'Duration',
     /** Duration presets, keyed by DurationValue. */
     durations: {

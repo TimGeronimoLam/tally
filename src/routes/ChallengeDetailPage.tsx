@@ -11,6 +11,8 @@ import {
   gapToFirst,
   inviteUrl,
   leaveChallenge,
+  teamPerDay,
+  teamTotalOf,
   useChallengeSummary,
   useLeaderboard,
 } from '../challenges/index.ts'
@@ -18,9 +20,11 @@ import { InviteCodeCard, LeaderboardList } from '../components/app/index.ts'
 import {
   Button,
   ButtonLink,
+  Card,
   ConfirmSheet,
   Gutter,
   IconButton,
+  ProgressBar,
   Screen,
   ScreenNav,
   SectionLabel,
@@ -85,6 +89,8 @@ export function ChallengeDetailPage() {
   const rows = board.data ?? c.top
   const unit = unitName(c.unit, t)
   const isHost = userId !== null && c.creatorId === userId
+  const team = c.goalType === 'team'
+  const teamTotal = teamTotalOf(c, board.data)
 
   async function share() {
     const outcome = await shareLink({
@@ -190,7 +196,13 @@ export function ChallengeDetailPage() {
             label={t.challengeDetail.yourUnit(unit)}
             value={formatNumber(c.myTotal)}
           />
-          {c.goalType === 'first_to' ? (
+          {team ? (
+            <Tile
+              label={t.challengeDetail.toGoal}
+              value={formatNumber(Math.max(0, (c.goalValue ?? 0) - teamTotal))}
+              emphasis
+            />
+          ) : c.goalType === 'first_to' ? (
             <Tile
               label={t.challengeDetail.toGoal}
               value={formatNumber(Math.max(0, (c.goalValue ?? 0) - c.myTotal))}
@@ -214,9 +226,23 @@ export function ChallengeDetailPage() {
         </TileGrid>
       </Gutter>
 
+      {team && (
+        <Gutter className="pt-2 pb-5">
+          <TeamProgress
+            total={teamTotal}
+            goal={c.goalValue ?? 0}
+            perDay={status === 'ended' ? 0 : teamPerDay({ ...c, teamTotal })}
+            ended={status === 'ended'}
+            unit={unit}
+          />
+        </Gutter>
+      )}
+
       <Gutter>
         <SectionLabel className="pb-2">
-          {t.challengeDetail.leaderboard}
+          {team
+            ? t.challengeDetail.contributions
+            : t.challengeDetail.leaderboard}
         </SectionLabel>
         <LeaderboardList
           rows={rows}
@@ -317,5 +343,58 @@ export function ChallengeDetailPage() {
         onClose={() => !busy && setConfirm(null)}
       />
     </Screen>
+  )
+}
+
+/** A team goal: everyone's total against the goal, and what it still takes. */
+function TeamProgress({
+  total,
+  goal,
+  perDay,
+  ended,
+  unit,
+}: {
+  total: number
+  goal: number
+  perDay: number
+  ended: boolean
+  unit: string
+}) {
+  const t = useT()
+  const reached = total >= goal
+  const note = reached
+    ? t.challengeDetail.teamReached
+    : ended
+      ? t.challenges.missed
+      : perDay > 0
+        ? t.challengeDetail.teamPerDay(formatNumber(perDay), unit)
+        : null
+  return (
+    <Card className="flex flex-col gap-2.5">
+      <div className="flex items-baseline justify-between gap-3">
+        <span className="text-[13px] font-medium text-muted">
+          {t.challenges.team}
+        </span>
+        <span className="text-[15px] font-semibold tabular-nums">
+          {formatNumber(total)} / {formatNumber(goal)}
+        </span>
+      </div>
+      <ProgressBar
+        value={total}
+        max={goal || 1}
+        aria-label={t.challenges.teamProgress}
+      />
+      {note && (
+        <span
+          className={
+            reached
+              ? 'text-[13px] font-medium text-accent-text'
+              : 'text-[13px] text-muted'
+          }
+        >
+          {note}
+        </span>
+      )}
+    </Card>
   )
 }

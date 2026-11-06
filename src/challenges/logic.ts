@@ -9,7 +9,7 @@ import {
   startOfDay,
 } from '../lib/date.ts'
 import { formatDayMonth, formatNumber } from '../lib/format.ts'
-import type { Challenge, ChallengeSummary } from './types.ts'
+import type { Challenge, ChallengeSummary, GoalType } from './types.ts'
 
 export type ChallengeStatus = 'upcoming' | 'active' | 'ended'
 
@@ -57,14 +57,40 @@ export function challengeDaysSoFar(
   return { first, last, count: now < start ? 0 : diffDays(first, last) + 1 }
 }
 
-/** True when the caller has won: first_to reached, or most_reps ended in 1st. */
+/**
+ * What all members logged together. Prefers the full leaderboard when it
+ * is loaded (fresher than the summary); `teamTotal` is missing from
+ * summaries cached before it existed.
+ */
+export function teamTotalOf(
+  s: Partial<Pick<ChallengeSummary, 'teamTotal'>>,
+  rows?: ReadonlyArray<{ total: number }>,
+): number {
+  if (rows) return rows.reduce((sum, r) => sum + r.total, 0)
+  return s.teamTotal ?? 0
+}
+
+/** Goal types the host sets a target number for. */
+export function needsGoalValue(goalType: GoalType): boolean {
+  return goalType !== 'most_reps'
+}
+
+/**
+ * True when the caller has won: first_to reached, most_reps ended in 1st,
+ * or the team reached its goal together (everyone wins). `teamTotal` is
+ * missing from summaries cached before it existed.
+ */
 export function isWon(
   s: Pick<
     ChallengeSummary,
     'goalType' | 'goalValue' | 'myTotal' | 'myRank' | 'startsAt' | 'endsAt'
-  >,
+  > &
+    Partial<Pick<ChallengeSummary, 'teamTotal'>>,
   now: number = serverNow(),
 ): boolean {
+  if (s.goalType === 'team') {
+    return s.goalValue !== null && teamTotalOf(s) >= s.goalValue
+  }
   if (s.goalType === 'first_to') {
     return s.goalValue !== null && s.myTotal >= s.goalValue && s.myRank === 1
   }
@@ -77,6 +103,20 @@ export function gapToFirst(
 ): number {
   if (s.myRank === 1) return 0
   return Math.max(0, s.leaderTotal - s.myTotal + 1)
+}
+
+/**
+ * What the team still needs per day to reach its goal: the rest spread
+ * over the days left (today included), rounded up. 0 once reached or
+ * when no days are left.
+ */
+export function teamPerDay(
+  s: Pick<ChallengeSummary, 'goalValue' | 'teamTotal' | 'endsAt'>,
+  now: number = serverNow(),
+): number {
+  const rest = Math.max(0, (s.goalValue ?? 0) - s.teamTotal)
+  const days = daysLeft(s, now)
+  return rest === 0 || days === 0 ? 0 : Math.ceil(rest / days)
 }
 
 /** Duration presets; labels come from `m.newChallenge.durations[value]`. */
@@ -206,11 +246,14 @@ export function challengeHeadline(
     Partial<Pick<Challenge, 'exerciseBuiltin'>>,
   m: Messages,
 ): string {
+  const goal = formatNumber(c.goalValue ?? 0)
   return [
     challengeExerciseName(c, m),
     c.goalType === 'first_to'
-      ? m.challengeDetail.firstToWins(formatNumber(c.goalValue ?? 0))
-      : m.challengeDetail.mostRepsWins,
+      ? m.challengeDetail.firstToWins(goal)
+      : c.goalType === 'team'
+        ? m.challengeDetail.teamGoal(goal)
+        : m.challengeDetail.mostRepsWins,
     `${formatDayMonth(c.startsAt)} – ${formatDayMonth(c.endsAt)}`,
   ].join(' · ')
 }
@@ -227,10 +270,13 @@ export function challengeSubtitle(
 ): string {
   const s = m.challenges.subtitle
   const parts = [challengeExerciseName(c, m)]
+  const goal = formatNumber(c.goalValue ?? 0)
   parts.push(
     c.goalType === 'first_to'
-      ? s.firstTo(formatNumber(c.goalValue ?? 0))
-      : s.mostReps,
+      ? s.firstTo(goal)
+      : c.goalType === 'team'
+        ? s.team(goal)
+        : s.mostReps,
   )
   const status = challengeStatus(c, opts.now)
   if (status === 'ended') {

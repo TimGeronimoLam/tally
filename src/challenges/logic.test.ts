@@ -17,6 +17,9 @@ import {
   endOfDayIn,
   gapToFirst,
   isWon,
+  needsGoalValue,
+  teamPerDay,
+  teamTotalOf,
 } from './logic.ts'
 import { en } from '../i18n/en.ts'
 import { setLocalePreference } from '../i18n/locale.ts'
@@ -296,6 +299,73 @@ describe('ranking', () => {
         NOW,
       ),
     ).toBe(false)
+  })
+})
+
+describe('team goals', () => {
+  const active = { startsAt: iso(NOW - DAY), endsAt: iso(NOW + DAY) }
+  const team = {
+    ...active,
+    goalType: 'team' as const,
+    goalValue: 1000,
+    myTotal: 10,
+    myRank: 3,
+  }
+
+  it('needs a target, like first to', () => {
+    expect(needsGoalValue('team')).toBe(true)
+    expect(needsGoalValue('first_to')).toBe(true)
+    expect(needsGoalValue('most_reps')).toBe(false)
+  })
+
+  it('is won by everyone once the members reach the goal together', () => {
+    expect(isWon({ ...team, teamTotal: 1000 }, NOW)).toBe(true)
+    expect(isWon({ ...team, teamTotal: 999 }, NOW)).toBe(false)
+    // Summaries cached before teamTotal existed.
+    expect(isWon(team, NOW)).toBe(false)
+  })
+
+  it('sums the full leaderboard when it is loaded', () => {
+    expect(teamTotalOf({ teamTotal: 5 })).toBe(5)
+    expect(teamTotalOf({}, undefined)).toBe(0)
+    expect(teamTotalOf({ teamTotal: 5 }, [{ total: 3 }, { total: 4 }])).toBe(7)
+  })
+
+  it('spreads the rest over the days left, rounded up', () => {
+    const endsAt = iso(NOW + 3 * DAY)
+    expect(teamPerDay({ goalValue: 1000, teamTotal: 700, endsAt }, NOW)).toBe(
+      100,
+    )
+    expect(teamPerDay({ goalValue: 1000, teamTotal: 699, endsAt }, NOW)).toBe(
+      101,
+    )
+    expect(teamPerDay({ goalValue: 1000, teamTotal: 1200, endsAt }, NOW)).toBe(
+      0,
+    )
+    expect(
+      teamPerDay(
+        { goalValue: 1000, teamTotal: 0, endsAt: iso(NOW - DAY) },
+        NOW,
+      ),
+    ).toBe(0)
+  })
+
+  it('names the shared goal in the subtitle', () => {
+    expect(
+      challengeSubtitle(
+        {
+          exerciseName: 'Pushups',
+          goalType: 'team',
+          goalValue: 5000,
+          startsAt: iso(NOW - DAY),
+          endsAt: iso(NOW + 19 * DAY),
+        },
+        en,
+        { now: NOW, memberCount: 4 },
+      ),
+    ).toBe(
+      `Pushups · Together to ${new Intl.NumberFormat('en').format(5000)} · 19 days left`,
+    )
   })
 })
 

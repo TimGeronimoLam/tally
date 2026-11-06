@@ -6,6 +6,15 @@ export function formatNumber(n: number): string {
   return new Intl.NumberFormat(currentLocale()).format(n)
 }
 
+/** Share of `max` reached, rounded down and capped at 100 %: "64 %". */
+export function formatPercent(value: number, max: number): string {
+  const share = max > 0 ? Math.min(1, value / max) : 0
+  return new Intl.NumberFormat(currentLocale(), {
+    style: 'percent',
+    maximumFractionDigits: 0,
+  }).format(Math.floor(share * 100) / 100)
+}
+
 /** Display name for a unit: the built-in ones are translated, others show as stored. */
 export function unitName(unit: string, m: Messages = messages()): string {
   return m.units[unit] ?? unit

@@ -112,6 +112,7 @@ function toSummary(r: Raw): ChallengeSummary {
     myTotal: num(r.my_total),
     myRank: num(r.my_rank),
     leaderTotal: num(r.leader_total),
+    teamTotal: num(r.team_total),
     top: Array.isArray(r.top) ? (r.top as Raw[]).map(toRow) : [],
   }
 }

@@ -1,28 +1,29 @@
 import { useState, type FormEvent } from 'react'
 import { useParams } from 'react-router'
 import {
-  GOAL_TYPES,
   challengeExerciseName,
   challengeStatus,
   dateRangeOf,
   editedWindow,
+  needsGoalValue,
   updateChallenge,
   useChallengeSummary,
   type ChallengeSummary,
   type GoalType,
 } from '../challenges/index.ts'
-import { DateRangeFields, PublicToggle } from '../components/app/index.ts'
+import {
+  DateRangeFields,
+  GoalFields,
+  PublicToggle,
+} from '../components/app/index.ts'
 import {
   Button,
-  Field,
   Gutter,
   Screen,
   ScreenNav,
-  SegmentedControl,
   TextField,
 } from '../components/ui/index.ts'
 import { useT } from '../i18n/index.ts'
-import { unitName } from '../lib/format.ts'
 import { useNav } from '../lib/nav.ts'
 import { useToast } from '../lib/toast.ts'
 
@@ -89,21 +90,16 @@ function EditForm({
   const timeWindow = editedWindow(c, range)
   const valid =
     name.trim().length > 0 &&
-    (goalType === 'most_reps' || goal > 0) &&
+    (!needsGoalValue(goalType) || goal > 0) &&
     timeWindow !== null
   const before = dateRangeOf(c)
   const changed =
     name.trim() !== c.name ||
     goalType !== c.goalType ||
-    (goalType === 'first_to' && goal !== c.goalValue) ||
+    (needsGoalValue(goalType) && goal !== c.goalValue) ||
     range.startKey !== before.startKey ||
     range.endKey !== before.endKey ||
     isPublic !== c.isPublic
-
-  const goalOptions = GOAL_TYPES.map((value) => ({
-    value,
-    label: t.challenges.goalType[value],
-  }))
 
   async function submit(e: FormEvent) {
     e.preventDefault()
@@ -113,7 +109,7 @@ function EditForm({
       await updateChallenge(c.id, {
         name: name.trim(),
         goalType,
-        goalValue: goalType === 'first_to' ? goal : null,
+        goalValue: needsGoalValue(goalType) ? goal : null,
         startsAt: timeWindow.startsAt,
         endsAt: timeWindow.endsAt,
         isPublic,
@@ -152,26 +148,13 @@ function EditForm({
           autoComplete="off"
         />
 
-        <Field label={t.newChallenge.goal}>
-          <SegmentedControl
-            aria-label={t.newChallenge.goalType}
-            options={goalOptions}
-            value={goalType}
-            onChange={setGoalType}
-          />
-        </Field>
-
-        {goalType === 'first_to' && (
-          <TextField
-            label={t.newChallenge.target(unitName(c.unit, t))}
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            value={goalValue}
-            onChange={(e) => setGoalValue(e.target.value.replace(/\D/g, ''))}
-            placeholder={t.newChallenge.targetPlaceholder}
-          />
-        )}
+        <GoalFields
+          goalType={goalType}
+          onGoalTypeChange={setGoalType}
+          goalValue={goalValue}
+          onGoalValueChange={setGoalValue}
+          unit={c.unit}
+        />
 
         <DateRangeFields
           range={range}
