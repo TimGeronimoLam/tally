@@ -406,6 +406,7 @@ export const es: Messages = {
     allDeleted: 'Todos los datos eliminados',
     lastError: 'Último error',
     clear: 'Borrar',
+    about: 'Acerca de',
   },
 
   sync: {
@@ -480,6 +481,54 @@ export const es: Messages = {
     prompt: 'Se abre a pantalla completa como una app y funciona sin conexión.',
     install: 'Instalar',
     gotIt: 'Entendido',
+  },
+
+  changelog: {
+    title: 'Novedades',
+    whatsNew: 'Novedades',
+    version: (v: string) => `Versión ${v}`,
+    /** Tag on the release this build is. */
+    current: 'Actual',
+    /** Log-screen notice after an update. */
+    updated: (v: string) => `Tally se ha actualizado a la ${v}`,
+    /** Per version, newest first; one sentence per change, as the user sees it. */
+    notes: {
+      '1.5.0': [
+        '31 insignias de logros: 19 nuevas en las cuatro secciones.',
+        'Un aviso cuando alguien te adelanta en un reto. Actívalo en Cuenta → Notificaciones.',
+        'La gráfica de datos sigue el calendario: semanas de lunes a domingo, meses desde el día 1, años desde enero.',
+        'Números de versión y esta página de novedades. Tras una actualización, la pantalla Registro te la señala una vez.',
+      ],
+      '1.4.0': [
+        'Retos públicos: un anfitrión puede hacer visible un reto para todos, y la pestaña Retos muestra los abiertos para unirse.',
+        'Metas de equipo: un reto puede fijar un total compartido que alcanzar entre todos.',
+        'Las cargas en segundo plano que fallan se reintentan en silencio en vez de mostrar un error.',
+      ],
+      '1.3.0': [
+        'Toca a un miembro en la clasificación de un reto para ver sus datos en él, día a día.',
+      ],
+      '1.2.0': [
+        'Los datos llegan hasta el inicio de tu historial, con barras uniformes.',
+        'El «hoy» de un reto empieza a medianoche, hora local, como en los datos.',
+      ],
+      '1.1.1': ['Volver a iniciar sesión ya no duplica las entradas.'],
+      '1.1.0': [
+        'Seis idiomas más: alemán, francés, español, italiano, neerlandés y portugués. La app sigue a tu teléfono; Cuenta → Idioma lo cambia.',
+        'Un recordatorio diario para registrar tus repeticiones (Cuenta → Notificaciones).',
+        'Más sensación de app nativa: transiciones entre pantallas, vibración, tirar para actualizar en los retos.',
+        'Los miembros pueden salir de un reto; los anfitriones pueden editarlo.',
+        'Los ejercicios incluidos siguen el idioma de la app.',
+        'Una pulsación larga en el teclado sigue contando, y la página ya no rebota.',
+      ],
+      '1.0.0': [
+        'Registra una serie con un toque y un número. Funciona sin conexión.',
+        'Datos: mapa de calor, rachas y gráfica de barras.',
+        'Logros.',
+        'Inicia sesión con un código por correo para sincronizar entre teléfonos.',
+        'Retos con amigos: códigos de invitación, clasificaciones, fechas a medida.',
+        'Modo claro y oscuro, instalación en la pantalla de inicio, exportar e importar.',
+      ],
+    },
   },
 
   offline:

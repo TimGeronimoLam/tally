@@ -1,4 +1,5 @@
 import { useRef, useState, type ChangeEvent } from 'react'
+import { APP_VERSION } from '../changelog/index.ts'
 import {
   ExerciseSheet,
   LanguageSheet,
@@ -199,10 +200,20 @@ export function AccountPage() {
         />
       </Gutter>
 
-      <Gutter className="pt-5 pb-6 text-xs leading-relaxed text-faint">
-        <div>Tally {__APP_VERSION__}</div>
+      <Gutter>
+        <SectionLabel>{t.account.about}</SectionLabel>
+        <ListGroup>
+          <ListRow
+            label={t.changelog.whatsNew}
+            detail={t.changelog.version(APP_VERSION)}
+            to="/account/whats-new"
+          />
+        </ListGroup>
+      </Gutter>
+
+      <Gutter className="pb-6 text-xs leading-relaxed text-faint empty:hidden">
         {lastError && (
-          <div className="mt-2 break-words">
+          <div className="pt-5 break-words">
             {t.account.lastError} ({new Date(lastError.at).toLocaleString()},{' '}
             {lastError.where}): {lastError.message}{' '}
             <button

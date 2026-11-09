@@ -413,6 +413,7 @@ export const pt: Messages = {
     allDeleted: 'Todos os dados eliminados',
     lastError: 'Último erro',
     clear: 'Limpar',
+    about: 'Sobre',
   },
 
   sync: {
@@ -487,6 +488,54 @@ export const pt: Messages = {
     prompt: 'Abre em ecrã inteiro como uma app e funciona offline.',
     install: 'Instalar',
     gotIt: 'Entendido',
+  },
+
+  changelog: {
+    title: 'Novidades',
+    whatsNew: 'Novidades',
+    version: (v: string) => `Versão ${v}`,
+    /** Tag on the release this build is. */
+    current: 'Atual',
+    /** Log-screen notice after an update. */
+    updated: (v: string) => `O Tally passou para a ${v}`,
+    /** Per version, newest first; one sentence per change, as the user sees it. */
+    notes: {
+      '1.5.0': [
+        '31 emblemas de conquistas: 19 novos nas quatro secções.',
+        'Um aviso quando alguém te ultrapassa num desafio. Ativa em Conta → Notificações.',
+        'O gráfico dos dados segue o calendário: semanas de segunda a domingo, meses a partir do dia 1, anos a partir de janeiro.',
+        'Números de versão e esta página de novidades. Depois de uma atualização, o ecrã Registo aponta para aqui uma vez.',
+      ],
+      '1.4.0': [
+        'Desafios públicos: um anfitrião pode tornar um desafio visível para todos, e o separador Desafios mostra os abertos para entrar.',
+        'Metas de equipa: um desafio pode definir um total partilhado para alcançar em conjunto.',
+        'Carregamentos em segundo plano que falham tentam de novo em silêncio em vez de mostrar um erro.',
+      ],
+      '1.3.0': [
+        'Toca num membro na classificação de um desafio para ver os dados dele nesse desafio, dia a dia.',
+      ],
+      '1.2.0': [
+        'Os dados recuam por todo o teu histórico, com barras uniformes.',
+        'O «hoje» de um desafio começa à meia-noite, hora local, como nos dados.',
+      ],
+      '1.1.1': ['Voltar a iniciar sessão já não duplica registos.'],
+      '1.1.0': [
+        'Mais seis idiomas: alemão, francês, espanhol, italiano, neerlandês e português. A app segue o teu telemóvel; Conta → Idioma muda-o.',
+        'Um lembrete diário para registares as tuas repetições (Conta → Notificações).',
+        'Mais sensação de app nativa: transições entre ecrãs, vibração, puxar para atualizar nos desafios.',
+        'Os membros podem sair de um desafio; os anfitriões podem editá-lo.',
+        'Os exercícios incluídos seguem o idioma da app.',
+        'Um toque longo no teclado continua a contar, e a página já não ressalta.',
+      ],
+      '1.0.0': [
+        'Regista uma série com um toque e um número. Funciona offline.',
+        'Dados: mapa de calor, sequências e gráfico de barras.',
+        'Conquistas.',
+        'Inicia sessão com um código por e-mail para sincronizar entre telemóveis.',
+        'Desafios com amigos: códigos de convite, classificações, datas à escolha.',
+        'Modo claro e escuro, instalação no ecrã principal, exportar e importar.',
+      ],
+    },
   },
 
   offline:

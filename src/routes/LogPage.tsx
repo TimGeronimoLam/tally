@@ -4,6 +4,7 @@ import {
   ExerciseChips,
   ExerciseSheet,
   InstallBanner,
+  WhatsNewBanner,
 } from '../components/app/index.ts'
 import {
   BigNumber,
@@ -102,7 +103,8 @@ export function LogPage() {
     <Screen>
       <ScreenHeader title={t.log.title} meta={formatHeaderDate()} />
 
-      <Gutter className="pt-3 empty:hidden">
+      <Gutter className="flex flex-col gap-2 pt-3 empty:hidden">
+        <WhatsNewBanner />
         <InstallBanner />
       </Gutter>
 

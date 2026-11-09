@@ -408,6 +408,7 @@ export const it: Messages = {
     allDeleted: 'Tutti i dati eliminati',
     lastError: 'Ultimo errore',
     clear: 'Cancella',
+    about: 'Informazioni',
   },
 
   sync: {
@@ -483,6 +484,54 @@ export const it: Messages = {
     prompt: "Si apre a schermo intero come un'app e funziona offline.",
     install: 'Installa',
     gotIt: 'Ok',
+  },
+
+  changelog: {
+    title: 'Novità',
+    whatsNew: 'Novità',
+    version: (v: string) => `Versione ${v}`,
+    /** Tag on the release this build is. */
+    current: 'Attuale',
+    /** Log-screen notice after an update. */
+    updated: (v: string) => `Tally è passato alla ${v}`,
+    /** Per version, newest first; one sentence per change, as the user sees it. */
+    notes: {
+      '1.5.0': [
+        '31 badge dei traguardi: 19 nuovi in tutte e quattro le sezioni.',
+        'Una notifica quando qualcuno ti supera in una sfida. Si attiva in Account → Notifiche.',
+        'Il grafico delle statistiche segue il calendario: settimane da lunedì a domenica, mesi dal 1°, anni da gennaio.',
+        'Numeri di versione e questa pagina delle novità. Dopo un aggiornamento, la schermata Registro la segnala una volta.',
+      ],
+      '1.4.0': [
+        'Sfide pubbliche: un host può rendere una sfida visibile a tutti, e la scheda Sfide mostra quelle aperte a cui unirsi.',
+        'Obiettivi di squadra: una sfida può fissare un totale condiviso da raggiungere insieme.',
+        'I caricamenti in background che falliscono riprovano in silenzio invece di mostrare un errore.',
+      ],
+      '1.3.0': [
+        'Tocca un membro nella classifica di una sfida per vedere le sue statistiche, giorno per giorno.',
+      ],
+      '1.2.0': [
+        'Le statistiche risalgono tutta la tua cronologia, con barre uniformi.',
+        'L’«oggi» di una sfida inizia a mezzanotte, ora locale, come nelle statistiche.',
+      ],
+      '1.1.1': ['Accedere di nuovo non raddoppia più le voci.'],
+      '1.1.0': [
+        'Sei lingue in più: tedesco, francese, spagnolo, italiano, olandese e portoghese. L’app segue il telefono; Account → Lingua la cambia.',
+        'Un promemoria quotidiano per registrare le ripetizioni (Account → Notifiche).',
+        'Più sensazione di app nativa: transizioni tra schermate, vibrazione, trascina per aggiornare nelle sfide.',
+        'I membri possono lasciare una sfida; gli host possono modificarla.',
+        'Gli esercizi inclusi seguono la lingua dell’app.',
+        'Una pressione lunga sul tastierino conta comunque, e la pagina non rimbalza più.',
+      ],
+      '1.0.0': [
+        'Registra una serie con un tocco e un numero. Funziona offline.',
+        'Statistiche: heatmap, serie e grafico a barre.',
+        'Traguardi.',
+        'Accedi con un codice via e-mail per sincronizzare tra telefoni.',
+        'Sfide con gli amici: codici di invito, classifiche, date personalizzate.',
+        'Tema chiaro e scuro, installazione nella schermata Home, esportazione e importazione.',
+      ],
+    },
   },
 
   offline:

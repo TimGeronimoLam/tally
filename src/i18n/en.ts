@@ -434,6 +434,7 @@ export const en = {
     allDeleted: 'All data deleted',
     lastError: 'Last error',
     clear: 'Clear',
+    about: 'About',
   },
 
   sync: {
@@ -513,6 +514,55 @@ export const en = {
     prompt: 'Opens full-screen like an app and works offline.',
     install: 'Install',
     gotIt: 'Got it',
+  },
+
+  /** Versions and what changed in each; CHANGELOG.md has the developer's log. */
+  changelog: {
+    title: "What's new",
+    whatsNew: "What's new",
+    version: (v: string) => `Version ${v}`,
+    /** Tag on the release this build is. */
+    current: 'Current',
+    /** Log-screen notice after an update. */
+    updated: (v: string) => `Tally updated to ${v}`,
+    /** Per version, newest first; one sentence per change, as the user sees it. */
+    notes: {
+      '1.5.0': [
+        '31 achievement badges: 19 new ones across all four sections.',
+        'A push alert when someone passes you in a challenge. Turn it on under Account → Notifications.',
+        'The stats chart follows the calendar: weeks run Monday to Sunday, months from the 1st, years from January.',
+        "Version numbers and this What's new page. After an update, the Log screen points here once.",
+      ],
+      '1.4.0': [
+        'Public challenges: a host can list a challenge for everyone, and the Challenges tab shows open ones to join.',
+        'Team goals: a challenge can set one shared total for everyone to reach together.',
+        'Background loads that fail retry quietly instead of showing an error.',
+      ],
+      '1.3.0': [
+        'Tap a member on a challenge leaderboard to see their stats for it, day by day.',
+      ],
+      '1.2.0': [
+        'Stats reach back through all your history, with even bars.',
+        'A challenge’s “today” starts at local midnight, like the stats.',
+      ],
+      '1.1.1': ['Signing in again no longer doubles entries.'],
+      '1.1.0': [
+        'Six more languages: German, French, Spanish, Italian, Dutch and Portuguese. The app follows your phone; Account → Language overrides it.',
+        'A daily push reminder to log your reps (Account → Notifications).',
+        'A more native feel: screen transitions, haptics, pull to refresh on challenges.',
+        'Members can leave a challenge; hosts can edit one.',
+        'Built-in exercises follow the app language.',
+        'A long press on the keypad still counts, and the page no longer rubber-bands.',
+      ],
+      '1.0.0': [
+        'Log a set with one tap and one number. Works offline.',
+        'Stats: heatmap, streaks and a bar chart.',
+        'Achievements.',
+        'Sign in with an emailed code to sync across phones.',
+        'Challenges with friends: invite codes, leaderboards, custom dates.',
+        'Light and dark mode, home-screen install, export and import.',
+      ],
+    },
   },
 
   offline: "Offline · logging still works, sync resumes when you're back",

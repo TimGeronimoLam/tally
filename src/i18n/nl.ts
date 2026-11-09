@@ -412,6 +412,7 @@ export const nl: Messages = {
     allDeleted: 'Alle gegevens verwijderd',
     lastError: 'Laatste fout',
     clear: 'Wissen',
+    about: 'Over',
   },
 
   sync: {
@@ -487,6 +488,54 @@ export const nl: Messages = {
     prompt: 'Opent schermvullend als een app en werkt offline.',
     install: 'Installeren',
     gotIt: 'Begrepen',
+  },
+
+  changelog: {
+    title: 'Nieuw in Tally',
+    whatsNew: 'Wat is nieuw',
+    version: (v: string) => `Versie ${v}`,
+    /** Tag on the release this build is. */
+    current: 'Huidig',
+    /** Log-screen notice after an update. */
+    updated: (v: string) => `Tally is nu versie ${v}`,
+    /** Per version, newest first; one sentence per change, as the user sees it. */
+    notes: {
+      '1.5.0': [
+        '31 prestatiebadges: 19 nieuwe in alle vier de secties.',
+        'Een melding wanneer iemand je inhaalt in een challenge. Zet aan onder Account → Meldingen.',
+        'De statistiekgrafiek volgt de kalender: weken van maandag tot zondag, maanden vanaf de 1e, jaren vanaf januari.',
+        'Versienummers en deze pagina. Na een update wijst het Loggen-scherm er één keer naar.',
+      ],
+      '1.4.0': [
+        'Openbare challenges: een host kan een challenge voor iedereen zichtbaar maken, en het tabblad Challenges toont open challenges om aan mee te doen.',
+        'Teamdoelen: een challenge kan één gezamenlijk totaal stellen om samen te halen.',
+        'Mislukte achtergrondladingen proberen het stil opnieuw in plaats van een fout te tonen.',
+      ],
+      '1.3.0': [
+        'Tik op een deelnemer in het klassement van een challenge om diens statistieken dag voor dag te zien.',
+      ],
+      '1.2.0': [
+        'Statistieken gaan terug door je hele geschiedenis, met gelijkmatige balken.',
+        'De “vandaag” van een challenge begint om middernacht lokale tijd, net als de statistieken.',
+      ],
+      '1.1.1': ['Opnieuw inloggen verdubbelt geen invoer meer.'],
+      '1.1.0': [
+        'Zes talen erbij: Duits, Frans, Spaans, Italiaans, Nederlands en Portugees. De app volgt je telefoon; Account → Taal past het aan.',
+        'Een dagelijkse herinnering om je reps te loggen (Account → Meldingen).',
+        'Meer app-gevoel: overgangen tussen schermen, trillingen, trekken om te vernieuwen bij challenges.',
+        'Deelnemers kunnen een challenge verlaten; hosts kunnen er een bewerken.',
+        'Meegeleverde oefeningen volgen de app-taal.',
+        'Lang drukken op het toetsenblok telt nog steeds, en de pagina veert niet meer.',
+      ],
+      '1.0.0': [
+        'Log een set met één tik en één getal. Werkt offline.',
+        'Statistieken: heatmap, reeksen en een staafdiagram.',
+        'Prestaties.',
+        'Log in met een code per e-mail om tussen telefoons te synchroniseren.',
+        'Challenges met vrienden: uitnodigingscodes, klassementen, eigen data.',
+        'Lichte en donkere modus, installatie op het beginscherm, exporteren en importeren.',
+      ],
+    },
   },
 
   offline:

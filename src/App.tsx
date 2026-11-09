@@ -15,6 +15,7 @@ import { LogPage } from './routes/LogPage.tsx'
 import { MemberStatsPage } from './routes/MemberStatsPage.tsx'
 import { NewChallengePage } from './routes/NewChallengePage.tsx'
 import { StatsPage } from './routes/StatsPage.tsx'
+import { WhatsNewPage } from './routes/WhatsNewPage.tsx'
 
 /**
  * A data router rather than `<BrowserRouter>`: only the data router runs
@@ -35,6 +36,7 @@ export const router = createBrowserRouter(
         />
         <Route path="achievements" element={<AchievementsPage />} />
         <Route path="account" element={<AccountPage />} />
+        <Route path="account/whats-new" element={<WhatsNewPage />} />
         <Route path="settings" element={<Navigate to="/account" replace />} />
       </Route>
       {/* Full-screen flows without the tab bar. */}

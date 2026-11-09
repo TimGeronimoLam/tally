@@ -416,6 +416,7 @@ export const de: Messages = {
     allDeleted: 'Alle Daten gelöscht',
     lastError: 'Letzter Fehler',
     clear: 'Löschen',
+    about: 'Über',
   },
 
   sync: {
@@ -491,6 +492,54 @@ export const de: Messages = {
     prompt: 'Öffnet im Vollbild wie eine App und funktioniert offline.',
     install: 'Installieren',
     gotIt: 'Verstanden',
+  },
+
+  changelog: {
+    title: 'Neu in Tally',
+    whatsNew: 'Was ist neu',
+    version: (v: string) => `Version ${v}`,
+    /** Tag on the release this build is. */
+    current: 'Aktuell',
+    /** Log-screen notice after an update. */
+    updated: (v: string) => `Tally ist jetzt Version ${v}`,
+    /** Per version, newest first; one sentence per change, as the user sees it. */
+    notes: {
+      '1.5.0': [
+        '31 Erfolgs-Abzeichen: 19 neue in allen vier Bereichen.',
+        'Eine Push-Mitteilung, wenn dich jemand in einer Challenge überholt. Einschalten unter Konto → Mitteilungen.',
+        'Die Statistik folgt dem Kalender: Wochen von Montag bis Sonntag, Monate ab dem 1., Jahre ab Januar.',
+        'Versionsnummern und diese Seite. Nach einem Update weist der Loggen-Bildschirm einmal hierher.',
+      ],
+      '1.4.0': [
+        'Öffentliche Challenges: Ein Host kann eine Challenge für alle sichtbar machen; der Challenges-Tab zeigt offene zum Mitmachen.',
+        'Teamziele: Eine Challenge kann ein gemeinsames Ziel setzen, das alle zusammen erreichen.',
+        'Fehlgeschlagene Ladevorgänge im Hintergrund werden still wiederholt, statt einen Fehler zu zeigen.',
+      ],
+      '1.3.0': [
+        'Tippe in der Rangliste einer Challenge auf ein Mitglied, um seine Statistik dazu Tag für Tag zu sehen.',
+      ],
+      '1.2.0': [
+        'Die Statistik reicht durch deinen ganzen Verlauf zurück, mit gleichmäßigen Balken.',
+        'Das „Heute“ einer Challenge beginnt um Mitternacht Ortszeit, wie in der Statistik.',
+      ],
+      '1.1.1': ['Erneutes Anmelden verdoppelt keine Einträge mehr.'],
+      '1.1.0': [
+        'Sechs weitere Sprachen: Deutsch, Französisch, Spanisch, Italienisch, Niederländisch und Portugiesisch. Die App folgt deinem Handy; Konto → Sprache überschreibt das.',
+        'Eine tägliche Push-Erinnerung, deine Reps zu loggen (Konto → Mitteilungen).',
+        'Mehr App-Gefühl: Übergänge zwischen Bildschirmen, Haptik, Ziehen zum Aktualisieren bei Challenges.',
+        'Mitglieder können eine Challenge verlassen; Hosts können sie bearbeiten.',
+        'Mitgelieferte Übungen folgen der App-Sprache.',
+        'Ein langer Druck auf dem Ziffernblock zählt trotzdem, und die Seite federt nicht mehr.',
+      ],
+      '1.0.0': [
+        'Einen Satz mit einem Tipp und einer Zahl loggen. Funktioniert offline.',
+        'Statistik: Heatmap, Serien und ein Balkendiagramm.',
+        'Erfolge.',
+        'Anmelden mit einem Code per E-Mail, um zwischen Handys zu synchronisieren.',
+        'Challenges mit Freunden: Einladungscodes, Ranglisten, eigene Zeiträume.',
+        'Heller und dunkler Modus, Installation auf dem Homescreen, Export und Import.',
+      ],
+    },
   },
 
   offline:

@@ -412,6 +412,7 @@ export const fr: Messages = {
     allDeleted: 'Toutes les données ont été supprimées',
     lastError: 'Dernière erreur',
     clear: 'Effacer',
+    about: 'À propos',
   },
 
   sync: {
@@ -486,6 +487,54 @@ export const fr: Messages = {
     prompt: "S'ouvre en plein écran comme une app et marche hors ligne.",
     install: 'Installer',
     gotIt: 'Compris',
+  },
+
+  changelog: {
+    title: 'Nouveautés',
+    whatsNew: 'Nouveautés',
+    version: (v: string) => `Version ${v}`,
+    /** Tag on the release this build is. */
+    current: 'Actuelle',
+    /** Log-screen notice after an update. */
+    updated: (v: string) => `Tally passe en version ${v}`,
+    /** Per version, newest first; one sentence per change, as the user sees it. */
+    notes: {
+      '1.5.0': [
+        '31 badges de succès : 19 nouveaux dans les quatre sections.',
+        'Une notification quand quelqu’un te dépasse dans un défi. À activer dans Compte → Notifications.',
+        'Le graphique des stats suit le calendrier : semaines du lundi au dimanche, mois à partir du 1er, années à partir de janvier.',
+        'Des numéros de version et cette page Nouveautés. Après une mise à jour, l’écran Journal y renvoie une fois.',
+      ],
+      '1.4.0': [
+        'Défis publics : un hôte peut rendre un défi visible par tous, et l’onglet Défis montre ceux à rejoindre.',
+        'Objectifs d’équipe : un défi peut fixer un total commun à atteindre ensemble.',
+        'Les chargements en arrière-plan qui échouent réessaient discrètement au lieu d’afficher une erreur.',
+      ],
+      '1.3.0': [
+        'Touche un membre dans le classement d’un défi pour voir ses stats, jour par jour.',
+      ],
+      '1.2.0': [
+        'Les stats remontent tout ton historique, avec des barres régulières.',
+        'L’« aujourd’hui » d’un défi commence à minuit, heure locale, comme les stats.',
+      ],
+      '1.1.1': ['Se reconnecter ne double plus les entrées.'],
+      '1.1.0': [
+        'Six langues de plus : allemand, français, espagnol, italien, néerlandais et portugais. L’app suit ton téléphone ; Compte → Langue permet de choisir.',
+        'Un rappel quotidien pour noter tes reps (Compte → Notifications).',
+        'Plus proche d’une app native : transitions entre écrans, vibrations, tirer pour actualiser les défis.',
+        'Les membres peuvent quitter un défi ; les hôtes peuvent le modifier.',
+        'Les exercices fournis suivent la langue de l’app.',
+        'Un appui long sur le pavé compte quand même, et la page ne rebondit plus.',
+      ],
+      '1.0.0': [
+        'Note une série en un geste et un nombre. Fonctionne hors ligne.',
+        'Stats : heatmap, séries et graphique en barres.',
+        'Succès.',
+        'Connexion par code reçu par e-mail pour synchroniser entre téléphones.',
+        'Défis entre amis : codes d’invitation, classements, dates au choix.',
+        'Mode clair et sombre, installation sur l’écran d’accueil, export et import.',
+      ],
+    },
   },
 
   offline:

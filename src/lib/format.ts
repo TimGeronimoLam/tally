@@ -72,6 +72,15 @@ export function formatDayMonth(d: Date | number | string): string {
   })
 }
 
+/** "9 Nov 2026" */
+export function formatFullDate(d: Date | number): string {
+  return new Date(d).toLocaleDateString(currentLocale(), {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
 /** "Mar 2026" */
 export function formatMonthYear(d: Date | number): string {
   return new Date(d).toLocaleDateString(currentLocale(), {

@@ -40,6 +40,7 @@ stretched UI. Fixed overlays (toast, sheet) share the same cap.
 | `src/db/`             | Dexie schema, types, mutations, live-query hooks, import/export           |
 | `src/lib/`            | Pure helpers: `cn`, `format`, `date`, `theme`, `toast` hook               |
 | `src/i18n/`           | Languages. `en.ts` is the typed source; every other locale must match it  |
+| `src/changelog/`      | Versions, with the What's new notice and page; see "Releasing"            |
 | `src/sync/`           | Supabase auth and sync                                                    |
 | `src/reminders/`      | Daily push reminder: subscribe, save the row, repair it on launch         |
 | `src/sw.ts`           | Service worker: offline precache plus the reminder's push handlers        |
@@ -150,6 +151,22 @@ Invite links (`/join/CODE`) have the iOS limit described above: on an
 iPhone they open in Safari, not in the installed app. The join page then
 shows the code with a Copy button and tells the user to enter it in the
 app's Challenges tab, where the code field already lives.
+
+## Releasing
+
+The version comes from `package.json` (`vite.config.ts` bakes it in as
+`__APP_VERSION__`). Users see it under Account → About → What's new, which
+lists every release with its notes in the app language, and the Log screen
+points there once after an update (per device, `tally.seenVersion` in
+localStorage). To ship a version:
+
+1. `npm version minor --no-git-tag-version` (or `patch`).
+2. Add the release to `RELEASES` in `src/changelog/releases.ts` and a
+   section to `CHANGELOG.md`, same version and date.
+3. Add its notes to `changelog.notes` in `src/i18n/en.ts`, then in every
+   other locale (`tsc` lists the ones missing). One sentence per change,
+   as the user sees it; the first note doubles as the Log-screen teaser.
+4. `npm test`: `src/changelog/releases.test.ts` checks the four agree.
 
 ## Captcha
 
