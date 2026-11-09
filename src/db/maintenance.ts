@@ -1,6 +1,6 @@
 import { messages } from '../i18n/index.ts'
 import { recordError } from '../lib/diagnostics.ts'
-import { disableReminder } from '../reminders/index.ts'
+import { disableNotifications } from '../reminders/index.ts'
 import { db } from './db.ts'
 import { seedIfNeeded } from './seed.ts'
 import {
@@ -123,7 +123,7 @@ export async function clearAccountData(): Promise<void> {
 /** Wipe everything and re-seed defaults. Irreversible. */
 export async function resetAllData(): Promise<void> {
   // A wiped phone stops getting reminders; the UI would show it off anyway.
-  await disableReminder().catch((err) => recordError('reminder', err))
+  await disableNotifications().catch((err) => recordError('reminder', err))
   await db.transaction(
     'rw',
     db.exercises,

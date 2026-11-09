@@ -37,6 +37,45 @@ export function notificationPayload(
   }
 }
 
+/** A row from `public.overtaken_alerts()`: one device of a passed member. */
+export interface OvertakenAlert {
+  endpoint: string
+  p256dh: string
+  auth: string
+  lang: string
+  origin: string
+  challenge_id: string
+  challenge_name: string
+  /** Display name of the member now directly ahead. */
+  ahead_name: string | null
+  rank: number
+  member_count: number
+}
+
+/**
+ * "Anna just passed you. You're 3rd now." under the challenge's name; a
+ * tap opens the challenge. One tag per challenge, so a newer alert
+ * replaces an unread older one instead of stacking.
+ */
+export function overtakenPayload(row: OvertakenAlert): ReminderPayload {
+  const locale = isLocale(row.lang) ? row.lang : 'en'
+  const t = MESSAGES[locale]
+  const place = t.ordinal(row.rank)
+  const name = row.ahead_name?.trim()
+  return {
+    web_push: 8030,
+    notification: {
+      title: row.challenge_name,
+      body: name
+        ? t.reminders.passedBody(name, place)
+        : t.reminders.passedBodyAnonymous(place),
+      navigate: `${row.origin}/challenges/${encodeURIComponent(row.challenge_id)}`,
+      lang: locale,
+      tag: `overtaken-${row.challenge_id}`,
+    },
+  }
+}
+
 export type SendOutcome = 'sent' | 'gone' | 'failed'
 
 /**

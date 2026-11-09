@@ -393,7 +393,7 @@ export const it: Messages = {
   },
 
   reminders: {
-    title: 'Promemoria',
+    title: 'Notifiche',
     daily: 'Promemoria giornaliero',
     time: 'Ora',
     installFirst: 'Prima installa Tally',
@@ -404,6 +404,13 @@ export const it: Messages = {
     disabled: 'Promemoria disattivato',
     pushTitle: "È l'ora di una serie",
     pushBody: 'Oggi non hai ancora registrato nulla. Basta una serie veloce.',
+    overtaken: 'Quando qualcuno ti supera',
+    overtakenOn: 'Ti avviseremo quando qualcuno ti supera',
+    overtakenOff: 'Avvisi delle sfide disattivati',
+    passedBody: (name, place) =>
+      `${name} ti ha appena superato. Ora sei ${place}.`,
+    passedBodyAnonymous: (place) =>
+      `Qualcuno ti ha appena superato. Ora sei ${place}.`,
   },
 
   install: {

@@ -57,12 +57,13 @@ export const META_KEYS = {
   /** Newest `updated_at` pulled per table (ISO string). */
   lastPullExercises: 'lastPull.exercises',
   lastPullEntries: 'lastPull.entries',
-  /** This device's daily reminder (`ReminderMeta`); absent while off. */
+  /** This device's notifications (`ReminderMeta`); absent while all off. */
   reminder: 'reminder',
 } as const
 
 /**
- * The daily reminder as this device last saved it to Supabase. The row lives
+ * This device's notifications (the daily reminder, challenge alerts) as it
+ * last saved them to Supabase. The row lives
  * under the push subscription's endpoint; src/reminders/push.ts compares
  * this with the browser and the session to repair it.
  */
@@ -76,4 +77,12 @@ export interface ReminderMeta {
   tz: string
   /** App language the notification is worded in. */
   lang: string
+  /**
+   * The daily reminder is on. Absent in metas saved before challenge
+   * alerts existed, when the daily reminder was the only reason to have
+   * one: read it with `wantsDaily`.
+   */
+  daily?: boolean
+  /** Push when another member passes this user in a challenge. */
+  overtaken?: boolean
 }

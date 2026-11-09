@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { de } from '../src/i18n/de.ts'
 import { en } from '../src/i18n/en.ts'
-import { classify, inFilter, notificationPayload } from './reminders.ts'
+import {
+  classify,
+  inFilter,
+  notificationPayload,
+  overtakenPayload,
+  type OvertakenAlert,
+} from './reminders.ts'
 
 describe('notificationPayload', () => {
   it('words the reminder in the subscription language', () => {
@@ -65,5 +71,44 @@ describe('inFilter', () => {
 
   it('escapes quotes and backslashes', () => {
     expect(inFilter(['a"b\\c'])).toBe('in.("a\\"b\\\\c")')
+  })
+})
+
+describe('overtakenPayload', () => {
+  const row: OvertakenAlert = {
+    endpoint: 'https://fcm.googleapis.com/fcm/send/abc',
+    p256dh: 'k',
+    auth: 'a',
+    lang: 'en',
+    origin: 'https://tally.example.com',
+    challenge_id: '6f1c2b1e-0000-4000-8000-000000000001',
+    challenge_name: 'Push-up November',
+    ahead_name: 'Anna',
+    rank: 3,
+    member_count: 5,
+  }
+
+  it('names who is ahead and the new place, under the challenge name', () => {
+    expect(overtakenPayload(row)).toEqual({
+      web_push: 8030,
+      notification: {
+        title: 'Push-up November',
+        body: "Anna just passed you. You're 3rd now.",
+        navigate:
+          'https://tally.example.com/challenges/6f1c2b1e-0000-4000-8000-000000000001',
+        lang: 'en',
+        tag: 'overtaken-6f1c2b1e-0000-4000-8000-000000000001',
+      },
+    })
+  })
+
+  it('words it in the subscription language with its ordinal', () => {
+    const p = overtakenPayload({ ...row, lang: 'de', rank: 2 })
+    expect(p.notification.body).toBe(de.reminders.passedBody('Anna', '2.'))
+  })
+
+  it('copes with a blank name', () => {
+    const p = overtakenPayload({ ...row, ahead_name: '  ' })
+    expect(p.notification.body).toBe(en.reminders.passedBodyAnonymous('3rd'))
   })
 })

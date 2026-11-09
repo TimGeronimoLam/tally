@@ -421,7 +421,7 @@ export const en = {
   },
 
   reminders: {
-    title: 'Reminders',
+    title: 'Notifications',
     daily: 'Daily reminder',
     time: 'Time',
     /** iOS in a Safari tab: web push needs the Home Screen app. */
@@ -434,6 +434,15 @@ export const en = {
     /** The notification itself, sent by the server in the device's language. */
     pushTitle: 'Time for a set',
     pushBody: 'Nothing logged today yet. One quick set counts.',
+    /** Switch for the "someone passed you" challenge alerts. */
+    overtaken: 'When someone passes you',
+    overtakenOn: "You'll hear when someone passes you",
+    overtakenOff: 'Challenge alerts off',
+    /** Challenge alert body, under the challenge's name; place is ordinal(rank). */
+    passedBody: (name: string, place: string) =>
+      `${name} just passed you. You're ${place} now.`,
+    passedBodyAnonymous: (place: string) =>
+      `Someone just passed you. You're ${place} now.`,
   },
 
   install: {

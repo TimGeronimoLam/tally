@@ -3,6 +3,8 @@ import type { ReminderMeta } from '../db/types.ts'
 import {
   planReconcile,
   urlBase64ToUint8Array,
+  wantsDaily,
+  wantsOvertaken,
   type ReconcileInput,
 } from './plan.ts'
 
@@ -99,5 +101,23 @@ describe('urlBase64ToUint8Array', () => {
     // 0xfb 0xff → "-_8" in base64url, "+/8=" in base64.
     expect([...urlBase64ToUint8Array('-_8')]).toEqual([0xfb, 0xff])
     expect([...urlBase64ToUint8Array(' AQID \n')]).toEqual([1, 2, 3])
+  })
+})
+
+describe('notification switches', () => {
+  it('reads a meta from before challenge alerts as daily only', () => {
+    expect(wantsDaily(meta)).toBe(true)
+    expect(wantsOvertaken(meta)).toBe(false)
+  })
+
+  it('reads the switches as saved', () => {
+    const alertsOnly = { ...meta, daily: false, overtaken: true }
+    expect(wantsDaily(alertsOnly)).toBe(false)
+    expect(wantsOvertaken(alertsOnly)).toBe(true)
+  })
+
+  it('has everything off without a meta', () => {
+    expect(wantsDaily(null)).toBe(false)
+    expect(wantsOvertaken(undefined)).toBe(false)
   })
 })

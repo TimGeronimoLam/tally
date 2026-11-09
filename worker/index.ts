@@ -1,13 +1,21 @@
 /**
  * The Cloudflare Worker behind the deployed app. Requests go straight to the
  * static build (wrangler.jsonc `assets`, SPA fallback included); the cron
- * trigger sends the daily "log your reps" reminders.
+ * trigger sends the daily "log your reps" reminders and the "someone
+ * passed you" challenge alerts.
  *
  * Secrets (dashboard → Workers → tally → Settings → Variables and Secrets,
  * or `.dev.vars` for `wrangler dev`): see Env below and the README.
  */
 import { buildPushPayload, type VapidKeys } from '@block65/webcrypto-web-push'
-import { classify, inFilter, notificationPayload } from './reminders.ts'
+import {
+  classify,
+  inFilter,
+  notificationPayload,
+  overtakenPayload,
+  type OvertakenAlert,
+  type ReminderPayload,
+} from './reminders.ts'
 
 export interface Env {
   ASSETS: Fetcher
@@ -49,14 +57,45 @@ function supabaseFetch(env: Env, path: string, init: RequestInit) {
   })
 }
 
+/** A push to send: the device and what to show on it. */
+interface Push {
+  endpoint: string
+  p256dh: string
+  auth: string
+  data: ReminderPayload
+  options: { ttl: number; topic: string }
+}
+
 /**
- * Claim the subscriptions that are due (the database decides who, in each
- * one's own time zone, and marks them sent in the same statement), push to
- * each, and drop those the push service says are gone.
+ * A cron run may make 50 subrequests on the free plan: two RPCs and one
+ * delete leave 47 for pushes. Challenge alerts go first (they are about
+ * the last 15 minutes); the daily reminders take what is left, and the
+ * rest go out on the next run, inside their grace window.
+ */
+const PUSH_BUDGET = 47
+const ALERT_MEMBERS_PER_RUN = 15
+
+async function rpc<T>(env: Env, name: string, args: object): Promise<T[]> {
+  const res = await supabaseFetch(env, `rpc/${name}`, {
+    method: 'POST',
+    body: JSON.stringify(args),
+  })
+  if (!res.ok) {
+    console.error(`push: ${name} ${res.status} ${await res.text()}`)
+    return []
+  }
+  return (await res.json()) as T[]
+}
+
+/**
+ * Claim who is due (the database decides: passed in a challenge since the
+ * last run, or past their reminder time in their own zone, and marks them
+ * in the same statement), push to each device, and drop those the push
+ * service says are gone.
  */
 export async function sendDueReminders(env: Env): Promise<void> {
   // Deployed before its settings were added: nothing to do yet. Checked
-  // before claiming, so no reminder is marked sent without being sent.
+  // before claiming, so nothing is marked sent without being sent.
   const missing = (
     [
       'SUPABASE_URL',
@@ -70,16 +109,38 @@ export async function sendDueReminders(env: Env): Promise<void> {
     console.warn(`reminders: not configured, missing ${missing.join(', ')}`)
     return
   }
-  const res = await supabaseFetch(env, 'rpc/due_reminders', {
-    method: 'POST',
-    body: '{}',
+
+  const alerts = (
+    await rpc<OvertakenAlert>(env, 'overtaken_alerts', {
+      p_limit: ALERT_MEMBERS_PER_RUN,
+    })
+  ).slice(0, PUSH_BUDGET)
+  const due = await rpc<DueReminder>(env, 'due_reminders', {
+    p_limit: PUSH_BUDGET - alerts.length,
   })
-  if (!res.ok) {
-    console.error(`reminders: due_reminders ${res.status} ${await res.text()}`)
-    return
-  }
-  const due = (await res.json()) as DueReminder[]
-  if (due.length === 0) return
+
+  const pushes: Push[] = [
+    ...alerts.map((row) => ({
+      endpoint: row.endpoint,
+      p256dh: row.p256dh,
+      auth: row.auth,
+      data: overtakenPayload(row),
+      // Stale after a few hours: the race has moved on.
+      // A Topic header is at most 32 URL-safe characters.
+      options: {
+        ttl: 4 * 3600,
+        topic: `ot-${row.challenge_id.replace(/-/g, '').slice(0, 29)}`,
+      },
+    })),
+    ...due.map((row) => ({
+      endpoint: row.endpoint,
+      p256dh: row.p256dh,
+      auth: row.auth,
+      data: notificationPayload(row.lang, row.origin),
+      options: { ttl: 7200, topic: 'daily-reminder' },
+    })),
+  ]
+  if (pushes.length === 0) return
 
   const vapid: VapidKeys = {
     subject: env.VAPID_SUBJECT,
@@ -87,36 +148,40 @@ export async function sendDueReminders(env: Env): Promise<void> {
     privateKey: env.VAPID_PRIVATE_KEY,
   }
   const results = await Promise.allSettled(
-    due.map(async (row) => {
+    pushes.map(async (push) => {
       const payload = await buildPushPayload(
         {
-          data: notificationPayload(row.lang, row.origin),
-          options: { ttl: 7200, urgency: 'normal', topic: 'daily-reminder' },
+          data: push.data,
+          options: { ...push.options, urgency: 'normal' },
         },
         {
-          endpoint: row.endpoint,
+          endpoint: push.endpoint,
           expirationTime: null,
-          keys: { p256dh: row.p256dh, auth: row.auth },
+          keys: { p256dh: push.p256dh, auth: push.auth },
         },
         vapid,
       )
-      const push = await fetch(row.endpoint, payload)
-      const outcome = classify(push.status)
+      const res = await fetch(push.endpoint, payload)
+      const outcome = classify(res.status)
       if (outcome === 'failed') {
         console.warn(
-          `reminders: ${new URL(row.endpoint).host} answered ${push.status}`,
+          `push: ${new URL(push.endpoint).host} answered ${res.status}`,
         )
       }
       return outcome
     }),
   )
 
-  const gone = due
-    .filter((_, i) => {
-      const r = results[i]
-      return r.status === 'fulfilled' && r.value === 'gone'
-    })
-    .map((row) => row.endpoint)
+  const gone = [
+    ...new Set(
+      pushes
+        .filter((_, i) => {
+          const r = results[i]
+          return r.status === 'fulfilled' && r.value === 'gone'
+        })
+        .map((push) => push.endpoint),
+    ),
+  ]
   if (gone.length > 0) {
     // One request for all of them: a cron run gets 50 subrequests.
     const del = await supabaseFetch(
@@ -124,14 +189,14 @@ export async function sendDueReminders(env: Env): Promise<void> {
       `push_subscriptions?endpoint=${encodeURIComponent(inFilter(gone))}`,
       { method: 'DELETE' },
     )
-    if (!del.ok) console.error(`reminders: delete ${del.status}`)
+    if (!del.ok) console.error(`push: delete ${del.status}`)
   }
 
   const count = (o: string) =>
     results.filter((r) => r.status === 'fulfilled' && r.value === o).length
   const errors = results.filter((r) => r.status === 'rejected')
-  for (const e of errors.slice(0, 3)) console.error('reminders:', e.reason)
+  for (const e of errors.slice(0, 3)) console.error('push:', e.reason)
   console.log(
-    `reminders: due ${due.length}, sent ${count('sent')}, gone ${gone.length}, failed ${count('failed') + errors.length}`,
+    `push: alerts ${alerts.length}, reminders ${due.length}, sent ${count('sent')}, gone ${gone.length}, failed ${count('failed') + errors.length}`,
   )
 }

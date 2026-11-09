@@ -400,7 +400,7 @@ export const nl: Messages = {
   },
 
   reminders: {
-    title: 'Herinneringen',
+    title: 'Meldingen',
     daily: 'Dagelijkse herinnering',
     time: 'Tijd',
     installFirst: 'Installeer Tally eerst',
@@ -411,6 +411,13 @@ export const nl: Messages = {
     disabled: 'Herinnering uit',
     pushTitle: 'Tijd voor een set',
     pushBody: 'Vandaag nog niets gelogd. Eén snelle set telt al.',
+    overtaken: 'Als iemand je inhaalt',
+    overtakenOn: 'Je hoort het als iemand je inhaalt',
+    overtakenOff: 'Challengemeldingen uit',
+    passedBody: (name, place) =>
+      `${name} heeft je net ingehaald. Je staat nu ${place}.`,
+    passedBodyAnonymous: (place) =>
+      `Iemand heeft je net ingehaald. Je staat nu ${place}.`,
   },
 
   install: {

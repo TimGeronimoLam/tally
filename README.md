@@ -187,7 +187,7 @@ console).
 
 ## Daily reminder (push)
 
-Account → Reminders → Daily reminder sends one notification a day at the
+Account → Notifications → Daily reminder sends one notification a day at the
 chosen time, skipped when that day already has a synced entry. It is per
 device: each phone has its own switch and time. Works on Android and
 desktop Chrome/Edge/Firefox, and on iOS 16.4+ only from the Home Screen app
@@ -202,6 +202,20 @@ an anonymous user, as joining a challenge does; the account card still says
 time zone (2-hour grace window, never twice a day), sends each an encrypted
 push with VAPID, and deletes rows the push service reports gone (404/410).
 `src/sw.ts` shows the notification; a tap opens the app.
+
+### Challenge alerts
+
+Account → Notifications → When someone passes you pushes "Anna just passed
+you. You're 3rd now." when another member moves ahead of you in a running
+challenge (not team goals). Same subscription row as the daily reminder,
+with its own `overtaken` switch next to `daily`. Each cron run first calls
+`overtaken_alerts()`: it ranks every running challenge like the leaderboard
+and compares with the rank each member was last seen at
+(`challenge_rank_seen`, server-only). A worse place is pushed if the member
+has logged something in the challenge and was not alerted for it in the
+last hour; otherwise it is remembered quietly (during the hour's pause it
+waits, and goes out later if they are still behind). The daily reminders
+get the rest of the run's 50-subrequest budget. A tap opens the challenge.
 
 Setup, once (needs the Cloudflare Workers deployment):
 

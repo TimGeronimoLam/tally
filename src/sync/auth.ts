@@ -4,7 +4,7 @@ import { messages } from '../i18n/index.ts'
 import { captchaToken, isCaptchaError } from '../lib/captcha.ts'
 import { recordError } from '../lib/diagnostics.ts'
 import { supabase } from '../lib/supabase.ts'
-import { disableReminder, reconcileReminder } from '../reminders/index.ts'
+import { disableNotifications, reconcileReminder } from '../reminders/index.ts'
 import { clearAccountData } from '../db/maintenance.ts'
 import { reconcileDisplayName } from './profile.ts'
 import { setSyncStatus } from './status.ts'
@@ -149,7 +149,7 @@ export async function signOut(): Promise<void> {
     throw new Error(messages().sync.signOutUnsynced)
   }
   cancelScheduledSync()
-  await disableReminder().catch((err) => recordError('reminder', err))
+  await disableNotifications().catch((err) => recordError('reminder', err))
   // This device only: other phones keep their sessions.
   const { error } = await client.auth.signOut({ scope: 'local' })
   if (error) throw error

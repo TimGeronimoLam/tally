@@ -390,7 +390,7 @@ export const es: Messages = {
   },
 
   reminders: {
-    title: 'Recordatorios',
+    title: 'Notificaciones',
     daily: 'Recordatorio diario',
     time: 'Hora',
     installFirst: 'Instala Tally primero',
@@ -401,6 +401,13 @@ export const es: Messages = {
     disabled: 'Recordatorio desactivado',
     pushTitle: 'Hora de una serie',
     pushBody: 'Hoy aún no has registrado nada. Una serie rápida cuenta.',
+    overtaken: 'Cuando alguien te adelanta',
+    overtakenOn: 'Te avisaremos cuando alguien te adelante',
+    overtakenOff: 'Avisos de retos desactivados',
+    passedBody: (name, place) =>
+      `${name} acaba de adelantarte. Ahora vas ${place}.`,
+    passedBodyAnonymous: (place) =>
+      `Alguien acaba de adelantarte. Ahora vas ${place}.`,
   },
 
   install: {

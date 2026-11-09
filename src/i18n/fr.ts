@@ -396,7 +396,7 @@ export const fr: Messages = {
   },
 
   reminders: {
-    title: 'Rappels',
+    title: 'Notifications',
     daily: 'Rappel quotidien',
     time: 'Heure',
     installFirst: "Installe d'abord Tally",
@@ -407,6 +407,13 @@ export const fr: Messages = {
     disabled: 'Rappel désactivé',
     pushTitle: "C'est l'heure d'une série",
     pushBody: "Rien d'enregistré aujourd'hui. Une petite série suffit.",
+    overtaken: "Quand quelqu'un te dépasse",
+    overtakenOn: "On te prévient quand quelqu'un te dépasse",
+    overtakenOff: 'Alertes de défi désactivées',
+    passedBody: (name, place) =>
+      `${name} vient de te dépasser. Tu es ${place} maintenant.`,
+    passedBodyAnonymous: (place) =>
+      `Quelqu'un vient de te dépasser. Tu es ${place} maintenant.`,
   },
 
   install: {

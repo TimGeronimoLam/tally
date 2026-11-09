@@ -397,7 +397,7 @@ export const pt: Messages = {
   },
 
   reminders: {
-    title: 'Lembretes',
+    title: 'Notificações',
     daily: 'Lembrete diário',
     time: 'Hora',
     installFirst: 'Instala o Tally primeiro',
@@ -408,6 +408,13 @@ export const pt: Messages = {
     disabled: 'Lembrete desligado',
     pushTitle: 'Hora de uma série',
     pushBody: 'Ainda não registaste nada hoje. Uma série rápida conta.',
+    overtaken: 'Quando alguém te ultrapassa',
+    overtakenOn: 'Vais saber quando alguém te ultrapassar',
+    overtakenOff: 'Alertas de desafios desligados',
+    passedBody: (name, place) =>
+      `${name} acabou de te ultrapassar. Estás agora em ${place}.`,
+    passedBodyAnonymous: (place) =>
+      `Alguém acabou de te ultrapassar. Estás agora em ${place}.`,
   },
 
   install: {

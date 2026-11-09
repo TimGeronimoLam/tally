@@ -401,7 +401,7 @@ export const de: Messages = {
   },
 
   reminders: {
-    title: 'Erinnerungen',
+    title: 'Mitteilungen',
     daily: 'Tägliche Erinnerung',
     time: 'Uhrzeit',
     installFirst: 'Erst Tally installieren',
@@ -412,6 +412,13 @@ export const de: Messages = {
     disabled: 'Erinnerung aus',
     pushTitle: 'Zeit für einen Satz',
     pushBody: 'Heute noch nichts geloggt. Ein kurzer Satz zählt schon.',
+    overtaken: 'Wenn dich jemand überholt',
+    overtakenOn: 'Du erfährst, wenn dich jemand überholt',
+    overtakenOff: 'Challenge-Mitteilungen aus',
+    passedBody: (name, place) =>
+      `${name} hat dich gerade überholt. Du bist jetzt ${place}.`,
+    passedBodyAnonymous: (place) =>
+      `Jemand hat dich gerade überholt. Du bist jetzt ${place}.`,
   },
 
   install: {

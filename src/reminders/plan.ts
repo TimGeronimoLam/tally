@@ -1,5 +1,15 @@
 import type { ReminderMeta } from '../db/types.ts'
 
+/** Whether the daily reminder is on (old metas had nothing else). */
+export function wantsDaily(meta: ReminderMeta | null | undefined): boolean {
+  return meta != null && meta.daily !== false
+}
+
+/** Whether "someone passed you" challenge alerts are on. */
+export function wantsOvertaken(meta: ReminderMeta | null | undefined): boolean {
+  return meta?.overtaken === true
+}
+
 /** What this device knows when it checks its reminder. */
 export interface ReconcileInput {
   /** The reminder as last saved, or null while off. */

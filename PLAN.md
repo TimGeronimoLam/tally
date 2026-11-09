@@ -164,6 +164,7 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
 ## Phase 7 – Daily reminder
 
 - [x] Web Push "log your reps" reminder, one per device per day at a chosen time, skipped when the day has an entry (`20261014000000_push_reminders.sql`, Worker cron in `worker/`, `src/sw.ts`, Account → Reminders)
+- [x] Challenge alerts: push when someone passes you in a running challenge, at most hourly per challenge (`20261109000000_overtaken_alerts.sql`, `overtaken_alerts()` in the same cron, Account → Notifications)
 
 ---
 

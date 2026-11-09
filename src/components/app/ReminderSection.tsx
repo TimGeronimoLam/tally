@@ -5,10 +5,13 @@ import { formatTime } from '../../lib/format.ts'
 import { useToast } from '../../lib/toast.ts'
 import {
   DEFAULT_REMINDER_TIME,
-  disableReminder,
-  enableReminder,
+  disableNotification,
+  enableNotification,
   reminderAvailability,
   setReminderTime,
+  wantsDaily,
+  wantsOvertaken,
+  type NotificationKind,
   type ReminderAvailability,
 } from '../../reminders/index.ts'
 import { ListGroup, ListRow, Switch } from '../ui/index.ts'
@@ -36,10 +39,11 @@ function useAvailability(): [ReminderAvailability, () => void] {
 }
 
 /**
- * The daily reminder rows on the Account screen: an on/off switch and,
- * while on, the time. Nothing here mentions accounts: turning it on with no
- * session creates an anonymous one, which the card above shows as
- * "Local only", as after a challenge join.
+ * The notification rows on the Account screen: the daily reminder with,
+ * while on, its time; and alerts when someone passes you in a challenge.
+ * Nothing here mentions accounts: turning one on with no session creates
+ * an anonymous one, which the card above shows as "Local only", as after a
+ * challenge join.
  */
 export function ReminderSection() {
   const t = useT()
@@ -64,18 +68,27 @@ export function ReminderSection() {
       })
   }
 
-  function toggle(on: boolean) {
-    // Synchronous on purpose: enableReminder asks for notification
+  function toggle(kind: NotificationKind, on: boolean) {
+    // Synchronous on purpose: enableNotification asks for notification
     // permission inside this tap.
-    if (on) {
+    if (kind === 'daily') {
       run(
-        enableReminder(DEFAULT_REMINDER_TIME),
-        t.reminders.enabled(formatClock(DEFAULT_REMINDER_TIME)),
+        on
+          ? enableNotification('daily', DEFAULT_REMINDER_TIME)
+          : disableNotification('daily'),
+        on
+          ? t.reminders.enabled(formatClock(DEFAULT_REMINDER_TIME))
+          : t.reminders.disabled,
       )
     } else {
-      run(disableReminder(), t.reminders.disabled)
+      run(
+        on ? enableNotification('overtaken') : disableNotification('overtaken'),
+        on ? t.reminders.overtakenOn : t.reminders.overtakenOff,
+      )
     }
   }
+
+  const daily = wantsDaily(reminder)
 
   const unavailable = {
     ok: null,
@@ -92,15 +105,28 @@ export function ReminderSection() {
           unavailable ?? (
             <Switch
               aria-label={t.reminders.daily}
-              checked={reminder != null}
+              checked={daily}
               disabled={busy || reminder === undefined}
-              onChange={toggle}
+              onChange={(on) => toggle('daily', on)}
             />
           )
         }
       />
-      {reminder && !unavailable && (
+      {reminder && daily && !unavailable && (
         <ReminderTimeRow key={reminder.endpoint} reminder={reminder} />
+      )}
+      {!unavailable && (
+        <ListRow
+          label={t.reminders.overtaken}
+          detail={
+            <Switch
+              aria-label={t.reminders.overtaken}
+              checked={wantsOvertaken(reminder)}
+              disabled={busy || reminder === undefined}
+              onChange={(on) => toggle('overtaken', on)}
+            />
+          }
+        />
       )}
     </ListGroup>
   )

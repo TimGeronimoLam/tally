@@ -7,14 +7,23 @@ import { deviceTimeZone } from '../lib/date.ts'
 import { recordError } from '../lib/diagnostics.ts'
 import { isIOS, isStandalone } from '../lib/install.ts'
 import { supabase } from '../lib/supabase.ts'
-import { planReconcile, urlBase64ToUint8Array } from './plan.ts'
+import {
+  planReconcile,
+  urlBase64ToUint8Array,
+  wantsDaily,
+  wantsOvertaken,
+} from './plan.ts'
 
 /**
- * The daily "log your reps" reminder on this device: a Web Push
- * subscription plus a `push_subscriptions` row that the Worker's cron
- * (worker/index.ts) reads. Per device, not per account: the toggle and the
- * time belong to this phone's subscription.
+ * This device's notifications: the daily "log your reps" reminder and the
+ * "someone passed you" challenge alerts. One Web Push subscription plus a
+ * `push_subscriptions` row that the Worker's cron (worker/index.ts) reads,
+ * with a switch for each. Per device, not per account: the switches and
+ * the time belong to this phone's subscription.
  */
+
+/** One of the notification switches. */
+export type NotificationKind = 'daily' | 'overtaken'
 
 export const DEFAULT_REMINDER_TIME = '19:00'
 
@@ -116,18 +125,22 @@ async function saveRow(sub: PushSubscription, meta: ReminderMeta) {
   if (!keys?.p256dh || !keys.auth) {
     throw new Error(messages().reminders.unsupported)
   }
-  const { error } = await requireClient().from('push_subscriptions').upsert(
-    {
-      endpoint: sub.endpoint,
-      p256dh: keys.p256dh,
-      auth: keys.auth,
-      tz: meta.tz,
-      remind_at: meta.time,
-      lang: meta.lang,
-      origin: window.location.origin,
-    },
-    { onConflict: 'endpoint' },
-  )
+  const { error } = await requireClient()
+    .from('push_subscriptions')
+    .upsert(
+      {
+        endpoint: sub.endpoint,
+        p256dh: keys.p256dh,
+        auth: keys.auth,
+        tz: meta.tz,
+        remind_at: meta.time,
+        lang: meta.lang,
+        daily: wantsDaily(meta),
+        overtaken: wantsOvertaken(meta),
+        origin: window.location.origin,
+      },
+      { onConflict: 'endpoint' },
+    )
   if (error) throw new Error(error.message)
 }
 
@@ -167,12 +180,27 @@ async function turnOff(meta: ReminderMeta | undefined) {
   ])
 }
 
+/** Save a change of switches on the existing subscription, or make a new one. */
+async function update(meta: ReminderMeta, next: ReminderMeta) {
+  const sub = await currentSubscription()
+  if (!sub || sub.endpoint !== meta.endpoint) {
+    await resubscribe(next)
+    return
+  }
+  await saveRow(sub, next)
+  await setMeta(META_KEYS.reminder, next)
+}
+
 /**
- * Turn the reminder on. Call straight from the tap: the permission prompt
- * is requested before anything is awaited, because Safari only shows it
- * while the user activation lasts.
+ * Turn one notification on. Call straight from the tap: the permission
+ * prompt is requested before anything is awaited, because Safari only
+ * shows it while the user activation lasts. `time` ("HH:MM") is the daily
+ * reminder's, when that is the one turned on.
  */
-export function enableReminder(time: string): Promise<void> {
+export function enableNotification(
+  kind: NotificationKind,
+  time = DEFAULT_REMINDER_TIME,
+): Promise<void> {
   if (reminderAvailability() !== 'ok') {
     return Promise.reject(new Error(messages().reminders.unsupported))
   }
@@ -181,18 +209,50 @@ export function enableReminder(time: string): Promise<void> {
     if ((await permission) !== 'granted') {
       throw new Error(messages().reminders.notAllowed)
     }
+    const meta = await getMeta<ReminderMeta>(META_KEYS.reminder)
+    const daily = kind === 'daily' || wantsDaily(meta)
+    const overtaken = kind === 'overtaken' || wantsOvertaken(meta)
+    const { data } = await requireClient().auth.getSession()
+    if (meta && data.session?.user.id === meta.userId) {
+      await update(meta, {
+        ...meta,
+        time: kind === 'daily' ? time : meta.time,
+        daily,
+        overtaken,
+      })
+      return
+    }
     const userId = await ensureUserId(requireClient())
     await resubscribe({
       userId,
-      time,
+      time: kind === 'daily' || !meta ? time : meta.time,
       tz: deviceTimeZone(),
       lang: currentLang(),
+      daily,
+      overtaken,
     })
   })
 }
 
-/** Turn the reminder off on this device. Never fails on the server part. */
-export function disableReminder(): Promise<void> {
+/**
+ * Turn one notification off; with none left, the subscription goes too.
+ * Never fails on the server part of a full turn-off.
+ */
+export function disableNotification(kind: NotificationKind): Promise<void> {
+  return serial(async () => {
+    const meta = await getMeta<ReminderMeta>(META_KEYS.reminder)
+    const daily = kind !== 'daily' && wantsDaily(meta)
+    const overtaken = kind !== 'overtaken' && wantsOvertaken(meta)
+    if (!meta || (!daily && !overtaken)) {
+      await turnOff(meta)
+      return
+    }
+    await update(meta, { ...meta, daily, overtaken })
+  })
+}
+
+/** Turn every notification off on this device (sign-out). Never fails on the server part. */
+export function disableNotifications(): Promise<void> {
   return serial(async () => {
     await turnOff(await getMeta<ReminderMeta>(META_KEYS.reminder))
   })
