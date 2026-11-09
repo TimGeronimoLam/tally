@@ -13,11 +13,17 @@ import {
   FlagIcon,
   Gutter,
   LayersIcon,
+  MedalIcon,
+  MoonIcon,
   PeopleIcon,
+  RefreshIcon,
   Screen,
   ScreenHeader,
   SectionLabel,
+  StatsIcon,
+  SunIcon,
   TrophyIcon,
+  ZapIcon,
 } from '../components/ui/index.ts'
 import { useT } from '../i18n/index.ts'
 
@@ -28,6 +34,12 @@ const ICONS = {
   flag: FlagIcon,
   trophy: TrophyIcon,
   people: PeopleIcon,
+  moon: MoonIcon,
+  sun: SunIcon,
+  refresh: RefreshIcon,
+  medal: MedalIcon,
+  stats: StatsIcon,
+  zap: ZapIcon,
 }
 
 function renderIcon(icon: AchievementIcon) {

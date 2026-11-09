@@ -142,6 +142,68 @@ export const de: Messages = {
       description: 'Als Erster ins Ziel',
     },
     host: { title: 'Gastgeber', description: 'Eine Challenge starten' },
+    firstLog: {
+      title: 'Erster Eintrag',
+      description: 'Deinen ersten Satz loggen',
+    },
+    bigDay: {
+      title: (total) => `${total} an einem Tag`,
+      description: (total) => `${total} an einem einzigen Tag loggen`,
+      progress: (best) => `${best} bester Tag bisher`,
+    },
+    bigSet: {
+      title: (amount) => `Satz von ${amount}`,
+      description: (amount) => `${amount} auf einmal loggen`,
+      progress: (best) => `${best} größter Satz bisher`,
+    },
+    comeback: {
+      title: 'Comeback',
+      description: 'Nach einem Monat Pause wieder loggen',
+    },
+    nightOwl: {
+      title: 'Nachteule',
+      description: '10 Einträge nach 22 Uhr',
+      progress: (n) => `${n} von 10 nach 22 Uhr`,
+    },
+    weekends: {
+      title: 'Wochenendkämpfer',
+      description: 'An 10 Wochenendtagen loggen',
+      progress: (n) => `${n} von 10 Wochenendtagen`,
+    },
+    collector: {
+      title: 'Sammler',
+      description: '10 Übungen erfassen',
+      progress: (n) => `${n} von 10 Übungen`,
+    },
+    activeDays: {
+      title: (days) => `${days} aktive Tage`,
+      description: (days) => `An ${days} verschiedenen Tagen loggen`,
+      progress: (n, days) => `${n} von ${days} Tagen`,
+    },
+    busyDay: {
+      title: 'Voller Tag',
+      description: '10 Sätze an einem Tag',
+      progress: (best) => `${best} Sätze bisher am besten`,
+    },
+    oneYear: {
+      title: 'Ein Jahr',
+      description: 'Ein Jahr nach deinem ersten Eintrag loggen',
+    },
+    challenges: {
+      title: (n) => `${n} Challenges`,
+      description: (n) => `${n} Challenges beitreten`,
+      progress: (sofar, n) => `${sofar} von ${n} beigetreten`,
+    },
+    hosted: {
+      title: 'Stammgastgeber',
+      description: '3 Challenges starten',
+      progress: (n) => `${n} von 3 gestartet`,
+    },
+    wins: {
+      title: 'Champion',
+      description: '3 Challenges gewinnen',
+      progress: (n) => `${n} von 3 gewonnen`,
+    },
   },
 
   challenges: {

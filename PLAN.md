@@ -78,6 +78,7 @@ Entries are immutable apart from `deletedAt` (soft delete). Stats are always der
   - Streaks: 7 / 30 / 100 days
   - Consistency: logged 7 days in a row, 5 exercises tracked
   - Social (placeholders until Phase 5): first challenge joined, first won, invited 3 people
+- [x] Expanded to 31 (2026-11-09): First log, 50k/100k, 500 in a day, Set of 100 · streaks 3/14/365, Comeback · Night owl, Weekend warrior, Collector (10 exercises), 100/365 active days, Busy day (10 sets), One year · 5 challenges, Regular host (3), Champion (3 wins)
 
 **Milestone:** the complete offline app. Share the URL with friends before touching Supabase.
 

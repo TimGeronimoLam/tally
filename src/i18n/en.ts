@@ -163,6 +163,65 @@ export const en = {
     },
     challengeWon: { title: 'Won a challenge', description: 'Finish first' },
     host: { title: 'Host', description: 'Start a challenge' },
+    firstLog: { title: 'First log', description: 'Log your first set' },
+    bigDay: {
+      title: (total: string) => `${total} in a day`,
+      description: (total: string) => `Log ${total} on a single day`,
+      progress: (best: string) => `${best} best day so far`,
+    },
+    bigSet: {
+      title: (amount: string) => `Set of ${amount}`,
+      description: (amount: string) => `Log ${amount} in one go`,
+      progress: (best: string) => `${best} biggest set so far`,
+    },
+    comeback: {
+      title: 'Comeback',
+      description: 'Log again after a month off',
+    },
+    nightOwl: {
+      title: 'Night owl',
+      description: '10 logs after 10pm',
+      progress: (n: number) => `${n} of 10 after 10pm`,
+    },
+    weekends: {
+      title: 'Weekend warrior',
+      description: 'Log on 10 weekend days',
+      progress: (n: number) => `${n} of 10 weekend days`,
+    },
+    collector: {
+      title: 'Collector',
+      description: 'Track 10 exercises',
+      progress: (n: number) => `${n} of 10 exercises`,
+    },
+    activeDays: {
+      title: (days: number) => `${days} active days`,
+      description: (days: number) => `Log on ${days} different days`,
+      progress: (n: number, days: number) => `${n} of ${days} days`,
+    },
+    busyDay: {
+      title: 'Busy day',
+      description: '10 sets in one day',
+      progress: (best: number) => `${best} sets best so far`,
+    },
+    oneYear: {
+      title: 'One year',
+      description: 'Log a year after your first entry',
+    },
+    challenges: {
+      title: (n: number) => `${n} challenges`,
+      description: (n: number) => `Join ${n} challenges`,
+      progress: (sofar: number, n: number) => `${sofar} of ${n} joined`,
+    },
+    hosted: {
+      title: 'Regular host',
+      description: 'Start 3 challenges',
+      progress: (n: number) => `${n} of 3 started`,
+    },
+    wins: {
+      title: 'Champion',
+      description: 'Win 3 challenges',
+      progress: (n: number) => `${n} of 3 won`,
+    },
   },
 
   challenges: {

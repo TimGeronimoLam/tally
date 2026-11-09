@@ -142,6 +142,65 @@ export const nl: Messages = {
       description: 'Eindig als eerste',
     },
     host: { title: 'Host', description: 'Start een challenge' },
+    firstLog: { title: 'Eerste log', description: 'Log je eerste set' },
+    bigDay: {
+      title: (total) => `${total} op één dag`,
+      description: (total) => `Log ${total} op één dag`,
+      progress: (best) => `${best} is je beste dag`,
+    },
+    bigSet: {
+      title: (amount) => `Set van ${amount}`,
+      description: (amount) => `Log ${amount} in één keer`,
+      progress: (best) => `${best} is je grootste set`,
+    },
+    comeback: {
+      title: 'Comeback',
+      description: 'Log weer na een maand pauze',
+    },
+    nightOwl: {
+      title: 'Nachtbraker',
+      description: '10 keer loggen na 22 uur',
+      progress: (n) => `${n} van 10 na 22 uur`,
+    },
+    weekends: {
+      title: 'Weekendstrijder',
+      description: 'Log op 10 weekenddagen',
+      progress: (n) => `${n} van 10 weekenddagen`,
+    },
+    collector: {
+      title: 'Verzamelaar',
+      description: 'Houd 10 oefeningen bij',
+      progress: (n) => `${n} van 10 oefeningen`,
+    },
+    activeDays: {
+      title: (days) => `${days} actieve dagen`,
+      description: (days) => `Log op ${days} verschillende dagen`,
+      progress: (n, days) => `${n} van ${days} dagen`,
+    },
+    busyDay: {
+      title: 'Drukke dag',
+      description: '10 sets op één dag',
+      progress: (best) => `${best} sets is je beste`,
+    },
+    oneYear: {
+      title: 'Eén jaar',
+      description: 'Log een jaar na je eerste invoer',
+    },
+    challenges: {
+      title: (n) => `${n} challenges`,
+      description: (n) => `Doe mee aan ${n} challenges`,
+      progress: (sofar, n) => `${sofar} van ${n} challenges`,
+    },
+    hosted: {
+      title: 'Vaste host',
+      description: 'Start 3 challenges',
+      progress: (n) => `${n} van 3 gestart`,
+    },
+    wins: {
+      title: 'Kampioen',
+      description: 'Win 3 challenges',
+      progress: (n) => `${n} van 3 gewonnen`,
+    },
   },
 
   challenges: {

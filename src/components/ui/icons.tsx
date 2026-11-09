@@ -180,3 +180,30 @@ export const UserIcon = createIcon(
     <path d="M4 21c0-4 3.5-7 8-7s8 3 8 7" />
   </>,
 )
+
+/* Achievements */
+export const MoonIcon = createIcon(
+  <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" />,
+  2,
+)
+
+export const SunIcon = createIcon(
+  <>
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+  </>,
+  2,
+)
+
+export const RefreshIcon = createIcon(
+  <>
+    <path d="M20 12a8 8 0 1 1-2.3-5.7" />
+    <path d="M20 4v5h-5" />
+  </>,
+  2,
+)
+
+export const ZapIcon = createIcon(
+  <path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z" />,
+  2,
+)
