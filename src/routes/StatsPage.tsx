@@ -21,7 +21,6 @@ import { dayKey, parseDayKey, weekdayMondayFirst } from '../lib/date.ts'
 import { haptic } from '../lib/haptics.ts'
 import {
   formatDayRange,
-  formatMonthRange,
   formatMonthShort,
   formatMonthYear,
   formatNumber,
@@ -45,17 +44,24 @@ import {
 const HEATMAP_WEEKS = 13
 /** Horizontal travel, in px, that turns a touch on the chart into a page turn. */
 const SWIPE_MIN = 40
-/** The chart's last range (7d / 30d / 1y), kept across visits on this device. */
+/** The chart's last range (week / month / year), kept across visits on this device. */
 const RANGE_KEY = 'tally.statsRange'
+/** Ranges saved before the chart followed the calendar. */
+const LEGACY_RANGES: Record<string, ChartRange> = {
+  '7d': 'week',
+  '30d': 'month',
+  '1y': 'year',
+}
 
 function readRange(): ChartRange {
   try {
     const v = localStorage.getItem(RANGE_KEY)
     if (CHART_RANGES.includes(v as ChartRange)) return v as ChartRange
+    if (v && v in LEGACY_RANGES) return LEGACY_RANGES[v]
   } catch {
     // storage unavailable (private mode etc.)
   }
-  return '7d'
+  return 'week'
 }
 
 function saveRange(range: ChartRange) {
@@ -102,26 +108,29 @@ export function StatsPage() {
     [stats, range, page, today],
   )
   const bars = useMemo(() => {
-    const initials = weekdayNames('narrow')
-    const last = period.buckets.length - 1
+    // "Mon", "Tue"…, without the trailing dot some locales add ("lun.").
+    const weekdays = weekdayNames('short').map((d) => d.replace(/\.$/, ''))
+    const current = range === 'year' ? today.slice(0, 7) + '-01' : today
     return period.buckets.map((b, i) => ({
       value: b.total,
-      highlight: page === 0 && i === last,
+      highlight: b.day === current,
       label:
-        range === '7d'
-          ? initials[weekdayMondayFirst(b.day)]
-          : range === '1y'
+        range === 'week'
+          ? weekdays[weekdayMondayFirst(b.day)]
+          : range === 'year'
             ? formatMonthShort(parseDayKey(b.day))
             : i % 5 === 4
               ? String(parseDayKey(b.day).getDate())
               : '',
     }))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [period, page, range, locale])
+  }, [period, range, today, locale])
   const periodLabel =
-    range === '1y'
-      ? formatMonthRange(parseDayKey(period.start), parseDayKey(period.end))
-      : formatDayRange(parseDayKey(period.start), parseDayKey(period.end))
+    range === 'year'
+      ? period.start.slice(0, 4)
+      : range === 'month'
+        ? formatMonthYear(parseDayKey(period.start))
+        : formatDayRange(parseDayKey(period.start), parseDayKey(period.end))
 
   function turnPage(to: number) {
     if (to < 0 || to > maxOffset || to === page) return
@@ -143,7 +152,12 @@ export function StatsPage() {
   ]
   const rangeOptions = CHART_RANGES.map((r) => ({
     value: r,
-    label: r === '1y' ? t.stats.rangeYear : t.stats.rangeDays(parseInt(r)),
+    label:
+      r === 'year'
+        ? t.stats.rangeYear
+        : r === 'month'
+          ? t.stats.rangeMonth
+          : t.stats.rangeWeek,
   }))
 
   if (!entries) return null
@@ -240,7 +254,7 @@ export function StatsPage() {
       <Gutter className="flex flex-col gap-2.5 pt-4 pb-6">
         <div className="flex items-center justify-between">
           <span className="text-sm font-semibold">
-            {range === '1y' ? t.stats.perMonth : t.stats.perDay}
+            {range === 'year' ? t.stats.perMonth : t.stats.perDay}
           </span>
           <SegmentedControl
             aria-label={t.stats.range}
@@ -304,7 +318,7 @@ export function StatsPage() {
           <BarChart
             bars={bars}
             aria-label={
-              range === '1y'
+              range === 'year'
                 ? t.stats.perMonthChart(unit, periodLabel)
                 : t.stats.perDayChart(unit, periodLabel)
             }

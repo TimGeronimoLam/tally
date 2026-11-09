@@ -101,14 +101,6 @@ export function formatDayRange(start: Date, end: Date): string {
   }).formatRange(start, end)
 }
 
-/** "Nov 2025 – Oct 2026" */
-export function formatMonthRange(start: Date, end: Date): string {
-  return new Intl.DateTimeFormat(currentLocale(), {
-    month: 'short',
-    year: 'numeric',
-  }).formatRange(start, end)
-}
-
 /** "October" */
 export function formatMonthName(d: Date | number = Date.now()): string {
   return new Date(d).toLocaleDateString(currentLocale(), { month: 'long' })
