@@ -40,12 +40,14 @@ import { clearLastError, readLastError } from '../lib/diagnostics.ts'
 import { formatNumber, unitName } from '../lib/format.ts'
 import { THEME_PREFERENCES, useThemePreference } from '../lib/theme.ts'
 import { useToast } from '../lib/toast.ts'
+import { deleteAccount, useSession } from '../sync/index.ts'
 
 type SheetState =
   | { mode: 'closed' }
   | { mode: 'add' }
   | { mode: 'edit'; exercise: Exercise }
   | { mode: 'reset' }
+  | { mode: 'deleteAccount' }
   | { mode: 'language' }
 
 export function AccountPage() {
@@ -59,6 +61,10 @@ export function AccountPage() {
   const [sheet, setSheet] = useState<SheetState>({ mode: 'closed' })
   const [lastError, setLastError] = useState(readLastError)
   const fileInput = useRef<HTMLInputElement>(null)
+  const { session } = useSession()
+  // Anonymous sessions look signed out in the UI; nothing to delete there.
+  const hasAccount = !!session && !session.user.is_anonymous
+  const [deleting, setDeleting] = useState(false)
 
   const closeSheet = () => setSheet({ mode: 'closed' })
 
@@ -105,6 +111,22 @@ export function AccountPage() {
     await resetAllData()
     closeSheet()
     toast({ message: t.account.allDeleted })
+  }
+
+  async function removeAccount() {
+    closeSheet()
+    setDeleting(true)
+    try {
+      await deleteAccount()
+      toast({ message: t.account.accountDeleted })
+    } catch (err) {
+      toast({
+        message:
+          err instanceof Error ? err.message : t.common.somethingWentWrong,
+      })
+    } finally {
+      setDeleting(false)
+    }
   }
 
   return (
@@ -190,6 +212,16 @@ export function AccountPage() {
             tone="danger"
             onClick={() => setSheet({ mode: 'reset' })}
           />
+          {hasAccount && (
+            <ListRow
+              label={
+                deleting ? t.account.deletingAccount : t.account.deleteAccount
+              }
+              tone="danger"
+              disabled={deleting}
+              onClick={() => setSheet({ mode: 'deleteAccount' })}
+            />
+          )}
         </ListGroup>
         <input
           ref={fileInput}
@@ -248,6 +280,16 @@ export function AccountPage() {
         confirmLabel={t.account.deleteEverything}
         destructive
         onConfirm={reset}
+        onClose={closeSheet}
+      />
+
+      <ConfirmSheet
+        open={sheet.mode === 'deleteAccount'}
+        title={t.account.deleteAccountTitle}
+        message={t.account.deleteAccountMessage(session?.user.email ?? '')}
+        confirmLabel={t.account.deleteAccount}
+        destructive
+        onConfirm={() => void removeAccount()}
         onClose={closeSheet}
       />
     </Screen>

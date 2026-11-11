@@ -414,6 +414,13 @@ export const de: Messages = {
       'Alle Übungen und Einträge auf diesem Gerät werden entfernt. Das lässt sich nicht rückgängig machen. Exportiere vorher, wenn du eine Kopie willst.',
     deleteEverything: 'Alles löschen',
     allDeleted: 'Alle Daten gelöscht',
+    deleteAccount: 'Konto löschen',
+    deletingAccount: 'Konto wird gelöscht…',
+    deleteAccountTitle: 'Konto löschen?',
+    deleteAccountMessage: (email) =>
+      `Dein Konto (${email}) und alles darin wird endgültig gelöscht: deine Einträge, dein Foto, deine Plätze in Challenges und die Challenges, die du leitest, für alle darin. Auch dieses Handy wird geleert. Das lässt sich nicht rückgängig machen. Exportiere vorher, wenn du eine Kopie willst.`,
+    accountDeleted: 'Konto gelöscht',
+    accountNotDeleted: 'Konto nicht gelöscht',
     lastError: 'Letzter Fehler',
     clear: 'Löschen',
     about: 'Über',

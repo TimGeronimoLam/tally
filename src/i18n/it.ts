@@ -406,6 +406,13 @@ export const it: Messages = {
       'Tutti gli esercizi e le voci su questo dispositivo verranno rimossi. Non si può annullare. Esporta prima se vuoi una copia.',
     deleteEverything: 'Elimina tutto',
     allDeleted: 'Tutti i dati eliminati',
+    deleteAccount: 'Elimina account',
+    deletingAccount: 'Eliminazione account…',
+    deleteAccountTitle: "Eliminare l'account?",
+    deleteAccountMessage: (email) =>
+      `Il tuo account (${email}) e tutto ciò che contiene vengono eliminati per sempre: le tue serie, la tua foto, il tuo posto nelle sfide e le sfide che organizzi, per tutti i partecipanti. Anche questo telefono viene svuotato. Non si può annullare. Esporta prima se vuoi una copia.`,
+    accountDeleted: 'Account eliminato',
+    accountNotDeleted: 'Account non eliminato',
     lastError: 'Ultimo errore',
     clear: 'Cancella',
     about: 'Informazioni',

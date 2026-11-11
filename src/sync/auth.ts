@@ -5,7 +5,8 @@ import { captchaToken, isCaptchaError } from '../lib/captcha.ts'
 import { recordError } from '../lib/diagnostics.ts'
 import { supabase } from '../lib/supabase.ts'
 import { disableNotifications, reconcileReminder } from '../reminders/index.ts'
-import { clearAccountData } from '../db/maintenance.ts'
+import { clearAccountData, resetAllData } from '../db/maintenance.ts'
+import { deleteAvatarFile } from './avatar.ts'
 import { reconcileDisplayName } from './profile.ts'
 import { setSyncStatus } from './status.ts'
 import { cancelScheduledSync, hasUnsyncedRows, syncNow } from './sync.ts'
@@ -154,5 +155,43 @@ export async function signOut(): Promise<void> {
   const { error } = await client.auth.signOut({ scope: 'local' })
   if (error) throw error
   await clearAccountData()
+  setSyncStatus({ state: 'idle', lastSyncAt: null, error: null })
+}
+
+/**
+ * Delete the signed-in email account for good: the server removes the
+ * user and everything that cascades from it (sets, memberships, hosted
+ * challenges, push rows; see the delete_account migration), then this
+ * device is wiped like "Delete all data". Other phones lose their session
+ * at the next token refresh; what they hold locally stays there.
+ */
+export async function deleteAccount(): Promise<void> {
+  const client = requireClient()
+  const session = (await client.auth.getSession()).data.session
+  if (!session || session.user.is_anonymous) {
+    throw new Error(messages().account.accountNotDeleted)
+  }
+  cancelScheduledSync()
+  // First, or the public file would outlive the account: nothing in SQL
+  // may delete it. A missing bucket (migration not run) means no file.
+  try {
+    await deleteAvatarFile(session.user.id)
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    if (!/not found/i.test(message)) {
+      throw new Error(`${messages().account.accountNotDeleted}: ${message}`)
+    }
+  }
+  // While the session still works, so the server row goes with the browser one.
+  await disableNotifications().catch((err) => recordError('reminder', err))
+  const { error } = await client.rpc('delete_my_account')
+  if (error) {
+    throw new Error(`${messages().account.accountNotDeleted}: ${error.message}`)
+  }
+  // The user is gone, so the server may refuse the sign-out; the local
+  // session goes either way.
+  const out = await client.auth.signOut({ scope: 'local' })
+  if (out.error) recordError('auth', out.error)
+  await resetAllData()
   setSyncStatus({ state: 'idle', lastSyncAt: null, error: null })
 }

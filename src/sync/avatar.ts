@@ -136,6 +136,17 @@ export async function uploadAvatar(file: Blob): Promise<void> {
   await saveUpdatedAt(session, new Date().toISOString())
 }
 
+/**
+ * Delete the user's picture file, if any, ahead of deleting the account
+ * (SQL cannot delete storage files). Missing files are not an error.
+ */
+export async function deleteAvatarFile(userId: string): Promise<void> {
+  const { error } = await requireClient()
+    .storage.from(BUCKET)
+    .remove([`${userId}.jpg`])
+  if (error) throw error
+}
+
 /** Back to initials: clear the timestamp first, then delete the file. */
 export async function removeAvatar(): Promise<void> {
   const session = await emailSession()

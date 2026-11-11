@@ -404,6 +404,13 @@ export const es: Messages = {
       'Se eliminarán todos los ejercicios y registros de este dispositivo. Esto no se puede deshacer. Exporta antes si quieres una copia.',
     deleteEverything: 'Eliminar todo',
     allDeleted: 'Todos los datos eliminados',
+    deleteAccount: 'Eliminar cuenta',
+    deletingAccount: 'Eliminando cuenta…',
+    deleteAccountTitle: '¿Eliminar tu cuenta?',
+    deleteAccountMessage: (email) =>
+      `Tu cuenta (${email}) y todo lo que contiene se eliminan para siempre: tus series, tu foto, tu puesto en los retos y los retos que organizas, para todos sus miembros. Este móvil también se vacía. No se puede deshacer. Exporta antes si quieres una copia.`,
+    accountDeleted: 'Cuenta eliminada',
+    accountNotDeleted: 'Cuenta no eliminada',
     lastError: 'Último error',
     clear: 'Borrar',
     about: 'Acerca de',

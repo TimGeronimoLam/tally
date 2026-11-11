@@ -410,6 +410,13 @@ export const nl: Messages = {
       'Alle oefeningen en logs op dit apparaat worden verwijderd. Dit kan niet ongedaan worden gemaakt. Exporteer eerst als je een kopie wilt.',
     deleteEverything: 'Alles verwijderen',
     allDeleted: 'Alle gegevens verwijderd',
+    deleteAccount: 'Account verwijderen',
+    deletingAccount: 'Account wordt verwijderd…',
+    deleteAccountTitle: 'Je account verwijderen?',
+    deleteAccountMessage: (email) =>
+      `Je account (${email}) en alles erin wordt definitief verwijderd: je logs, je foto, je plek in challenges en de challenges die je host, voor iedereen erin. Deze telefoon wordt ook leeggemaakt. Dit kan niet ongedaan worden gemaakt. Exporteer eerst als je een kopie wilt.`,
+    accountDeleted: 'Account verwijderd',
+    accountNotDeleted: 'Account niet verwijderd',
     lastError: 'Laatste fout',
     clear: 'Wissen',
     about: 'Over',

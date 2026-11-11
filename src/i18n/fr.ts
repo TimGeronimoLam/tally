@@ -410,6 +410,13 @@ export const fr: Messages = {
       "Tous les exercices et entrées de cet appareil seront supprimés. Cette action est irréversible. Exporte d'abord si tu veux une copie.",
     deleteEverything: 'Tout supprimer',
     allDeleted: 'Toutes les données ont été supprimées',
+    deleteAccount: 'Supprimer le compte',
+    deletingAccount: 'Suppression du compte…',
+    deleteAccountTitle: 'Supprimer ton compte ?',
+    deleteAccountMessage: (email) =>
+      `Ton compte (${email}) et tout ce qu'il contient sont supprimés définitivement : tes séries, ta photo, ta place dans les défis et les défis que tu organises, pour tous leurs membres. Ce téléphone est aussi vidé. Cette action est irréversible. Exporte d'abord si tu veux une copie.`,
+    accountDeleted: 'Compte supprimé',
+    accountNotDeleted: 'Compte non supprimé',
     lastError: 'Dernière erreur',
     clear: 'Effacer',
     about: 'À propos',

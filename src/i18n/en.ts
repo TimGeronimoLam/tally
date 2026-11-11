@@ -432,6 +432,13 @@ export const en = {
       'Every exercise and entry on this device will be removed. This cannot be undone. Export first if you want a copy.',
     deleteEverything: 'Delete everything',
     allDeleted: 'All data deleted',
+    deleteAccount: 'Delete account',
+    deletingAccount: 'Deleting account…',
+    deleteAccountTitle: 'Delete your account?',
+    deleteAccountMessage: (email: string) =>
+      `Your account (${email}) and everything in it are deleted for good: your sets, your photo, your place in challenges, and the challenges you host, for everyone in them. This phone is cleared too. This cannot be undone. Export first if you want a copy.`,
+    accountDeleted: 'Account deleted',
+    accountNotDeleted: 'Account not deleted',
     lastError: 'Last error',
     clear: 'Clear',
     about: 'About',

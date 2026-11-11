@@ -411,6 +411,13 @@ export const pt: Messages = {
       'Todos os exercícios e registos neste dispositivo serão removidos. Isto não pode ser anulado. Exporta primeiro se quiseres uma cópia.',
     deleteEverything: 'Eliminar tudo',
     allDeleted: 'Todos os dados eliminados',
+    deleteAccount: 'Eliminar conta',
+    deletingAccount: 'A eliminar conta…',
+    deleteAccountTitle: 'Eliminar a tua conta?',
+    deleteAccountMessage: (email) =>
+      `A tua conta (${email}) e tudo o que contém são eliminados para sempre: os teus registos, a tua foto, o teu lugar nos desafios e os desafios que organizas, para todos os membros. Este telemóvel também é limpo. Isto não pode ser anulado. Exporta primeiro se quiseres uma cópia.`,
+    accountDeleted: 'Conta eliminada',
+    accountNotDeleted: 'Conta não eliminada',
     lastError: 'Último erro',
     clear: 'Limpar',
     about: 'Sobre',
