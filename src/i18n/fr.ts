@@ -455,6 +455,18 @@ export const fr: Messages = {
     wholeCode: 'Entre le code complet reçu par e-mail',
     codeWrong: 'Ce code est faux ou a expiré. Demandes-en un nouveau.',
     signedInAs: (email) => `Connecté en tant que ${email}`,
+    photo: 'Photo de profil',
+    addPhoto: 'Ajouter une photo',
+    changePhoto: 'Changer la photo',
+    choosePhoto: 'Choisir une photo',
+    removePhoto: 'Supprimer la photo',
+    photoShownTo:
+      'Affichée à côté de ton nom dans les classements. Tous les membres de tes défis la voient, y compris dans les défis publics.',
+    photoSaved: 'Photo enregistrée',
+    photoRemoved: 'Photo supprimée',
+    photoUnreadable: "Impossible d'ouvrir cette image. Essaie-en une autre.",
+    photoNeedsSignIn: 'Connecte-toi par e-mail pour ajouter une photo.',
+    photoNotSaved: 'Photo non enregistrée',
     saving: 'Enregistrement…',
   },
 

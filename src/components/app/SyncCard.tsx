@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useDisplayName } from '../../db/index.ts'
 import { useT } from '../../i18n/index.ts'
 import { formatTime } from '../../lib/format.ts'
@@ -6,19 +6,30 @@ import { isSyncConfigured } from '../../lib/supabase.ts'
 import { useToast } from '../../lib/toast.ts'
 import {
   DISPLAY_NAME_MAX,
+  ownAvatarUrl,
+  removeAvatar,
   setDisplayName,
   signInWithEmail,
   signOut,
   syncNow,
+  uploadAvatar,
   useSession,
   useSyncStatus,
   type EmailCodeType,
 } from '../../sync/index.ts'
-import { Avatar, Button, Card, ConfirmSheet, InputSheet } from '../ui/index.ts'
+import {
+  Avatar,
+  Button,
+  CameraIcon,
+  Card,
+  ConfirmSheet,
+  InputSheet,
+  Sheet,
+} from '../ui/index.ts'
 import { EmailCodeSheet } from './EmailCodeSheet.tsx'
 import { EmailSheet } from './EmailSheet.tsx'
 
-type SheetMode = 'closed' | 'name' | 'email' | 'code' | 'signOut'
+type SheetMode = 'closed' | 'name' | 'photo' | 'email' | 'code' | 'signOut'
 
 /** The sign-in email just sent; the code sheet verifies against it. */
 interface PendingSignIn {
@@ -41,6 +52,7 @@ export function SyncCard() {
   const [sheet, setSheet] = useState<SheetMode>('closed')
   const [pending, setPending] = useState<PendingSignIn | null>(null)
   const [busy, setBusy] = useState(false)
+  const fileInput = useRef<HTMLInputElement>(null)
 
   async function act(fn: () => Promise<unknown>, success?: string) {
     setBusy(true)
@@ -76,7 +88,12 @@ export function SyncCard() {
     <>
       <Card>
         <div className="flex flex-col gap-4">
-          <ProfileRow name={name} onEdit={() => setSheet('name')} />
+          <ProfileRow
+            name={name}
+            photo={email ? ownAvatarUrl(session) : null}
+            onEdit={() => setSheet('name')}
+            onEditPhoto={email ? () => setSheet('photo') : undefined}
+          />
           <hr className="border-0 border-t border-border-strong/60" />
 
           {email ? (
@@ -154,6 +171,63 @@ export function SyncCard() {
           maxLength: DISPLAY_NAME_MAX,
         }}
       />
+      <Sheet
+        open={sheet === 'photo'}
+        onClose={() => setSheet('closed')}
+        title={t.sync.photo}
+      >
+        <p className="text-[15px] leading-relaxed text-muted">
+          {t.sync.photoShownTo}
+        </p>
+        <input
+          ref={fileInput}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0]
+            // Same file again should still fire next time.
+            e.target.value = ''
+            if (!file) return
+            setSheet('closed')
+            void act(() => uploadAvatar(file), t.sync.photoSaved)
+          }}
+        />
+        <div className="flex flex-col gap-2">
+          <Button
+            variant="primary"
+            size="lg"
+            fullWidth
+            disabled={busy}
+            onClick={() => fileInput.current?.click()}
+          >
+            {busy ? t.sync.saving : t.sync.choosePhoto}
+          </Button>
+          {ownAvatarUrl(session) && (
+            <Button
+              variant="ghost"
+              size="md"
+              fullWidth
+              disabled={busy}
+              className="text-danger!"
+              onClick={() => {
+                setSheet('closed')
+                void act(removeAvatar, t.sync.photoRemoved)
+              }}
+            >
+              {t.sync.removePhoto}
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="md"
+            fullWidth
+            onClick={() => setSheet('closed')}
+          >
+            {t.common.cancel}
+          </Button>
+        </div>
+      </Sheet>
       <ConfirmSheet
         open={sheet === 'signOut'}
         title={t.sync.signOutTitle}
@@ -194,31 +268,61 @@ export function SyncCard() {
   )
 }
 
-function ProfileRow({ name, onEdit }: { name: string; onEdit: () => void }) {
+function ProfileRow({
+  name,
+  photo,
+  onEdit,
+  onEditPhoto,
+}: {
+  name: string
+  photo: string | null
+  onEdit: () => void
+  /** Set for email accounts: the avatar becomes its own button. */
+  onEditPhoto?: () => void
+}) {
   const t = useT()
+  const avatar = (
+    <Avatar
+      initial={name || '?'}
+      src={photo}
+      highlight={!!name}
+      className="size-10 text-[15px]"
+    />
+  )
   return (
-    <button
-      type="button"
-      onClick={onEdit}
-      className="flex w-full items-center gap-3 text-left"
-    >
-      <Avatar
-        initial={name || '?'}
-        highlight={!!name}
-        className="size-10 text-[15px]"
-      />
-      <span className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate text-[15px] font-semibold">
-          {name || t.sync.addYourName}
+    <div className="flex w-full items-center gap-3">
+      {onEditPhoto ? (
+        <button
+          type="button"
+          onClick={onEditPhoto}
+          aria-label={photo ? t.sync.changePhoto : t.sync.addPhoto}
+          className="pressable-dim relative shrink-0"
+        >
+          {avatar}
+          <span className="absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded-full border-2 border-surface bg-surface-2 text-fg">
+            <CameraIcon size={11} strokeWidth={2.25} />
+          </span>
+        </button>
+      ) : null}
+      <button
+        type="button"
+        onClick={onEdit}
+        className="flex min-w-0 flex-1 items-center gap-3 text-left"
+      >
+        {onEditPhoto ? null : avatar}
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className="truncate text-[15px] font-semibold">
+            {name || t.sync.addYourName}
+          </span>
+          <span className="text-[12px] text-muted">
+            {name ? t.sync.nameOnLeaderboards : t.sync.shownOnLeaderboards}
+          </span>
         </span>
-        <span className="text-[12px] text-muted">
-          {name ? t.sync.nameOnLeaderboards : t.sync.shownOnLeaderboards}
+        <span className="text-[13px] font-medium text-muted">
+          {t.common.edit}
         </span>
-      </span>
-      <span className="text-[13px] font-medium text-muted">
-        {t.common.edit}
-      </span>
-    </button>
+      </button>
+    </div>
   )
 }
 

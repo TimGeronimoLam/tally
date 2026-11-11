@@ -456,6 +456,18 @@ export const pt: Messages = {
     wholeCode: 'Escreve o código completo do e-mail',
     codeWrong: 'Esse código está errado ou expirou. Pede um novo.',
     signedInAs: (email) => `Sessão iniciada como ${email}`,
+    photo: 'Foto de perfil',
+    addPhoto: 'Adicionar foto',
+    changePhoto: 'Alterar foto',
+    choosePhoto: 'Escolher foto',
+    removePhoto: 'Remover foto',
+    photoShownTo:
+      'Aparece ao lado do teu nome nas classificações. Todos nos teus desafios a veem, também nos públicos.',
+    photoSaved: 'Foto guardada',
+    photoRemoved: 'Foto removida',
+    photoUnreadable: 'Não é possível abrir essa imagem. Experimenta outra.',
+    photoNeedsSignIn: 'Inicia sessão com o email para adicionar uma foto.',
+    photoNotSaved: 'Foto não guardada',
     saving: 'A guardar…',
   },
 

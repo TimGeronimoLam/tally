@@ -124,6 +124,13 @@ export const UploadIcon = createIcon(
   </>,
 )
 
+export const CameraIcon = createIcon(
+  <>
+    <path d="M4 8h3l2-3h6l2 3h3v11H4z" />
+    <circle cx="12" cy="13" r="3.5" />
+  </>,
+)
+
 export const TrashIcon = createIcon(
   <>
     <path d="M4 7h16" />

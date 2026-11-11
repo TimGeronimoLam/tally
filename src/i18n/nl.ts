@@ -456,6 +456,19 @@ export const nl: Messages = {
     wholeCode: 'Voer de volledige code uit de e-mail in',
     codeWrong: 'Die code klopt niet of is verlopen. Vraag een nieuwe aan.',
     signedInAs: (email) => `Ingelogd als ${email}`,
+    photo: 'Profielfoto',
+    addPhoto: 'Foto toevoegen',
+    changePhoto: 'Foto wijzigen',
+    choosePhoto: 'Foto kiezen',
+    removePhoto: 'Foto verwijderen',
+    photoShownTo:
+      'Staat naast je naam in ranglijsten. Iedereen in je challenges ziet hem, ook in openbare.',
+    photoSaved: 'Foto opgeslagen',
+    photoRemoved: 'Foto verwijderd',
+    photoUnreadable:
+      'Deze afbeelding kan niet worden geopend. Probeer een andere.',
+    photoNeedsSignIn: 'Log in met e-mail om een foto toe te voegen.',
+    photoNotSaved: 'Foto niet opgeslagen',
     saving: 'Opslaan…',
   },
 

@@ -10,7 +10,10 @@ import {
   precacheAndRoute,
   type PrecacheEntry,
 } from 'workbox-precaching'
+import { CacheableResponsePlugin } from 'workbox-cacheable-response'
+import { ExpirationPlugin } from 'workbox-expiration'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
+import { CacheFirst } from 'workbox-strategies'
 
 declare let self: ServiceWorkerGlobalScope & {
   __WB_MANIFEST: Array<PrecacheEntry | string>
@@ -23,6 +26,27 @@ clientsClaim()
 precacheAndRoute(self.__WB_MANIFEST)
 cleanupOutdatedCaches()
 registerRoute(new NavigationRoute(createHandlerBoundToURL('/index.html')))
+
+// Profile pictures (src/sync/avatar.ts): the URL changes with every upload,
+// so a stored copy is never stale. Kept so leaderboards show faces offline.
+// Only CORS responses (the <img> asks with crossOrigin): opaque ones would
+// eat several MB of quota each.
+registerRoute(
+  ({ url, request }) =>
+    request.destination === 'image' &&
+    url.pathname.includes('/storage/v1/object/public/avatars/'),
+  new CacheFirst({
+    cacheName: 'avatars',
+    plugins: [
+      new CacheableResponsePlugin({ statuses: [200] }),
+      new ExpirationPlugin({
+        maxEntries: 200,
+        maxAgeSeconds: 60 * 60 * 24 * 60,
+        purgeOnQuotaError: true,
+      }),
+    ],
+  }),
+)
 
 /** `notification` of the push payload (worker/reminders.ts). */
 interface PushNotice {

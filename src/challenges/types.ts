@@ -31,6 +31,11 @@ export interface Challenge {
 export interface LeaderboardRow {
   userId: string
   displayName: string
+  /**
+   * When the member last uploaded a profile picture (see `avatarUrl`);
+   * null or missing (older cached rows) means none.
+   */
+  avatarUpdatedAt?: string | null
   total: number
   today: number
   rank: number

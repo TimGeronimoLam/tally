@@ -477,6 +477,18 @@ export const en = {
     wholeCode: 'Enter the whole code from the email',
     codeWrong: 'That code is wrong or has expired. Ask for a new one.',
     signedInAs: (email: string) => `Signed in as ${email}`,
+    photo: 'Profile photo',
+    addPhoto: 'Add photo',
+    changePhoto: 'Change photo',
+    choosePhoto: 'Choose photo',
+    removePhoto: 'Remove photo',
+    photoShownTo:
+      'Shown next to your name on leaderboards. Everyone in your challenges can see it, in public ones too.',
+    photoSaved: 'Photo saved',
+    photoRemoved: 'Photo removed',
+    photoUnreadable: "That image can't be opened. Try another one.",
+    photoNeedsSignIn: 'Sign in with email to add a photo.',
+    photoNotSaved: 'Photo not saved',
     saving: 'Saving…',
   },
 

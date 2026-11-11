@@ -4,6 +4,7 @@ import { calibrate } from '../lib/clock.ts'
 import { deviceTimeZone } from '../lib/date.ts'
 import { supabase } from '../lib/supabase.ts'
 import { signInAnonymously } from '../sync/auth.ts'
+import { fetchAvatarVersions } from '../sync/avatar.ts'
 import { ensureSyncOwner, sessionUser, syncNow } from '../sync/sync.ts'
 import { generateInviteCode } from './codes.ts'
 import {
@@ -98,6 +99,7 @@ function toRow(r: Raw): LeaderboardRow {
   return {
     userId: str(r.user_id),
     displayName: str(r.display_name),
+    avatarUpdatedAt: null,
     total: num(r.total),
     today: num(r.today),
     rank: num(r.rank),
@@ -268,7 +270,11 @@ export async function fetchMyChallenges(): Promise<ChallengeSummary[]> {
   const rows = (data ?? []) as Raw[]
   // Every row carries the server's clock reading for this request.
   if (rows.length) calibrate(rows[0].server_now as string | undefined)
-  return rows.map(toSummary)
+  const summaries = rows.map(toSummary)
+  const avatars = await fetchAvatarVersions(
+    summaries.flatMap((c) => c.top.map((r) => r.userId)),
+  )
+  return summaries.map((c) => ({ ...c, top: withAvatars(c.top, avatars) }))
 }
 
 /**
@@ -292,7 +298,18 @@ export async function fetchLeaderboard(
     p_tz: deviceTimeZone(),
   })
   if (error) fail(messages().errors.couldNotLoadLeaderboard, error)
-  return ((data ?? []) as Raw[]).map(toRow)
+  const rows = ((data ?? []) as Raw[]).map(toRow)
+  return withAvatars(rows, await fetchAvatarVersions(rows.map((r) => r.userId)))
+}
+
+function withAvatars(
+  rows: LeaderboardRow[],
+  avatars: Map<string, string>,
+): LeaderboardRow[] {
+  return rows.map((r) => ({
+    ...r,
+    avatarUpdatedAt: avatars.get(r.userId) ?? null,
+  }))
 }
 
 /**

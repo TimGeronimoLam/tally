@@ -452,6 +452,18 @@ export const it: Messages = {
     wholeCode: "Inserisci il codice completo dell'email",
     codeWrong: 'Codice errato o scaduto. Richiedine uno nuovo.',
     signedInAs: (email) => `Accesso effettuato come ${email}`,
+    photo: 'Foto profilo',
+    addPhoto: 'Aggiungi foto',
+    changePhoto: 'Cambia foto',
+    choosePhoto: 'Scegli foto',
+    removePhoto: 'Rimuovi foto',
+    photoShownTo:
+      'Appare accanto al tuo nome nelle classifiche. Tutti nelle tue sfide possono vederla, anche in quelle pubbliche.',
+    photoSaved: 'Foto salvata',
+    photoRemoved: 'Foto rimossa',
+    photoUnreadable: "Impossibile aprire l'immagine. Provane un'altra.",
+    photoNeedsSignIn: "Accedi con l'email per aggiungere una foto.",
+    photoNotSaved: 'Foto non salvata',
     saving: 'Salvataggio…',
   },
 

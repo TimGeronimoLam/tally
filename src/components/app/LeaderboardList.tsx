@@ -4,6 +4,7 @@ import { useT } from '../../i18n/index.ts'
 import { cn } from '../../lib/cn.ts'
 import { formatNumber } from '../../lib/format.ts'
 import { markNav } from '../../lib/nav.ts'
+import { avatarUrl } from '../../sync/index.ts'
 import { Avatar, ChevronRightIcon } from '../ui/index.ts'
 
 export interface LeaderboardListProps {
@@ -38,7 +39,11 @@ export function LeaderboardList({
         const body = (
           <>
             <span className="w-5 text-right text-sm text-faint">{r.rank}</span>
-            <Avatar initial={r.displayName} highlight={me} />
+            <Avatar
+              initial={r.displayName}
+              src={avatarUrl(r.userId, r.avatarUpdatedAt)}
+              highlight={me}
+            />
             <span className="min-w-0 flex-1 truncate text-[15px]">
               {r.displayName}
               {me && (
