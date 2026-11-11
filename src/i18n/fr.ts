@@ -527,6 +527,11 @@ export const fr: Messages = {
     updated: (v: string) => `Tally passe en version ${v}`,
     /** Per version, newest first; one sentence per change, as the user sees it. */
     notes: {
+      '1.6.0': [
+        "Photos de profil : ajoute la tienne dans Compte. Elle s'affiche à côté de ton nom dans les classements des défis.",
+        'Supprime ton compte dans Compte → Données. Tes séries, ta photo et tes défis partent avec.',
+        'Propose une fonctionnalité dans Compte → À propos. Ton idée arrive directement chez le développeur.',
+      ],
       '1.5.0': [
         '31 badges de succès : 19 nouveaux dans les quatre sections.',
         'Une notification quand quelqu’un te dépasse dans un défi. À activer dans Compte → Notifications.',

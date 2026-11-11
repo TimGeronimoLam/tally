@@ -18,6 +18,19 @@ export default defineConfig({
     port: Number(process.env.PORT) || 5173,
   },
   plugins: [
+    // __APP_VERSION__ is read once at startup: restart the dev server when
+    // package.json changes (a version bump), or What's new marks the old one.
+    {
+      name: 'restart-on-package-json',
+      apply: 'serve',
+      configureServer(server) {
+        const file = `${server.config.root}/package.json`.replace(/\\/g, '/')
+        server.watcher.add(file)
+        server.watcher.on('change', (path) => {
+          if (path.replace(/\\/g, '/') === file) void server.restart()
+        })
+      },
+    },
     react(),
     tailwindcss(),
     VitePWA({

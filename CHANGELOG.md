@@ -8,6 +8,15 @@ the versions and dates and a test keeps the three in step.
 Releases before 1.5.0 are reconstructed from the deploy history: the app
 shipped as 1.0.0 and every push to `main` went live without a version bump.
 
+## 1.6.0 – 2026-11-11
+
+- Profile pictures: upload one under Account; it shows on challenge
+  leaderboards. Needs migration `20261111000000`.
+- Delete account under Account → Data: removes the user and everything that
+  cascades from it, plus the photo file. Needs migration `20261111000001`.
+- Request a feature under Account → About, mailed through the Worker and
+  Resend (see README "Feature requests" for the Worker settings).
+
 ## 1.5.0 – 2026-11-09
 
 - Nineteen new achievements, for 31 badges across all four sections.

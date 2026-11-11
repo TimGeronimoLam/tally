@@ -555,6 +555,11 @@ export const en = {
     updated: (v: string) => `Tally updated to ${v}`,
     /** Per version, newest first; one sentence per change, as the user sees it. */
     notes: {
+      '1.6.0': [
+        'Profile photos: add one under Account. It shows next to your name on challenge leaderboards.',
+        'Delete your account under Account → Data. Your sets, photo and challenges go with it.',
+        'Request a feature under Account → About. Your idea goes straight to the developer.',
+      ],
       '1.5.0': [
         '31 achievement badges: 19 new ones across all four sections.',
         'A push alert when someone passes you in a challenge. Turn it on under Account → Notifications.',

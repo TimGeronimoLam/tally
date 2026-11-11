@@ -10,6 +10,7 @@ type Noted = keyof Messages['changelog']['notes']
  * and package.json in step.
  */
 export const RELEASES = [
+  { version: '1.6.0', date: '2026-11-11' },
   { version: '1.5.0', date: '2026-11-09' },
   { version: '1.4.0', date: '2026-11-06' },
   { version: '1.3.0', date: '2026-10-26' },
