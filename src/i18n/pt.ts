@@ -421,6 +421,16 @@ export const pt: Messages = {
     lastError: 'Último erro',
     clear: 'Limpar',
     about: 'Sobre',
+    requestFeature: 'Sugerir uma funcionalidade',
+    featureDescription:
+      'O que tornaria o Tally melhor para ti? A tua ideia vai diretamente para o programador.',
+    featureIdea: 'A tua ideia',
+    featurePlaceholder: 'Por exemplo: um temporizador de descanso entre séries',
+    featureEmail: 'Email para resposta (opcional)',
+    featureSend: 'Enviar',
+    featureSent: 'Obrigado! A tua ideia está a caminho.',
+    featureFailed:
+      'Não foi possível enviar. Verifica a ligação e tenta de novo.',
   },
 
   sync: {

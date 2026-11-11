@@ -2,12 +2,17 @@
  * The Cloudflare Worker behind the deployed app. Requests go straight to the
  * static build (wrangler.jsonc `assets`, SPA fallback included); the cron
  * trigger sends the daily "log your reps" reminders and the "someone
- * passed you" challenge alerts.
+ * passed you" challenge alerts. /api/feature-request mails the Account
+ * page's feature request form (worker/feature-request.ts).
  *
  * Secrets (dashboard → Workers → tally → Settings → Variables and Secrets,
  * or `.dev.vars` for `wrangler dev`): see Env below and the README.
  */
 import { buildPushPayload, type VapidKeys } from '@block65/webcrypto-web-push'
+import {
+  handleFeatureRequest,
+  type FeatureRequestEnv,
+} from './feature-request.ts'
 import {
   classify,
   inFilter,
@@ -17,7 +22,7 @@ import {
   type ReminderPayload,
 } from './reminders.ts'
 
-export interface Env {
+export interface Env extends FeatureRequestEnv {
   ASSETS: Fetcher
   SUPABASE_URL: string
   /** Supabase secret (service-role) key. Never shipped to the browser. */
@@ -38,7 +43,10 @@ interface DueReminder {
 }
 
 export default {
-  fetch: (request, env) => env.ASSETS.fetch(request),
+  fetch: (request, env) =>
+    new URL(request.url).pathname === '/api/feature-request'
+      ? handleFeatureRequest(request, env)
+      : env.ASSETS.fetch(request),
   scheduled: (_controller, env, ctx) => {
     ctx.waitUntil(sendDueReminders(env))
   },

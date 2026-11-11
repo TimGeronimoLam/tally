@@ -15,7 +15,7 @@ import { messages } from '../i18n/index.ts'
  */
 
 /** Names the protected surface; Cloudflare shows it in its analytics. */
-export type CaptchaAction = 'anonymous' | 'email' | 'reminder'
+export type CaptchaAction = 'anonymous' | 'email' | 'reminder' | 'feedback'
 
 const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim() || undefined
 const ONLOAD = '__tallyTurnstileReady'

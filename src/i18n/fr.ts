@@ -420,6 +420,15 @@ export const fr: Messages = {
     lastError: 'Dernière erreur',
     clear: 'Effacer',
     about: 'À propos',
+    requestFeature: 'Proposer une fonctionnalité',
+    featureDescription:
+      "Qu'est-ce qui rendrait Tally meilleur pour toi ? Ton idée arrive directement chez le développeur.",
+    featureIdea: 'Ton idée',
+    featurePlaceholder: 'Par exemple : un minuteur de repos entre les séries',
+    featureEmail: 'E-mail pour une réponse (facultatif)',
+    featureSend: 'Envoyer',
+    featureSent: 'Merci ! Ton idée est en route.',
+    featureFailed: 'Envoi impossible. Vérifie ta connexion et réessaie.',
   },
 
   sync: {

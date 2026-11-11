@@ -2,6 +2,7 @@ import { useRef, useState, type ChangeEvent } from 'react'
 import { APP_VERSION } from '../changelog/index.ts'
 import {
   ExerciseSheet,
+  FeatureRequestSheet,
   LanguageSheet,
   ReminderSection,
   SyncCard,
@@ -49,6 +50,7 @@ type SheetState =
   | { mode: 'reset' }
   | { mode: 'deleteAccount' }
   | { mode: 'language' }
+  | { mode: 'featureRequest' }
 
 export function AccountPage() {
   const t = useT()
@@ -240,10 +242,14 @@ export function AccountPage() {
             detail={t.changelog.version(APP_VERSION)}
             to="/account/whats-new"
           />
+          <ListRow
+            label={t.account.requestFeature}
+            onClick={() => setSheet({ mode: 'featureRequest' })}
+          />
         </ListGroup>
       </Gutter>
 
-      <Gutter className="pb-6 text-xs leading-relaxed text-faint empty:hidden">
+      <Gutter className="text-xs leading-relaxed text-faint empty:hidden">
         {lastError && (
           <div className="pt-5 break-words">
             {t.account.lastError} ({new Date(lastError.at).toLocaleString()},{' '}
@@ -262,6 +268,8 @@ export function AccountPage() {
         )}
       </Gutter>
 
+      <div className="pb-6" />
+
       <ExerciseSheet
         key={sheet.mode === 'edit' ? sheet.exercise.id : sheet.mode}
         open={sheet.mode === 'add' || sheet.mode === 'edit'}
@@ -272,6 +280,17 @@ export function AccountPage() {
       />
 
       <LanguageSheet open={sheet.mode === 'language'} onClose={closeSheet} />
+
+      <FeatureRequestSheet
+        key={sheet.mode === 'featureRequest' ? 'open' : 'closed'}
+        open={sheet.mode === 'featureRequest'}
+        defaultEmail={hasAccount ? (session?.user.email ?? '') : ''}
+        onSent={() => {
+          closeSheet()
+          toast({ message: t.account.featureSent })
+        }}
+        onClose={closeSheet}
+      />
 
       <ConfirmSheet
         open={sheet.mode === 'reset'}

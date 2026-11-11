@@ -258,6 +258,30 @@ the reminder still comes. Delivery is best effort; battery savers can delay
 it. A permission denied in the prompt can only be undone in system settings.
 Signing out or deleting all data turns the reminder off.
 
+## Feature requests
+
+Account → About → Request a feature takes an idea and an optional reply
+address (prefilled when signed in) and posts it to the Worker's
+`/api/feature-request` (`worker/feature-request.ts`). The Worker checks the
+Turnstile token, then mails the request through [Resend](https://resend.com)
+with the sender as Reply-To. The destination address is a Worker setting, not
+in this repo. Under `npm run dev` there is no Worker, so sending fails; try it
+with `npm run build && npx wrangler dev` and the settings in `.dev.vars`.
+
+Setup, once:
+
+1. Sign up at Resend **with the address requests should go to**, and create
+   an API key (Sending access).
+2. Cloudflare → Workers → tally → Settings → Variables and Secrets:
+   `RESEND_API_KEY` (secret), `FEEDBACK_TO` (that address), and
+   `TURNSTILE_SECRET_KEY` (secret; the same Turnstile widget's secret as in
+   Supabase, see "Captcha"). Without the first two the form answers "Could not
+   send"; without the Turnstile secret, tokens are not checked.
+3. Optional: verify a domain in Resend and set `FEEDBACK_FROM`
+   (`Tally <feedback@your-domain>`). Until then mail comes from Resend's
+   shared `onboarding@resend.dev`, which may only send to the Resend account's
+   own address.
+
 ## PWA notes
 
 - Service worker is only generated on `build`; test install with `npm run preview`.

@@ -420,6 +420,16 @@ export const nl: Messages = {
     lastError: 'Laatste fout',
     clear: 'Wissen',
     about: 'Over',
+    requestFeature: 'Functie voorstellen',
+    featureDescription:
+      'Wat zou Tally beter maken voor jou? Je idee gaat rechtstreeks naar de ontwikkelaar.',
+    featureIdea: 'Je idee',
+    featurePlaceholder: 'Bijvoorbeeld: een rusttimer tussen sets',
+    featureEmail: 'E-mail voor een antwoord (optioneel)',
+    featureSend: 'Versturen',
+    featureSent: 'Bedankt! Je idee is onderweg.',
+    featureFailed:
+      'Versturen mislukt. Controleer je verbinding en probeer het opnieuw.',
   },
 
   sync: {

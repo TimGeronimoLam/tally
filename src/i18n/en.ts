@@ -442,6 +442,15 @@ export const en = {
     lastError: 'Last error',
     clear: 'Clear',
     about: 'About',
+    requestFeature: 'Request a feature',
+    featureDescription:
+      'What would make Tally better for you? Your idea goes straight to the developer.',
+    featureIdea: 'Your idea',
+    featurePlaceholder: 'For example: a rest timer between sets',
+    featureEmail: 'Email for a reply (optional)',
+    featureSend: 'Send',
+    featureSent: 'Thanks! Your idea is on its way.',
+    featureFailed: 'Could not send. Check your connection and try again.',
   },
 
   sync: {
