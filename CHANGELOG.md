@@ -8,6 +8,14 @@ the versions and dates and a test keeps the three in step.
 Releases before 1.5.0 are reconstructed from the deploy history: the app
 shipped as 1.0.0 and every push to `main` went live without a version bump.
 
+## 1.6.1 – 2026-11-15
+
+- A member's stats screen (tap them on a challenge leaderboard) shows their
+  profile picture full width, with the name and placing over a gradient.
+- Photos are stored at 768px instead of 256px; the encoder lowers JPEG
+  quality, then size, to stay under the bucket's 200 KB limit. Existing
+  photos stay at 256px until re-uploaded. No migration.
+
 ## 1.6.0 – 2026-11-11
 
 - Profile pictures: upload one under Account; it shows on challenge

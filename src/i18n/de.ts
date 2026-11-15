@@ -534,6 +534,10 @@ export const de: Messages = {
     updated: (v: string) => `Tally ist jetzt Version ${v}`,
     /** Per version, newest first; one sentence per change, as the user sees it. */
     notes: {
+      '1.6.1': [
+        'Tippe in einer Challenge-Rangliste auf jemanden, um sein Foto groß über seinen Statistiken zu sehen.',
+        'Profilfotos, die du ab jetzt hochlädst, sind viel schärfer.',
+      ],
       '1.6.0': [
         'Profilfotos: Füge eins unter Konto hinzu. Es erscheint neben deinem Namen in Challenge-Ranglisten.',
         'Lösche dein Konto unter Konto → Daten. Deine Sätze, dein Foto und deine Challenges gehen mit.',

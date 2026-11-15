@@ -530,6 +530,10 @@ export const nl: Messages = {
     updated: (v: string) => `Tally is nu versie ${v}`,
     /** Per version, newest first; one sentence per change, as the user sees it. */
     notes: {
+      '1.6.1': [
+        'Tik op iemand in een challenge-ranglijst om diens foto groot boven de statistieken te zien.',
+        "Profielfoto's die je vanaf nu uploadt, zijn veel scherper.",
+      ],
       '1.6.0': [
         "Profielfoto's: voeg er een toe onder Account. Hij staat naast je naam in challenge-ranglijsten.",
         'Verwijder je account onder Account → Gegevens. Je sets, foto en challenges gaan mee.',

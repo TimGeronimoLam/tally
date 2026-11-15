@@ -522,6 +522,10 @@ export const es: Messages = {
     updated: (v: string) => `Tally se ha actualizado a la ${v}`,
     /** Per version, newest first; one sentence per change, as the user sees it. */
     notes: {
+      '1.6.1': [
+        'Toca a alguien en la clasificación de un reto para ver su foto en grande, encima de sus estadísticas.',
+        'Las fotos de perfil que subas a partir de ahora se ven mucho más nítidas.',
+      ],
       '1.6.0': [
         'Fotos de perfil: añade una en Cuenta. Aparece junto a tu nombre en las clasificaciones de los retos.',
         'Elimina tu cuenta en Cuenta → Datos. Tus series, tu foto y tus retos se van con ella.',

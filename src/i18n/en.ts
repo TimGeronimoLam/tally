@@ -555,6 +555,10 @@ export const en = {
     updated: (v: string) => `Tally updated to ${v}`,
     /** Per version, newest first; one sentence per change, as the user sees it. */
     notes: {
+      '1.6.1': [
+        'Tap someone on a challenge leaderboard to see their photo big, at the top of their stats.',
+        'Profile photos you upload from now on are much sharper.',
+      ],
       '1.6.0': [
         'Profile photos: add one under Account. It shows next to your name on challenge leaderboards.',
         'Delete your account under Account → Data. Your sets, photo and challenges go with it.',
