@@ -8,11 +8,22 @@ export interface AvatarProps {
   src?: string | null
   /** Accent fill, used for the current user. */
   highlight?: boolean
+  /**
+   * 32px circle for list rows (default), 80px circle for a profile header,
+   * or a rounded square as wide as its container for a profile photo.
+   */
+  size?: 'md' | 'xl' | 'full'
   className?: string
 }
 
-/** 32px avatar for leaderboards: a photo when there is one, else an initial. */
-export function Avatar({ initial, src, highlight, className }: AvatarProps) {
+/** Round avatar: a photo when there is one, else an initial. */
+export function Avatar({
+  initial,
+  src,
+  highlight,
+  size = 'md',
+  className,
+}: AvatarProps) {
   // Keyed by URL, so a new picture gets a fresh try after a failed one.
   const [state, setState] = useState<{ src: string; ok: boolean } | null>(null)
   const loaded = src != null && state?.src === src && state.ok
@@ -21,7 +32,12 @@ export function Avatar({ initial, src, highlight, className }: AvatarProps) {
     <span
       aria-hidden="true"
       className={cn(
-        'relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full text-[13px] font-semibold',
+        'relative flex shrink-0 items-center justify-center overflow-hidden font-semibold',
+        size === 'full'
+          ? 'aspect-square w-full rounded-2xl text-[96px]'
+          : size === 'xl'
+            ? 'size-20 rounded-full text-[32px]'
+            : 'size-8 rounded-full text-[13px]',
         highlight ? 'bg-accent text-accent-fg' : 'bg-surface-2 text-fg',
         className,
       )}

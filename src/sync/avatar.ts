@@ -13,9 +13,42 @@ import { supabase } from '../lib/supabase.ts'
  */
 
 const BUCKET = 'avatars'
-/** Edge length of the stored picture; shown at up to 40px, so 3x and then some. */
-export const AVATAR_SIZE = 256
-const QUALITY = 0.85
+/**
+ * Edge length of the stored picture. The member stats screen shows it
+ * full width (about 335px on a phone), so this is sharp at 2x.
+ */
+export const AVATAR_SIZE = 768
+/** The bucket's `file_size_limit` (migration 20261111000000): 200 KB. */
+export const AVATAR_MAX_BYTES = 204_800
+/**
+ * Encodings to try in order until one fits AVATAR_MAX_BYTES: lower JPEG
+ * quality first, then a smaller picture for very busy photos.
+ */
+export const AVATAR_ATTEMPTS: readonly { size: number; quality: number }[] = [
+  { size: AVATAR_SIZE, quality: 0.85 },
+  { size: AVATAR_SIZE, quality: 0.75 },
+  { size: AVATAR_SIZE, quality: 0.65 },
+  { size: 512, quality: 0.75 },
+  { size: 512, quality: 0.6 },
+]
+
+/**
+ * The first encoding from `attempts` no larger than `maxBytes`, or the
+ * last one if none fits (the upload then reports the size error).
+ */
+export async function firstThatFits<A>(
+  attempts: readonly A[],
+  encode: (attempt: A) => Promise<Blob>,
+  maxBytes: number,
+): Promise<Blob> {
+  let blob: Blob | null = null
+  for (const attempt of attempts) {
+    blob = await encode(attempt)
+    if (blob.size <= maxBytes) return blob
+  }
+  if (!blob) throw new Error('no attempts')
+  return blob
+}
 
 function requireClient() {
   if (!supabase) throw new Error(messages().errors.syncNotConfigured)
@@ -57,9 +90,10 @@ export function squareCrop(
 }
 
 /**
- * Centre-crop to a square and scale to AVATAR_SIZE as JPEG. The browser
- * applies the photo's EXIF rotation when decoding. iOS hands over HEIC
- * photos as JPEG from a file input.
+ * Centre-crop to a square and scale to AVATAR_SIZE as JPEG, at the best
+ * quality that fits the bucket's size limit. The browser applies the
+ * photo's EXIF rotation when decoding. iOS hands over HEIC photos as JPEG
+ * from a file input.
  */
 export async function resizeAvatar(file: Blob): Promise<Blob> {
   let bitmap: ImageBitmap
@@ -70,22 +104,33 @@ export async function resizeAvatar(file: Blob): Promise<Blob> {
   }
   try {
     const { sx, sy, size } = squareCrop(bitmap.width, bitmap.height)
-    const out = Math.min(AVATAR_SIZE, size)
     const canvas = document.createElement('canvas')
-    canvas.width = out
-    canvas.height = out
     const ctx = canvas.getContext('2d')
     if (!ctx) throw new Error(messages().sync.photoUnreadable)
-    // JPEG has no transparency; a transparent PNG would turn black.
-    ctx.fillStyle = '#fff'
-    ctx.fillRect(0, 0, out, out)
-    ctx.imageSmoothingQuality = 'high'
-    ctx.drawImage(bitmap, sx, sy, size, size, 0, 0, out, out)
-    const blob = await new Promise<Blob | null>((resolve) =>
-      canvas.toBlob(resolve, 'image/jpeg', QUALITY),
+    let drawn = 0
+    return await firstThatFits(
+      AVATAR_ATTEMPTS,
+      async (attempt) => {
+        const out = Math.min(attempt.size, size)
+        // Redraw only when the size changes, not for each quality.
+        if (drawn !== out) {
+          drawn = out
+          canvas.width = out
+          canvas.height = out
+          // JPEG has no transparency; a transparent PNG would turn black.
+          ctx.fillStyle = '#fff'
+          ctx.fillRect(0, 0, out, out)
+          ctx.imageSmoothingQuality = 'high'
+          ctx.drawImage(bitmap, sx, sy, size, size, 0, 0, out, out)
+        }
+        const blob = await new Promise<Blob | null>((resolve) =>
+          canvas.toBlob(resolve, 'image/jpeg', attempt.quality),
+        )
+        if (!blob) throw new Error(messages().sync.photoUnreadable)
+        return blob
+      },
+      AVATAR_MAX_BYTES,
     )
-    if (!blob) throw new Error(messages().sync.photoUnreadable)
-    return blob
   } finally {
     bitmap.close()
   }

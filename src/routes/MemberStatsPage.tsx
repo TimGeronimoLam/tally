@@ -8,6 +8,7 @@ import {
   useMemberDays,
 } from '../challenges/index.ts'
 import {
+  Avatar,
   Card,
   Gutter,
   Heatmap,
@@ -17,6 +18,7 @@ import {
   TileGrid,
 } from '../components/ui/index.ts'
 import { useLocale, useT } from '../i18n/index.ts'
+import { cn } from '../lib/cn.ts'
 import { parseDayKey } from '../lib/date.ts'
 import {
   formatDayMonth,
@@ -27,6 +29,7 @@ import {
 } from '../lib/format.ts'
 import { useNav } from '../lib/nav.ts'
 import { buildHeatmap, statsFromDailyTotals } from '../stats/index.ts'
+import { avatarUrl } from '../sync/index.ts'
 
 /**
  * One member's stats in a challenge: the challenge's exercise, inside its
@@ -99,6 +102,15 @@ export function MemberStatsPage() {
 
   const status = challengeStatus(c)
   const unit = unitName(c.unit, t)
+  const photo = avatarUrl(member.userId, member.avatarUpdatedAt)
+  const avatar = (size: 'full' | 'xl') => (
+    <Avatar
+      size={size}
+      initial={member.displayName}
+      src={photo}
+      highlight={member.userId === userId}
+    />
+  )
   const selectedDay = picked ?? span.last
   // Until the first load, tiles show a dash rather than zeros.
   const value = (n: number) => (days.data ? formatNumber(n) : '—')
@@ -109,8 +121,11 @@ export function MemberStatsPage() {
         title={member.displayName}
         backLabel={t.memberStats.backLabel}
         onBack={back}
+        // A full-width photo under the name; without one, a big initial
+        // would be wasted space, so it stays a circle above it.
+        {...(photo ? { cover: avatar('full') } : { leading: avatar('xl') })}
       >
-        <span className="text-sm text-muted">
+        <span className={cn('text-sm', photo ? 'text-white/85' : 'text-muted')}>
           {status === 'upcoming'
             ? c.name
             : `${t.challenges.placing(t.ordinal(member.rank), rows.length)} · ${c.name}`}

@@ -135,6 +135,13 @@ export interface ScreenNavProps {
   action?: ReactNode
   /** Large title under the bar; moves into the bar once scrolled under it. */
   title: string
+  /** Rendered above the large title, e.g. a profile picture. */
+  leading?: ReactNode
+  /**
+   * A full-width picture with the large title and `children` laid over its
+   * lower half in white, on a dark gradient. Replaces `leading`.
+   */
+  cover?: ReactNode
   /** Rendered under the large title, e.g. a subtitle line. */
   children?: ReactNode
 }
@@ -150,6 +157,8 @@ export function ScreenNav({
   backLabel,
   action,
   title,
+  leading,
+  cover,
   children,
 }: ScreenNavProps) {
   const t = useT()
@@ -193,15 +202,34 @@ export function ScreenNav({
         {action ?? <span className="size-11" />}
       </div>
       <PullIndicator />
-      <Gutter className="flex flex-col gap-1 pt-2">
-        <h1
-          ref={heading}
-          className="text-[28px] font-semibold tracking-[-0.02em]"
-        >
-          {title}
-        </h1>
-        {children}
-      </Gutter>
+      {cover ? (
+        <Gutter className="pt-2">
+          <div className="relative overflow-hidden rounded-2xl">
+            {cover}
+            {/* Darkens the lower half so the white title reads on any photo. */}
+            <div className="absolute inset-x-0 bottom-0 flex h-1/2 flex-col justify-end gap-1 bg-linear-to-t from-black/75 via-black/40 to-transparent px-4 pb-4 text-white">
+              <h1
+                ref={heading}
+                className="text-[28px] font-semibold tracking-[-0.02em]"
+              >
+                {title}
+              </h1>
+              {children}
+            </div>
+          </div>
+        </Gutter>
+      ) : (
+        <Gutter className="flex flex-col gap-1 pt-2">
+          {leading && <div className="mb-2">{leading}</div>}
+          <h1
+            ref={heading}
+            className="text-[28px] font-semibold tracking-[-0.02em]"
+          >
+            {title}
+          </h1>
+          {children}
+        </Gutter>
+      )}
     </>
   )
 }
